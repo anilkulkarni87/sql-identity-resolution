@@ -1,0 +1,3 @@
+table_id,source_name,trust_rank,is_active
+customer,CRM,1,true
+transactions,POS,2,true

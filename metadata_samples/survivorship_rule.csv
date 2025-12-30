@@ -1,0 +1,5 @@
+attribute_name,strategy,source_priority_list,recency_field
+email_primary,SOURCE_PRIORITY,customer>transactions,record_updated_at
+phone_primary,SOURCE_PRIORITY,customer>transactions,record_updated_at
+first_name,MOST_RECENT,,record_updated_at
+last_name,MOST_RECENT,,record_updated_at
