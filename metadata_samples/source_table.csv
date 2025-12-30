@@ -1,0 +1,3 @@
+table_id,table_fqn,entity_type,entity_key_expr,watermark_column,watermark_lookback_minutes,is_active
+customer,prod.crm.customer,PERSON,customer_id,rec_create_dt,0,true
+transactions,prod.sales.transactions,PERSON,order_id||'-'||line_id,load_ts,0,true

@@ -1,0 +1,9 @@
+table_id,attribute_name,attribute_expr
+customer,record_updated_at,rec_update_dt
+customer,first_name,first_name
+customer,last_name,last_name
+customer,email_raw,email
+customer,phone_raw,phone
+transactions,record_updated_at,load_ts
+transactions,email_raw,customer_email
+transactions,phone_raw,customer_phone
