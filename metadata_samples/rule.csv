@@ -1,4 +1,0 @@
-rule_id,rule_name,is_active,priority,identifier_type,canonicalize,allow_hashed,require_non_null
-R_EMAIL_EXACT,Email exact match,true,1,EMAIL,LOWERCASE,true,true
-R_PHONE_EXACT,Phone exact match,true,2,PHONE,NONE,true,true
-R_LOYALTY_EXACT,Loyalty ID exact match,true,3,LOYALTY_ID,NONE,true,true

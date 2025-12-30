@@ -1,0 +1,17 @@
+{
+  "name": "IDR_Run",
+  "tasks": [
+    {
+      "task_key": "idr_run",
+      "notebook_task": {
+        "notebook_path": "/Repos/<user>/<repo>/sql/databricks/notebooks/IDR_Run",
+        "base_parameters": {
+          "RUN_MODE": "INCR",
+          "MAX_ITERS": "30",
+          "RUN_ID": ""
+        }
+      },
+      "existing_cluster_id": "<cluster_id>"
+    }
+  ]
+}

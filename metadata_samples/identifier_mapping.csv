@@ -1,6 +1,0 @@
-table_id,identifier_type,identifier_value_expr,is_hashed
-customer,EMAIL,email,false
-customer,PHONE,phone,false
-customer,LOYALTY_ID,loyalty_id,false
-transactions,EMAIL,customer_email,false
-transactions,PHONE,customer_phone,false
