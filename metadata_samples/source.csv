@@ -1,3 +1,6 @@
 table_id,source_name,trust_rank,is_active
 customer,CRM,1,true
-transactions,POS,2,true
+loyalty_accounts,Loyalty,1,true
+store_visits,Store,2,true
+transactions,POS,3,true
+web_events,Digital,4,true

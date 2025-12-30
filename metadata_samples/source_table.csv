@@ -1,3 +1,6 @@
 table_id,table_fqn,entity_type,entity_key_expr,watermark_column,watermark_lookback_minutes,is_active
-customer,prod.crm.customer,PERSON,customer_id,rec_create_dt,0,true
-transactions,prod.sales.transactions,PERSON,order_id||'-'||line_id,load_ts,0,true
+customer,main.crm.customer,PERSON,customer_id,rec_create_dt,0,true
+transactions,main.sales.transactions,PERSON,order_id||'-'||line_id,load_ts,0,true
+loyalty_accounts,main.loyalty.loyalty_accounts,PERSON,loyalty_account_id,updated_at,0,true
+web_events,main.digital.web_events,PERSON,event_id,event_ts,0,true
+store_visits,main.store.store_visits,PERSON,visit_id,visit_ts,0,true

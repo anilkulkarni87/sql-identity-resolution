@@ -1,4 +1,5 @@
 
+CREATE SCHEMA IF NOT EXISTS idr_work;
 CREATE SCHEMA IF NOT EXISTS idr_out;
 
 CREATE TABLE IF NOT EXISTS idr_out.identity_edges_current (
@@ -7,11 +8,35 @@ CREATE TABLE IF NOT EXISTS idr_out.identity_edges_current (
   right_entity_key STRING,
   identifier_type STRING,
   identifier_value_norm STRING,
-  first_seen_ts TIMESTAMP
+  first_seen_ts TIMESTAMP,
+  last_seen_ts TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS idr_out.identity_resolved_membership_current (
   entity_key STRING,
   resolved_id STRING,
   updated_ts TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS idr_out.identity_clusters_current (
+  resolved_id STRING,
+  cluster_size BIGINT,
+  updated_ts TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS idr_out.golden_profile_current (
+  resolved_id STRING,
+  email_primary STRING,
+  phone_primary STRING,
+  first_name STRING,
+  last_name STRING,
+  updated_ts TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS idr_out.rule_match_audit_current (
+  run_id STRING,
+  rule_id STRING,
+  edges_created BIGINT,
+  started_at TIMESTAMP,
+  ended_at TIMESTAMP
 );

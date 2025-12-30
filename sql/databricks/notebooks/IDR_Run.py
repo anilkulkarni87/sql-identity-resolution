@@ -9,30 +9,44 @@
 
 # COMMAND ----------
 from datetime import datetime
+import time
 import uuid
 
 # COMMAND ----------
 dbutils.widgets.text("RUN_MODE", "INCR")   # INCR | FULL
 dbutils.widgets.text("RUN_ID", "")         # optional
 dbutils.widgets.text("MAX_ITERS", "30")    # label propagation max iters
+dbutils.widgets.text("REPO_ROOT", "")      # optional override if notebook path detection fails
 
 RUN_MODE = dbutils.widgets.get("RUN_MODE").strip().upper()
 RUN_ID = dbutils.widgets.get("RUN_ID").strip() or f"run_{uuid.uuid4().hex}"
 MAX_ITERS = int(dbutils.widgets.get("MAX_ITERS"))
+REPO_ROOT = dbutils.widgets.get("REPO_ROOT").strip()
 
 RUN_TS = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")  # UTC
+_run_start_ts = time.time()
 print({"RUN_MODE": RUN_MODE, "RUN_ID": RUN_ID, "RUN_TS_UTC": RUN_TS, "MAX_ITERS": MAX_ITERS})
 
 # COMMAND ----------
 # Auto-detect repo root (no user input)
-nb_path = dbutils.notebook.getContext().notebookPath().get()
-marker = "/sql/databricks/notebooks/"
-if marker not in nb_path:
-    raise RuntimeError(f"Unexpected notebook path: {nb_path}. Expected to contain '{marker}'")
+nb_path = None
+try:
+    nb_path = dbutils.notebook.getContext().notebookPath().get()
+except Exception:
+    nb_path = None
 
-repo_root = "/Workspace" + nb_path.split(marker)[0]
+marker = "/sql/databricks/notebooks/"
+if REPO_ROOT:
+    repo_root = REPO_ROOT
+    sql_common_root = f"{repo_root}/sql/common"
+    print({"notebook_path": nb_path, "repo_root": repo_root, "sql_common_root": sql_common_root, "source": "REPO_ROOT widget"})
+elif nb_path and marker in nb_path:
+    repo_root = "/Workspace" + nb_path.split(marker)[0]
+    sql_common_root = f"{repo_root}/sql/common"
+    print({"notebook_path": nb_path, "repo_root": repo_root, "sql_common_root": sql_common_root, "source": "auto-detect"})
+else:
+    raise RuntimeError("Cannot determine repo root. Set the REPO_ROOT widget to your repo path (e.g. /Workspace/Repos/<user>/<repo>).")
 sql_common_root = f"{repo_root}/sql/common"
-print({"notebook_path": nb_path, "repo_root": repo_root, "sql_common_root": sql_common_root})
 
 # COMMAND ----------
 def q(sql: str):
@@ -56,6 +70,10 @@ def run_sql_file(path: str, replacements=None):
 
 # COMMAND ----------
 # Preflight validation
+q("CREATE SCHEMA IF NOT EXISTS idr_meta")
+q("CREATE SCHEMA IF NOT EXISTS idr_work")
+q("CREATE SCHEMA IF NOT EXISTS idr_out")
+
 def table_exists(fqn: str) -> bool:
     parts = fqn.split(".")
     if len(parts) != 3:
@@ -63,6 +81,43 @@ def table_exists(fqn: str) -> bool:
     catalog, schema, table = parts
     rows = collect(f"SHOW TABLES IN {catalog}.{schema} LIKE '{table}'")
     return len(rows) > 0
+
+def table_in_schema(schema: str, table: str) -> bool:
+    rows = collect(f"SHOW TABLES IN {schema} LIKE '{table}'")
+    return len(rows) > 0
+
+required_meta_tables = [
+    "source_table",
+    "rule",
+    "identifier_mapping",
+    "source",
+    "entity_attribute_mapping",
+    "survivorship_rule",
+]
+missing_meta = [t for t in required_meta_tables if not table_in_schema("idr_meta", t)]
+if missing_meta:
+    raise RuntimeError("Missing metadata tables in idr_meta.* (run 00_ddl_meta.sql): " + ", ".join(missing_meta))
+
+required_out_tables = [
+    "identity_edges_current",
+    "identity_resolved_membership_current",
+    "identity_clusters_current",
+    "golden_profile_current",
+    "rule_match_audit_current",
+]
+missing_out = [t for t in required_out_tables if not table_in_schema("idr_out", t)]
+if missing_out:
+    raise RuntimeError("Missing output tables in idr_out.* (run 01_ddl_outputs.sql): " + ", ".join(missing_out))
+
+meta_counts = {}
+empty_meta = []
+for t in required_meta_tables:
+    c = q(f"SELECT COUNT(*) AS c FROM idr_meta.{t}").first()["c"]
+    meta_counts[t] = c
+    if c == 0:
+        empty_meta.append(t)
+if empty_meta:
+    raise RuntimeError("Metadata tables are empty; load metadata first: " + ", ".join(empty_meta))
 
 run_sql_text('''
 MERGE INTO idr_meta.run_state tgt
@@ -104,6 +159,7 @@ if bad_types:
     raise RuntimeError("identifier_mapping contains identifier_type(s) with no active rule in idr_meta.rule:\n" + ", ".join(bad_types))
 
 print("✅ Preflight OK", {"active_tables": len(source_rows), "mappings": len(mapping_rows), "active_rules": len(active_rule_types)})
+print("ℹ️ Metadata counts", meta_counts)
 
 # COMMAND ----------
 # Builders
@@ -114,7 +170,7 @@ def build_where(wm_col, last_wm, lookback_min):
     lb = int(lookback_min or 0)
     if lb > 0:
         return f"{wm_col} >= ({last} - INTERVAL {lb} MINUTES)"
-    return f"{wm_col} > {last}"
+    return f"{wm_col} >= {last}"
 
 def build_entities_delta_sql(rows):
     sels = []
@@ -246,7 +302,9 @@ SELECT entity_key, entity_key AS label
 FROM idr_work.subgraph_nodes
 ''')
 
+iterations = 0
 for i in range(MAX_ITERS):
+    iterations = i + 1
     run_sql_file(f"{sql_common_root}/31_label_propagation_step.sql", replacements={"${RUN_ID}": RUN_ID})
     delta = q("SELECT delta_changed FROM idr_work.lp_stats").first()[0]
     print(f"iter={i+1} delta_changed={delta}")
@@ -330,5 +388,19 @@ WHEN MATCHED THEN UPDATE SET tgt.edges_created=src.edges_created, tgt.started_at
 WHEN NOT MATCHED THEN INSERT (run_id,rule_id,edges_created,started_at,ended_at)
 VALUES (src.run_id,src.rule_id,src.edges_created,src.started_at,src.ended_at)
 ''')
+
+entities_delta_cnt = q("SELECT COUNT(*) AS c FROM idr_work.entities_delta").first()["c"]
+edges_new_cnt = q("SELECT COUNT(*) AS c FROM idr_work.edges_new").first()["c"]
+membership_cnt = q("SELECT COUNT(*) AS c FROM idr_out.identity_resolved_membership_current").first()["c"]
+audit_rows = [row.asDict() for row in q("SELECT rule_id, edges_created FROM idr_work.audit_edges_created").collect()]
+print("ℹ️ Run summary", {
+    "RUN_ID": RUN_ID,
+    "RUN_MODE": RUN_MODE,
+    "iterations": iterations if 'iterations' in locals() else 0,
+    "entities_delta": entities_delta_cnt,
+    "edges_new": edges_new_cnt,
+    "membership_current": membership_cnt,
+    "edges_created_by_rule": audit_rows,
+})
 
 print("✅ IDR run completed", {"RUN_ID": RUN_ID, "RUN_MODE": RUN_MODE})

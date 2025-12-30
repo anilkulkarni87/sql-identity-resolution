@@ -9,3 +9,6 @@ Tables created:
 - `main.loyalty.loyalty_accounts` (watermark: `updated_at`)
 - `main.digital.web_events` (watermark: `event_ts`)
 - `main.store.store_visits` (watermark: `visit_ts`)
+
+Use the matching metadata templates in `metadata_samples/` (source_table, identifier_mapping, entity_attribute_mapping, etc.) to run `IDR_Run` against these demo tables.
+For a turnkey setup, run `sql/databricks/notebooks/IDR_LoadMetadata.py` to ingest the sample CSVs into `idr_meta.*` before executing `IDR_Run.py`.
