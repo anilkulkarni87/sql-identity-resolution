@@ -1,127 +1,131 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
-         <loc>https://github.com/anilkulkarni87/sql-identity-resolution/</loc>
+         <loc>https://anilkulkarni87.github.io/sql-identity-resolution/</loc>
          <lastmod>2025-12-31</lastmod>
     </url>
     <url>
-         <loc>https://github.com/anilkulkarni87/sql-identity-resolution/architecture/</loc>
+         <loc>https://anilkulkarni87.github.io/sql-identity-resolution/architecture/</loc>
          <lastmod>2025-12-31</lastmod>
     </url>
     <url>
-         <loc>https://github.com/anilkulkarni87/sql-identity-resolution/cluster_sizing/</loc>
+         <loc>https://anilkulkarni87.github.io/sql-identity-resolution/cluster_sizing/</loc>
          <lastmod>2025-12-31</lastmod>
     </url>
     <url>
-         <loc>https://github.com/anilkulkarni87/sql-identity-resolution/metadata_configuration/</loc>
+         <loc>https://anilkulkarni87.github.io/sql-identity-resolution/metadata_configuration/</loc>
          <lastmod>2025-12-31</lastmod>
     </url>
     <url>
-         <loc>https://github.com/anilkulkarni87/sql-identity-resolution/runbook/</loc>
+         <loc>https://anilkulkarni87.github.io/sql-identity-resolution/runbook/</loc>
          <lastmod>2025-12-31</lastmod>
     </url>
     <url>
-         <loc>https://github.com/anilkulkarni87/sql-identity-resolution/sample_data/</loc>
+         <loc>https://anilkulkarni87.github.io/sql-identity-resolution/sample_data/</loc>
          <lastmod>2025-12-31</lastmod>
     </url>
     <url>
-         <loc>https://github.com/anilkulkarni87/sql-identity-resolution/scale_considerations/</loc>
+         <loc>https://anilkulkarni87.github.io/sql-identity-resolution/scale_considerations/</loc>
          <lastmod>2025-12-31</lastmod>
     </url>
     <url>
-         <loc>https://github.com/anilkulkarni87/sql-identity-resolution/testing_bigquery/</loc>
+         <loc>https://anilkulkarni87.github.io/sql-identity-resolution/testing_bigquery/</loc>
          <lastmod>2025-12-31</lastmod>
     </url>
     <url>
-         <loc>https://github.com/anilkulkarni87/sql-identity-resolution/testing_databricks/</loc>
+         <loc>https://anilkulkarni87.github.io/sql-identity-resolution/testing_databricks/</loc>
          <lastmod>2025-12-31</lastmod>
     </url>
     <url>
-         <loc>https://github.com/anilkulkarni87/sql-identity-resolution/testing_duckdb/</loc>
+         <loc>https://anilkulkarni87.github.io/sql-identity-resolution/testing_duckdb/</loc>
          <lastmod>2025-12-31</lastmod>
     </url>
     <url>
-         <loc>https://github.com/anilkulkarni87/sql-identity-resolution/testing_snowflake/</loc>
+         <loc>https://anilkulkarni87.github.io/sql-identity-resolution/testing_snowflake/</loc>
          <lastmod>2025-12-31</lastmod>
     </url>
     <url>
-         <loc>https://github.com/anilkulkarni87/sql-identity-resolution/concepts/architecture/</loc>
+         <loc>https://anilkulkarni87.github.io/sql-identity-resolution/concepts/architecture/</loc>
          <lastmod>2025-12-31</lastmod>
     </url>
     <url>
-         <loc>https://github.com/anilkulkarni87/sql-identity-resolution/concepts/data-model/</loc>
+         <loc>https://anilkulkarni87.github.io/sql-identity-resolution/concepts/data-model/</loc>
          <lastmod>2025-12-31</lastmod>
     </url>
     <url>
-         <loc>https://github.com/anilkulkarni87/sql-identity-resolution/concepts/matching-algorithm/</loc>
+         <loc>https://anilkulkarni87.github.io/sql-identity-resolution/concepts/matching-algorithm/</loc>
          <lastmod>2025-12-31</lastmod>
     </url>
     <url>
-         <loc>https://github.com/anilkulkarni87/sql-identity-resolution/deployment/ci-cd/</loc>
+         <loc>https://anilkulkarni87.github.io/sql-identity-resolution/deployment/ci-cd/</loc>
          <lastmod>2025-12-31</lastmod>
     </url>
     <url>
-         <loc>https://github.com/anilkulkarni87/sql-identity-resolution/deployment/scheduling/</loc>
+         <loc>https://anilkulkarni87.github.io/sql-identity-resolution/deployment/scheduling/</loc>
          <lastmod>2025-12-31</lastmod>
     </url>
     <url>
-         <loc>https://github.com/anilkulkarni87/sql-identity-resolution/deployment/security/</loc>
+         <loc>https://anilkulkarni87.github.io/sql-identity-resolution/deployment/security/</loc>
          <lastmod>2025-12-31</lastmod>
     </url>
     <url>
-         <loc>https://github.com/anilkulkarni87/sql-identity-resolution/getting-started/overview/</loc>
+         <loc>https://anilkulkarni87.github.io/sql-identity-resolution/getting-started/overview/</loc>
          <lastmod>2025-12-31</lastmod>
     </url>
     <url>
-         <loc>https://github.com/anilkulkarni87/sql-identity-resolution/getting-started/quickstart/</loc>
+         <loc>https://anilkulkarni87.github.io/sql-identity-resolution/getting-started/quickstart/</loc>
          <lastmod>2025-12-31</lastmod>
     </url>
     <url>
-         <loc>https://github.com/anilkulkarni87/sql-identity-resolution/getting-started/platforms/bigquery/</loc>
+         <loc>https://anilkulkarni87.github.io/sql-identity-resolution/getting-started/platforms/bigquery/</loc>
          <lastmod>2025-12-31</lastmod>
     </url>
     <url>
-         <loc>https://github.com/anilkulkarni87/sql-identity-resolution/getting-started/platforms/databricks/</loc>
+         <loc>https://anilkulkarni87.github.io/sql-identity-resolution/getting-started/platforms/databricks/</loc>
          <lastmod>2025-12-31</lastmod>
     </url>
     <url>
-         <loc>https://github.com/anilkulkarni87/sql-identity-resolution/getting-started/platforms/duckdb/</loc>
+         <loc>https://anilkulkarni87.github.io/sql-identity-resolution/getting-started/platforms/duckdb/</loc>
          <lastmod>2025-12-31</lastmod>
     </url>
     <url>
-         <loc>https://github.com/anilkulkarni87/sql-identity-resolution/getting-started/platforms/snowflake/</loc>
+         <loc>https://anilkulkarni87.github.io/sql-identity-resolution/getting-started/platforms/snowflake/</loc>
          <lastmod>2025-12-31</lastmod>
     </url>
     <url>
-         <loc>https://github.com/anilkulkarni87/sql-identity-resolution/guides/configuration/</loc>
+         <loc>https://anilkulkarni87.github.io/sql-identity-resolution/guides/configuration/</loc>
          <lastmod>2025-12-31</lastmod>
     </url>
     <url>
-         <loc>https://github.com/anilkulkarni87/sql-identity-resolution/guides/dry-run-mode/</loc>
+         <loc>https://anilkulkarni87.github.io/sql-identity-resolution/guides/dry-run-mode/</loc>
          <lastmod>2025-12-31</lastmod>
     </url>
     <url>
-         <loc>https://github.com/anilkulkarni87/sql-identity-resolution/guides/metrics-monitoring/</loc>
+         <loc>https://anilkulkarni87.github.io/sql-identity-resolution/guides/metrics-monitoring/</loc>
          <lastmod>2025-12-31</lastmod>
     </url>
     <url>
-         <loc>https://github.com/anilkulkarni87/sql-identity-resolution/guides/production-hardening/</loc>
+         <loc>https://anilkulkarni87.github.io/sql-identity-resolution/guides/production-hardening/</loc>
          <lastmod>2025-12-31</lastmod>
     </url>
     <url>
-         <loc>https://github.com/anilkulkarni87/sql-identity-resolution/guides/troubleshooting/</loc>
+         <loc>https://anilkulkarni87.github.io/sql-identity-resolution/guides/troubleshooting/</loc>
          <lastmod>2025-12-31</lastmod>
     </url>
     <url>
-         <loc>https://github.com/anilkulkarni87/sql-identity-resolution/reference/cli-reference/</loc>
+         <loc>https://anilkulkarni87.github.io/sql-identity-resolution/performance/benchmark-results/</loc>
          <lastmod>2025-12-31</lastmod>
     </url>
     <url>
-         <loc>https://github.com/anilkulkarni87/sql-identity-resolution/reference/metrics-reference/</loc>
+         <loc>https://anilkulkarni87.github.io/sql-identity-resolution/reference/cli-reference/</loc>
          <lastmod>2025-12-31</lastmod>
     </url>
     <url>
-         <loc>https://github.com/anilkulkarni87/sql-identity-resolution/reference/schema-reference/</loc>
+         <loc>https://anilkulkarni87.github.io/sql-identity-resolution/reference/metrics-reference/</loc>
+         <lastmod>2025-12-31</lastmod>
+    </url>
+    <url>
+         <loc>https://anilkulkarni87.github.io/sql-identity-resolution/reference/schema-reference/</loc>
          <lastmod>2025-12-31</lastmod>
     </url>
 </urlset>

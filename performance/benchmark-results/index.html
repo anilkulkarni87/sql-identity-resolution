@@ -10,7 +10,7 @@
       
       
       
-        <link rel="canonical" href="https://anilkulkarni87.github.io/sql-identity-resolution/cluster_sizing/">
+        <link rel="canonical" href="https://anilkulkarni87.github.io/sql-identity-resolution/performance/benchmark-results/">
       
       
       
@@ -18,19 +18,19 @@
         
       
       
-      <link rel="icon" href="../assets/images/favicon.png">
+      <link rel="icon" href="../../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
     
     
       
-        <title>Cluster Sizing Guide - SQL Identity Resolution</title>
+        <title>IDR Performance Benchmark Results - SQL Identity Resolution</title>
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
       
         
-        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
       
       
 
@@ -49,7 +49,7 @@
       
     
     
-    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -74,7 +74,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#cluster-sizing-guide" class="md-skip">
+        <a href="#idr-performance-benchmark-results" class="md-skip">
           Skip to content
         </a>
       
@@ -88,7 +88,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href=".." title="SQL Identity Resolution" class="md-header__button md-logo" aria-label="SQL Identity Resolution" data-md-component="logo">
+    <a href="../.." title="SQL Identity Resolution" class="md-header__button md-logo" aria-label="SQL Identity Resolution" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -108,7 +108,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Cluster Sizing Guide
+              IDR Performance Benchmark Results
             
           </span>
         </div>
@@ -221,7 +221,7 @@
   
   
     <li class="md-tabs__item">
-      <a href=".." class="md-tabs__link">
+      <a href="../.." class="md-tabs__link">
         
   
   
@@ -242,7 +242,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../getting-started/overview/" class="md-tabs__link">
+        <a href="../../getting-started/overview/" class="md-tabs__link">
           
   
   
@@ -262,7 +262,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../concepts/architecture/" class="md-tabs__link">
+        <a href="../../concepts/architecture/" class="md-tabs__link">
           
   
   
@@ -282,7 +282,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../guides/configuration/" class="md-tabs__link">
+        <a href="../../guides/configuration/" class="md-tabs__link">
           
   
   
@@ -302,7 +302,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../deployment/scheduling/" class="md-tabs__link">
+        <a href="../../deployment/scheduling/" class="md-tabs__link">
           
   
   
@@ -322,7 +322,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../reference/cli-reference/" class="md-tabs__link">
+        <a href="../../reference/cli-reference/" class="md-tabs__link">
           
   
   
@@ -356,7 +356,7 @@
 
 <nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href=".." title="SQL Identity Resolution" class="md-nav__button md-logo" aria-label="SQL Identity Resolution" data-md-component="logo">
+    <a href="../.." title="SQL Identity Resolution" class="md-nav__button md-logo" aria-label="SQL Identity Resolution" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -386,7 +386,7 @@
   
   
     <li class="md-nav__item">
-      <a href=".." class="md-nav__link">
+      <a href="../.." class="md-nav__link">
         
   
   
@@ -467,7 +467,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../getting-started/overview/" class="md-nav__link">
+      <a href="../../getting-started/overview/" class="md-nav__link">
         
   
   
@@ -495,7 +495,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../getting-started/quickstart/" class="md-nav__link">
+      <a href="../../getting-started/quickstart/" class="md-nav__link">
         
   
   
@@ -577,7 +577,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../getting-started/platforms/duckdb/" class="md-nav__link">
+      <a href="../../getting-started/platforms/duckdb/" class="md-nav__link">
         
   
   
@@ -605,7 +605,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../getting-started/platforms/snowflake/" class="md-nav__link">
+      <a href="../../getting-started/platforms/snowflake/" class="md-nav__link">
         
   
   
@@ -633,7 +633,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../getting-started/platforms/bigquery/" class="md-nav__link">
+      <a href="../../getting-started/platforms/bigquery/" class="md-nav__link">
         
   
   
@@ -661,7 +661,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../getting-started/platforms/databricks/" class="md-nav__link">
+      <a href="../../getting-started/platforms/databricks/" class="md-nav__link">
         
   
   
@@ -758,7 +758,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../concepts/architecture/" class="md-nav__link">
+      <a href="../../concepts/architecture/" class="md-nav__link">
         
   
   
@@ -786,7 +786,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../concepts/matching-algorithm/" class="md-nav__link">
+      <a href="../../concepts/matching-algorithm/" class="md-nav__link">
         
   
   
@@ -814,7 +814,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../concepts/data-model/" class="md-nav__link">
+      <a href="../../concepts/data-model/" class="md-nav__link">
         
   
   
@@ -903,7 +903,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../guides/configuration/" class="md-nav__link">
+      <a href="../../guides/configuration/" class="md-nav__link">
         
   
   
@@ -931,7 +931,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../guides/dry-run-mode/" class="md-nav__link">
+      <a href="../../guides/dry-run-mode/" class="md-nav__link">
         
   
   
@@ -959,7 +959,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../guides/metrics-monitoring/" class="md-nav__link">
+      <a href="../../guides/metrics-monitoring/" class="md-nav__link">
         
   
   
@@ -987,7 +987,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../guides/production-hardening/" class="md-nav__link">
+      <a href="../../guides/production-hardening/" class="md-nav__link">
         
   
   
@@ -1015,7 +1015,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../guides/troubleshooting/" class="md-nav__link">
+      <a href="../../guides/troubleshooting/" class="md-nav__link">
         
   
   
@@ -1104,7 +1104,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../deployment/scheduling/" class="md-nav__link">
+      <a href="../../deployment/scheduling/" class="md-nav__link">
         
   
   
@@ -1132,7 +1132,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../deployment/ci-cd/" class="md-nav__link">
+      <a href="../../deployment/ci-cd/" class="md-nav__link">
         
   
   
@@ -1160,7 +1160,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../deployment/security/" class="md-nav__link">
+      <a href="../../deployment/security/" class="md-nav__link">
         
   
   
@@ -1249,7 +1249,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../reference/cli-reference/" class="md-nav__link">
+      <a href="../../reference/cli-reference/" class="md-nav__link">
         
   
   
@@ -1277,7 +1277,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../reference/schema-reference/" class="md-nav__link">
+      <a href="../../reference/schema-reference/" class="md-nav__link">
         
   
   
@@ -1305,7 +1305,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../reference/metrics-reference/" class="md-nav__link">
+      <a href="../../reference/metrics-reference/" class="md-nav__link">
         
   
   
@@ -1360,10 +1360,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#quick-reference" class="md-nav__link">
+  <a href="#test-environment-summary" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Quick Reference
+        Test Environment Summary
       
     </span>
   </a>
@@ -1371,22 +1371,211 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#platform-specific-sizing" class="md-nav__link">
+  <a href="#20-million-rows" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Platform-Specific Sizing
+        20 Million Rows
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Platform-Specific Sizing">
+    <nav class="md-nav" aria-label="20 Million Rows">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#databricks" class="md-nav__link">
+  <a href="#timing-results" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Databricks
+        Timing Results
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#metrics-results" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Metrics Results
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#consistency-check" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Consistency Check
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#50-million-rows" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        50 Million Rows
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="50 Million Rows">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#timing-results_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Timing Results
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#metrics-results_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Metrics Results
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#consistency-check_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Consistency Check
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#100-million-rows" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        100 Million Rows
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="100 Million Rows">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#timing-results_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Timing Results
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#metrics-results_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Metrics Results
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#consistency-check_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Consistency Check
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#performance-charts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Performance Charts
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Performance Charts">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#total-duration-by-platform-scale" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Total Duration by Platform &amp; Scale
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cost-analysis-cloud-only" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cost Analysis (Cloud Only)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#observations-insights" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Observations &amp; Insights
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Observations &amp; Insights">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#duckdb" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DuckDB
       
     </span>
   </a>
@@ -1416,118 +1605,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#duckdb" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        DuckDB
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#overlap-rate-impact" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Overlap Rate Impact
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#label-propagation-iterations" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Label Propagation Iterations
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#memory-considerations" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Memory Considerations
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#monitoring-during-scale-runs" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Monitoring During Scale Runs
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Monitoring During Scale Runs">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#key-metrics-to-watch" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Key Metrics to Watch
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#query-to-check-health" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Query to Check Health
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#cluster-health-check" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Cluster Health Check
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#running-scale-tests" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Running Scale Tests
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Running Scale Tests">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#databricks_1" class="md-nav__link">
+  <a href="#databricks" class="md-nav__link">
     <span class="md-ellipsis">
       
         Databricks
@@ -1537,33 +1615,28 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#snowflake_1" class="md-nav__link">
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#recommendations" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Snowflake
+        Recommendations
       
     </span>
   </a>
   
-</li>
+    <nav class="md-nav" aria-label="Recommendations">
+      <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#bigquery_1" class="md-nav__link">
+  <a href="#when-to-use-each-platform" class="md-nav__link">
     <span class="md-ellipsis">
       
-        BigQuery
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#duckdb_1" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        DuckDB
+        When to Use Each Platform
       
     </span>
   </a>
@@ -1572,6 +1645,28 @@
         
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#test-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Test Commands
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#appendix-test-data-distribution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Appendix: Test Data Distribution
+      
+    </span>
+  </a>
   
 </li>
       
@@ -1595,356 +1690,578 @@
   
 
 
-<h1 id="cluster-sizing-guide">Cluster Sizing Guide</h1>
-<p>Performance recommendations for running sql-identity-resolution at scale.</p>
-<h2 id="quick-reference">Quick Reference</h2>
+<h1 id="idr-performance-benchmark-results">IDR Performance Benchmark Results</h1>
+<blockquote>
+<p><strong>Status</strong>: Testing in progress<br />
+<strong>Dataset</strong>: Retail customer data (deterministic seed: 42)<br />
+<strong>Last Updated</strong>: <em>To be filled after testing</em></p>
+</blockquote>
+<hr />
+<h2 id="test-environment-summary">Test Environment Summary</h2>
 <table>
 <thead>
 <tr>
-<th>Rows per Table</th>
-<th>Total Rows</th>
-<th>Max Edge Pairs</th>
-<th>Expected Clusters</th>
+<th>Platform</th>
+<th>Configuration</th>
+<th>Instance Type</th>
+<th>Notes</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>100K</td>
-<td>500K</td>
-<td>~1M</td>
-<td>~40K-60K</td>
+<td>DuckDB</td>
+<td>Local / Docker</td>
+<td><em>TBD</em></td>
+<td>Single-node</td>
 </tr>
 <tr>
-<td>500K</td>
-<td>2.5M</td>
-<td>~5M</td>
-<td>~200K-300K</td>
+<td>Snowflake</td>
+<td><em>TBD</em></td>
+<td><em>Warehouse size</em></td>
+<td></td>
 </tr>
 <tr>
-<td>1M</td>
-<td>5M</td>
-<td>~10M</td>
-<td>~400K-600K</td>
+<td>BigQuery</td>
+<td><em>TBD</em></td>
+<td><em>On-demand/Slots</em></td>
+<td></td>
 </tr>
 <tr>
-<td>5M</td>
-<td>25M</td>
-<td>~50M</td>
-<td>~2M-3M</td>
-</tr>
-<tr>
-<td>10M</td>
-<td>50M</td>
-<td>~100M</td>
-<td>~4M-6M</td>
+<td>Databricks</td>
+<td><em>TBD</em></td>
+<td><em>Cluster config</em></td>
+<td></td>
 </tr>
 </tbody>
 </table>
-<h2 id="platform-specific-sizing">Platform-Specific Sizing</h2>
-<h3 id="databricks">Databricks</h3>
+<hr />
+<h2 id="20-million-rows">20 Million Rows</h2>
+<h3 id="timing-results">Timing Results</h3>
 <table>
 <thead>
 <tr>
-<th>Scale</th>
-<th>Cluster Type</th>
-<th>Workers</th>
-<th>Node Size</th>
-<th>Runtime</th>
+<th>Platform</th>
+<th>Data Load</th>
+<th>Entity Extract</th>
+<th>Edge Build</th>
+<th>Label Prop</th>
+<th>Output Gen</th>
+<th><strong>Total</strong></th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>100K</td>
-<td>Standard</td>
-<td>2-4</td>
-<td>m5.xlarge</td>
-<td>13.3 LTS</td>
+<td>DuckDB</td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+<td><strong><em>TBD</em></strong></td>
 </tr>
 <tr>
-<td>500K</td>
-<td>Standard</td>
-<td>4-8</td>
-<td>m5.xlarge</td>
-<td>13.3 LTS</td>
+<td>Snowflake</td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+<td><strong><em>TBD</em></strong></td>
 </tr>
 <tr>
-<td>1M</td>
-<td>Standard</td>
-<td>8-16</td>
-<td>m5.2xlarge</td>
-<td>13.3 LTS</td>
+<td>BigQuery</td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+<td><strong><em>TBD</em></strong></td>
 </tr>
 <tr>
-<td>5M</td>
-<td>Photon</td>
-<td>16-32</td>
-<td>m5.4xlarge</td>
-<td>14.3 LTS</td>
-</tr>
-<tr>
-<td>10M</td>
-<td>Photon</td>
-<td>32-64</td>
-<td>m5.4xlarge</td>
-<td>14.3 LTS</td>
+<td>Databricks</td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+<td><strong><em>TBD</em></strong></td>
 </tr>
 </tbody>
 </table>
-<p><strong>Spark Config for Scale:</strong>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># 1M+ rows</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="n">spark</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;spark.sql.shuffle.partitions&quot;</span><span class="p">,</span> <span class="s2">&quot;200&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">spark</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;spark.sql.adaptive.enabled&quot;</span><span class="p">,</span> <span class="s2">&quot;true&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="c1"># 5M+ rows  </span>
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="n">spark</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;spark.sql.shuffle.partitions&quot;</span><span class="p">,</span> <span class="s2">&quot;400&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="n">spark</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;spark.databricks.delta.optimizeWrite.enabled&quot;</span><span class="p">,</span> <span class="s2">&quot;true&quot;</span><span class="p">)</span>
-</code></pre></div></p>
-<h3 id="snowflake">Snowflake</h3>
+<h3 id="metrics-results">Metrics Results</h3>
 <table>
 <thead>
 <tr>
-<th>Scale</th>
-<th>Warehouse Size</th>
-<th>Expected Duration</th>
+<th>Platform</th>
+<th>Entities</th>
+<th>Edges</th>
+<th>Clusters</th>
+<th>Largest</th>
+<th>Singletons</th>
+<th>LP Iters</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>100K</td>
-<td>X-Small</td>
-<td>2-5 min</td>
+<td>DuckDB</td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
 </tr>
 <tr>
-<td>500K</td>
-<td>Small</td>
-<td>5-15 min</td>
+<td>Snowflake</td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
 </tr>
 <tr>
-<td>1M</td>
-<td>Medium</td>
-<td>15-30 min</td>
+<td>BigQuery</td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
 </tr>
 <tr>
-<td>5M</td>
-<td>Large</td>
-<td>30-60 min</td>
-</tr>
-<tr>
-<td>10M</td>
-<td>X-Large</td>
-<td>1-2 hours</td>
+<td>Databricks</td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
 </tr>
 </tbody>
 </table>
-<p><strong>Tips:</strong>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1">-- Scale up warehouse before running</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="k">ALTER</span><span class="w"> </span><span class="n">WAREHOUSE</span><span class="w"> </span><span class="n">my_wh</span><span class="w"> </span><span class="k">SET</span><span class="w"> </span><span class="n">WAREHOUSE_SIZE</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;LARGE&#39;</span><span class="p">;</span>
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="c1">-- Enable clustering for large tables</span>
-<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="k">ALTER</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">idr_out</span><span class="p">.</span><span class="n">identity_edges_current</span><span class="w"> </span><span class="k">CLUSTER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="p">(</span><span class="n">identifier_type</span><span class="p">);</span>
-</code></pre></div></p>
-<h3 id="bigquery">BigQuery</h3>
+<h3 id="consistency-check">Consistency Check</h3>
+<ul>
+<li>[ ] All platforms produced same cluster count</li>
+<li>[ ] Largest cluster size matches across platforms</li>
+<li>[ ] Singleton count matches across platforms</li>
+</ul>
+<hr />
+<h2 id="50-million-rows">50 Million Rows</h2>
+<h3 id="timing-results_1">Timing Results</h3>
 <table>
 <thead>
 <tr>
-<th>Scale</th>
-<th>Pricing Model</th>
-<th>Slots</th>
-<th>Expected Duration</th>
+<th>Platform</th>
+<th>Data Load</th>
+<th>Entity Extract</th>
+<th>Edge Build</th>
+<th>Label Prop</th>
+<th>Output Gen</th>
+<th><strong>Total</strong></th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>100K</td>
-<td>On-Demand</td>
-<td>Auto</td>
-<td>2-5 min</td>
+<td>DuckDB</td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+<td><strong><em>TBD</em></strong></td>
 </tr>
 <tr>
-<td>500K</td>
-<td>On-Demand</td>
-<td>Auto</td>
-<td>5-15 min</td>
+<td>Snowflake</td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+<td><strong><em>TBD</em></strong></td>
 </tr>
 <tr>
-<td>1M</td>
-<td>On-Demand</td>
-<td>Auto</td>
-<td>15-30 min</td>
+<td>BigQuery</td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+<td><strong><em>TBD</em></strong></td>
 </tr>
 <tr>
-<td>5M</td>
-<td>Flat-Rate</td>
-<td>2000+</td>
-<td>30-60 min</td>
-</tr>
-<tr>
-<td>10M</td>
-<td>Flat-Rate</td>
-<td>4000+</td>
-<td>1-2 hours</td>
+<td>Databricks</td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+<td><strong><em>TBD</em></strong></td>
 </tr>
 </tbody>
 </table>
-<p><strong>Tips:</strong>
-- Use partitioned tables for &gt; 1M rows
-- Enable BI Engine for faster aggregations
-- Monitor slot usage in BigQuery Admin</p>
+<h3 id="metrics-results_1">Metrics Results</h3>
+<table>
+<thead>
+<tr>
+<th>Platform</th>
+<th>Entities</th>
+<th>Edges</th>
+<th>Clusters</th>
+<th>Largest</th>
+<th>Singletons</th>
+<th>LP Iters</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>DuckDB</td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+</tr>
+<tr>
+<td>Snowflake</td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+</tr>
+<tr>
+<td>BigQuery</td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+</tr>
+<tr>
+<td>Databricks</td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+</tr>
+</tbody>
+</table>
+<h3 id="consistency-check_1">Consistency Check</h3>
+<ul>
+<li>[ ] All platforms produced same cluster count</li>
+<li>[ ] Largest cluster size matches across platforms</li>
+<li>[ ] Singleton count matches across platforms</li>
+</ul>
+<hr />
+<h2 id="100-million-rows">100 Million Rows</h2>
+<h3 id="timing-results_2">Timing Results</h3>
+<table>
+<thead>
+<tr>
+<th>Platform</th>
+<th>Data Load</th>
+<th>Entity Extract</th>
+<th>Edge Build</th>
+<th>Label Prop</th>
+<th>Output Gen</th>
+<th><strong>Total</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>DuckDB</td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+<td><strong><em>TBD</em></strong></td>
+</tr>
+<tr>
+<td>Snowflake</td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+<td><strong><em>TBD</em></strong></td>
+</tr>
+<tr>
+<td>BigQuery</td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+<td><strong><em>TBD</em></strong></td>
+</tr>
+<tr>
+<td>Databricks</td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+<td><strong><em>TBD</em></strong></td>
+</tr>
+</tbody>
+</table>
+<h3 id="metrics-results_2">Metrics Results</h3>
+<table>
+<thead>
+<tr>
+<th>Platform</th>
+<th>Entities</th>
+<th>Edges</th>
+<th>Clusters</th>
+<th>Largest</th>
+<th>Singletons</th>
+<th>LP Iters</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>DuckDB</td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+</tr>
+<tr>
+<td>Snowflake</td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+</tr>
+<tr>
+<td>BigQuery</td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+</tr>
+<tr>
+<td>Databricks</td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+</tr>
+</tbody>
+</table>
+<h3 id="consistency-check_2">Consistency Check</h3>
+<ul>
+<li>[ ] All platforms produced same cluster count</li>
+<li>[ ] Largest cluster size matches across platforms</li>
+<li>[ ] Singleton count matches across platforms</li>
+</ul>
+<hr />
+<h2 id="performance-charts">Performance Charts</h2>
+<h3 id="total-duration-by-platform-scale">Total Duration by Platform &amp; Scale</h3>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>Platform     | 20M      | 50M      | 100M
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>-------------|----------|----------|----------
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>DuckDB       | ████     | ████████ | ████████████
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>Snowflake    | ████     | ████████ | ████████████
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>BigQuery     | ████     | ████████ | ████████████
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>Databricks   | ████     | ████████ | ████████████
+</code></pre></div>
+<em>(To be replaced with actual Chart.js visualization)</em></p>
+<h3 id="cost-analysis-cloud-only">Cost Analysis (Cloud Only)</h3>
+<table>
+<thead>
+<tr>
+<th>Platform</th>
+<th>20M Cost</th>
+<th>50M Cost</th>
+<th>100M Cost</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Snowflake</td>
+<td>$<em>TBD</em></td>
+<td>$<em>TBD</em></td>
+<td>$<em>TBD</em></td>
+<td>Warehouse: <em>TBD</em></td>
+</tr>
+<tr>
+<td>BigQuery</td>
+<td>$<em>TBD</em></td>
+<td>$<em>TBD</em></td>
+<td>$<em>TBD</em></td>
+<td>On-demand pricing</td>
+</tr>
+<tr>
+<td>Databricks</td>
+<td>$<em>TBD</em></td>
+<td>$<em>TBD</em></td>
+<td>$<em>TBD</em></td>
+<td>DBU cost</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="observations-insights">Observations &amp; Insights</h2>
 <h3 id="duckdb">DuckDB</h3>
+<ul>
+<li><em>To be filled</em></li>
+</ul>
+<h3 id="snowflake">Snowflake</h3>
+<ul>
+<li><em>To be filled</em></li>
+</ul>
+<h3 id="bigquery">BigQuery</h3>
+<ul>
+<li><em>To be filled</em></li>
+</ul>
+<h3 id="databricks">Databricks</h3>
+<ul>
+<li><em>To be filled</em></li>
+</ul>
+<hr />
+<h2 id="recommendations">Recommendations</h2>
+<h3 id="when-to-use-each-platform">When to Use Each Platform</h3>
 <table>
 <thead>
 <tr>
-<th>Scale</th>
-<th>RAM Required</th>
-<th>Expected Duration</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>100K</td>
-<td>2 GB</td>
-<td>30s - 2 min</td>
-</tr>
-<tr>
-<td>500K</td>
-<td>4 GB</td>
-<td>2-5 min</td>
-</tr>
-<tr>
-<td>1M</td>
-<td>8 GB</td>
-<td>5-15 min</td>
-</tr>
-<tr>
-<td>2M</td>
-<td>16 GB</td>
-<td>15-30 min</td>
-</tr>
-</tbody>
-</table>
-<p><strong>Note:</strong> DuckDB is best for testing &lt; 10M rows. For larger scale, use cloud platforms.</p>
-<h2 id="overlap-rate-impact">Overlap Rate Impact</h2>
-<p>The <code>OVERLAP_RATE</code> parameter controls identity density:</p>
-<table>
-<thead>
-<tr>
-<th>Overlap Rate</th>
-<th>Effect</th>
 <th>Use Case</th>
+<th>Recommended Platform</th>
+<th>Rationale</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>0.3</td>
-<td>Many unique identities, few matches</td>
-<td>Sparse data</td>
+<td>&lt; 10M rows, local dev</td>
+<td>DuckDB</td>
+<td>Fast, free, no infra</td>
 </tr>
 <tr>
-<td>0.5</td>
-<td>Moderate matching</td>
-<td>Typical B2C</td>
+<td>10-50M rows, batch</td>
+<td><em>TBD</em></td>
+<td>Based on testing</td>
 </tr>
 <tr>
-<td>0.6</td>
-<td>Good matching (default)</td>
-<td>Retail/CDP</td>
+<td>50-100M rows</td>
+<td><em>TBD</em></td>
+<td>Based on testing</td>
 </tr>
 <tr>
-<td>0.7</td>
-<td>High matching</td>
-<td>Loyalty-heavy</td>
+<td>&gt; 100M rows</td>
+<td><em>TBD</em></td>
+<td>Based on testing</td>
+</tr>
+<tr>
+<td>Real-time/streaming</td>
+<td><em>TBD</em></td>
+<td>Based on latency needs</td>
 </tr>
 </tbody>
 </table>
-<p>Higher overlap = larger clusters = more LP iterations needed.</p>
-<h2 id="label-propagation-iterations">Label Propagation Iterations</h2>
+<hr />
+<h2 id="test-commands">Test Commands</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># Generate 20M dataset</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>python<span class="w"> </span>tools/scale_test/data_generator.py<span class="w"> </span>--rows<span class="o">=</span><span class="m">20000000</span><span class="w"> </span>--seed<span class="o">=</span><span class="m">42</span><span class="w"> </span>--output<span class="o">=</span>data/
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="c1"># Run DuckDB benchmark</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>python<span class="w"> </span>tools/scale_test/benchmark.py<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">    </span>--platform<span class="o">=</span>duckdb<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">    </span>--data<span class="o">=</span>data/retail_customers_20m.parquet<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="w">    </span>--rows<span class="o">=</span><span class="m">20000000</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="w">    </span>--db<span class="o">=</span>idr_benchmark.duckdb
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>
+<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="c1"># Generate 50M dataset</span>
+<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>python<span class="w"> </span>tools/scale_test/data_generator.py<span class="w"> </span>--rows<span class="o">=</span><span class="m">50000000</span><span class="w"> </span>--seed<span class="o">=</span><span class="m">42</span><span class="w"> </span>--output<span class="o">=</span>data/
+<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>
+<a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a><span class="c1"># Generate 100M dataset</span>
+<a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a>python<span class="w"> </span>tools/scale_test/data_generator.py<span class="w"> </span>--rows<span class="o">=</span><span class="m">100000000</span><span class="w"> </span>--seed<span class="o">=</span><span class="m">42</span><span class="w"> </span>--output<span class="o">=</span>data/
+</code></pre></div>
+<hr />
+<h2 id="appendix-test-data-distribution">Appendix: Test Data Distribution</h2>
+<p>Target distribution (retail industry standard):</p>
 <table>
 <thead>
 <tr>
-<th>Max Cluster Size</th>
-<th>Iterations Needed</th>
+<th>Cluster Size</th>
+<th>Percentage</th>
+<th>@ 20M</th>
+<th>@ 50M</th>
+<th>@ 100M</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>&lt; 10</td>
-<td>5-10</td>
+<td>1 (singleton)</td>
+<td>35%</td>
+<td>7M</td>
+<td>17.5M</td>
+<td>35M</td>
 </tr>
 <tr>
-<td>10-50</td>
-<td>10-20</td>
+<td>2 (pairs)</td>
+<td>25%</td>
+<td>5M</td>
+<td>12.5M</td>
+<td>25M</td>
 </tr>
 <tr>
-<td>50-200</td>
-<td>20-30</td>
+<td>3-5 (small)</td>
+<td>20%</td>
+<td>4M</td>
+<td>10M</td>
+<td>20M</td>
 </tr>
 <tr>
-<td>200+</td>
-<td>30-50</td>
+<td>6-15 (medium)</td>
+<td>12%</td>
+<td>2.4M</td>
+<td>6M</td>
+<td>12M</td>
+</tr>
+<tr>
+<td>16-50 (large)</td>
+<td>5%</td>
+<td>1M</td>
+<td>2.5M</td>
+<td>5M</td>
+</tr>
+<tr>
+<td>51-200 (v.large)</td>
+<td>2%</td>
+<td>400K</td>
+<td>1M</td>
+<td>2M</td>
+</tr>
+<tr>
+<td>201-1000 (massive)</td>
+<td>1%</td>
+<td>200K</td>
+<td>500K</td>
+<td>1M</td>
 </tr>
 </tbody>
 </table>
-<p><strong>Warning signs:</strong>
-- Not converging at 30 iterations → check for "super clusters" (bad identifiers)
-- Giant clusters (1000+) → likely data quality issue (generic identifiers)</p>
-<h2 id="memory-considerations">Memory Considerations</h2>
-<p>The label propagation step is memory-intensive:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>Memory ≈ (nodes × 2 + edges × 3) × 8 bytes
-</code></pre></div>
-<p>For 1M entities with 2M edges:
-- ~48 MB for labels
-- Spark/Snowflake handle this automatically
-- DuckDB needs sufficient RAM</p>
-<h2 id="monitoring-during-scale-runs">Monitoring During Scale Runs</h2>
-<h3 id="key-metrics-to-watch">Key Metrics to Watch</h3>
-<ol>
-<li><strong>LP Iterations</strong> — Should converge before max</li>
-<li><strong>Stage Timing</strong> — Identify bottlenecks</li>
-<li><strong>Cluster Size Distribution</strong> — Giant clusters indicate issues</li>
-</ol>
-<h3 id="query-to-check-health">Query to Check Health</h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">SELECT</span><span class="w"> </span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">  </span><span class="n">run_id</span><span class="p">,</span>
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">  </span><span class="n">status</span><span class="p">,</span>
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">  </span><span class="n">duration_seconds</span><span class="p">,</span>
-<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">  </span><span class="n">lp_iterations</span><span class="p">,</span>
-<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="w">  </span><span class="n">entities_processed</span><span class="p">,</span>
-<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="w">  </span><span class="n">edges_created</span>
-<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="k">FROM</span><span class="w"> </span><span class="n">idr_out</span><span class="p">.</span><span class="n">run_history</span>
-<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">started_at</span><span class="w"> </span><span class="k">DESC</span>
-<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="k">LIMIT</span><span class="w"> </span><span class="mi">5</span><span class="p">;</span>
-</code></pre></div>
-<h3 id="cluster-health-check">Cluster Health Check</h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1">-- Check for giant clusters (potential data issues)</span>
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="k">SELECT</span><span class="w"> </span>
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">  </span><span class="k">CASE</span><span class="w"> </span>
-<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">    </span><span class="k">WHEN</span><span class="w"> </span><span class="n">cluster_size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="k">THEN</span><span class="w"> </span><span class="s1">&#39;singleton&#39;</span>
-<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">    </span><span class="k">WHEN</span><span class="w"> </span><span class="n">cluster_size</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mi">10</span><span class="w"> </span><span class="k">THEN</span><span class="w"> </span><span class="s1">&#39;small&#39;</span>
-<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="w">    </span><span class="k">WHEN</span><span class="w"> </span><span class="n">cluster_size</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mi">100</span><span class="w"> </span><span class="k">THEN</span><span class="w"> </span><span class="s1">&#39;medium&#39;</span>
-<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="w">    </span><span class="k">WHEN</span><span class="w"> </span><span class="n">cluster_size</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mi">1000</span><span class="w"> </span><span class="k">THEN</span><span class="w"> </span><span class="s1">&#39;large&#39;</span>
-<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="w">    </span><span class="k">ELSE</span><span class="w"> </span><span class="s1">&#39;GIANT ⚠️&#39;</span>
-<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="w">  </span><span class="k">END</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">bucket</span><span class="p">,</span>
-<a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="w">  </span><span class="k">COUNT</span><span class="p">(</span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="k">count</span><span class="p">,</span>
-<a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="w">  </span><span class="k">SUM</span><span class="p">(</span><span class="n">cluster_size</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">entities</span>
-<a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a><span class="k">FROM</span><span class="w"> </span><span class="n">idr_out</span><span class="p">.</span><span class="n">identity_clusters_current</span>
-<a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a><span class="k">GROUP</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="mi">1</span>
-<a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
-</code></pre></div>
-<h2 id="running-scale-tests">Running Scale Tests</h2>
-<h3 id="databricks_1">Databricks</h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1"># Run: sql/databricks/notebooks/IDR_ScaleTest.py</span>
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="c1"># Set widget: SCALE = &quot;1M&quot;</span>
-</code></pre></div>
-<h3 id="snowflake_1">Snowflake</h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">SET</span><span class="w"> </span><span class="n">N_ROWS</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1000000</span><span class="p">;</span>
-<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="c1">-- Run: sql/snowflake/IDR_ScaleTest.sql</span>
-</code></pre></div>
-<h3 id="bigquery_1">BigQuery</h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>python<span class="w"> </span>sql/bigquery/idr_scale_test.py<span class="w"> </span>--project<span class="o">=</span>your-project<span class="w"> </span>--scale<span class="o">=</span>1M
-</code></pre></div>
-<h3 id="duckdb_1">DuckDB</h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>python<span class="w"> </span>sql/duckdb/idr_scale_test.py<span class="w"> </span>--db<span class="o">=</span>scale_test.duckdb<span class="w"> </span>--scale<span class="o">=</span>1M
-</code></pre></div>
+<p>Identifier match rates:
+- Email: 55%
+- Phone: 25%
+- Loyalty ID: 10%
+- Address: 10%
+- Chain patterns: 15%</p>
 
 
 
@@ -2018,10 +2335,10 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["content.code.copy", "content.code.annotate", "content.tabs.link", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.top", "search.suggest", "search.highlight"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["content.code.copy", "content.code.annotate", "content.tabs.link", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.top", "search.suggest", "search.highlight"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
       
     
   </body>
