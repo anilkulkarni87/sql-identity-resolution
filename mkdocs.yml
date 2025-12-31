@@ -68,6 +68,7 @@ nav:
       - BigQuery: getting-started/platforms/bigquery.md
       - Databricks: getting-started/platforms/databricks.md
   - Concepts:
+    - How It Works (Simple): concepts/how-it-works-simple.md
     - Architecture: concepts/architecture.md
     - Matching Algorithm: concepts/matching-algorithm.md
     - Data Model: concepts/data-model.md
