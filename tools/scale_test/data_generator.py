@@ -393,7 +393,7 @@ class RetailMultiSourceGenerator:
         
         for size_min, size_max, percentage in self.config.distributions:
             target_entities = int(total_rows * percentage)
-            while target_entities > 0:
+            while target_entities >= size_min:  # Fixed: only generate if we have enough entities
                 size = self.rng.randint(size_min, min(size_max, target_entities))
                 clusters_to_generate.append(size)
                 target_entities -= size
