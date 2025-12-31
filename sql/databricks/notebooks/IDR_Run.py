@@ -124,8 +124,9 @@ def init_run_history():
       started_at TIMESTAMP, ended_at TIMESTAMP, duration_seconds BIGINT,
       entities_processed BIGINT, edges_created BIGINT, edges_updated BIGINT,
       clusters_impacted BIGINT, lp_iterations INT,
-      source_tables_processed INT, watermarks_json STRING,
-      error_message STRING, error_stage STRING,
+      source_tables_processed INT, groups_skipped INT, values_excluded INT,
+      large_clusters INT, warnings STRING,
+      watermarks_json STRING, error_message STRING, error_stage STRING,
       created_at TIMESTAMP
     )""")
     
@@ -136,20 +137,37 @@ def init_run_history():
       rows_in BIGINT, rows_out BIGINT, notes STRING
     )""")
     
+    # Ensure skipped_identifier_groups table exists
+    q("""
+    CREATE TABLE IF NOT EXISTS idr_out.skipped_identifier_groups (
+      run_id STRING, identifier_type STRING, identifier_value_norm STRING,
+      group_size BIGINT, max_allowed INT, sample_entity_keys STRING,
+      reason STRING DEFAULT 'EXCEEDED_MAX_GROUP_SIZE', skipped_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )""")
+    
+    # Ensure identifier_exclusion table exists
+    q("""
+    CREATE TABLE IF NOT EXISTS idr_meta.identifier_exclusion (
+      identifier_type STRING, identifier_value_pattern STRING, match_type STRING DEFAULT 'EXACT',
+      reason STRING, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, created_by STRING
+    )""")
+    
     q(f"""
     INSERT INTO idr_out.run_history 
     (run_id, run_mode, status, started_at, source_tables_processed, created_at)
     VALUES ('{RUN_ID}', '{RUN_MODE}', 'RUNNING', TIMESTAMP('{RUN_TS}'), 0, CURRENT_TIMESTAMP)
     """)
-
 def finalize_run_history(status: str, entities: int, edges_created: int, edges_updated: int, 
                          clusters: int, iterations: int, sources: int, watermarks: dict,
+                         groups_skipped: int = 0, values_excluded: int = 0,
+                         large_clusters: int = 0, warnings: list = None,
                          error_msg: str = None, error_stage: str = None):
     """Update run_history with final metrics."""
     end_ts = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
     duration = int(time.time() - _run_start_ts)
     wm_json = json.dumps(watermarks).replace("'", "''")
     err_msg = error_msg.replace("'", "''") if error_msg else None
+    warnings_json = json.dumps(warnings).replace("'", "''") if warnings else None
     
     q(f"""
     UPDATE idr_out.run_history SET
@@ -162,6 +180,10 @@ def finalize_run_history(status: str, entities: int, edges_created: int, edges_u
       clusters_impacted = {clusters},
       lp_iterations = {iterations},
       source_tables_processed = {sources},
+      groups_skipped = {groups_skipped},
+      values_excluded = {values_excluded},
+      large_clusters = {large_clusters},
+      warnings = {f"'{warnings_json}'" if warnings_json else 'NULL'},
       watermarks_json = '{wm_json}',
       error_message = {f"'{err_msg}'" if err_msg else 'NULL'},
       error_stage = {f"'{error_stage}'" if error_stage else 'NULL'}
@@ -512,32 +534,68 @@ cluster_cnt = q("SELECT COUNT(*) AS c FROM idr_out.identity_clusters_current").f
 audit_rows = [row.asDict() for row in q("SELECT rule_id, edges_created FROM idr_work.audit_edges_created").collect()]
 total_edges_created = sum(r.get('edges_created', 0) for r in audit_rows)
 
+# Count large clusters and skipped groups
+large_cluster_cnt = q("SELECT COUNT(*) AS c FROM idr_out.identity_clusters_current WHERE cluster_size >= 1000").first()["c"]
+skipped_groups_cnt = q(f"SELECT COUNT(*) AS c FROM idr_out.skipped_identifier_groups WHERE run_id = '{RUN_ID}'").first()["c"] if q("SHOW TABLES IN idr_out LIKE 'skipped_identifier_groups'").count() > 0 else 0
+values_excluded_cnt = 0  # Placeholder - would come from exclusion filter counts
+
 # Build watermarks dict for run history
 watermarks = {}
 for r in collect("SELECT table_id, new_watermark_value FROM idr_work.watermark_updates"):
     watermarks[r['table_id']] = str(r['new_watermark_value'])
 
-# Finalize run history with success
+# Build warnings list
+run_warnings = []
+if skipped_groups_cnt > 0:
+    run_warnings.append(f"{skipped_groups_cnt} identifier groups skipped (exceeded max_group_size)")
+if values_excluded_cnt > 0:
+    run_warnings.append(f"{values_excluded_cnt} identifier values excluded (matched exclusion list)")
+if large_cluster_cnt > 0:
+    run_warnings.append(f"{large_cluster_cnt} large clusters detected (1000+ entities)")
+
+run_status = 'SUCCESS' if not run_warnings else 'SUCCESS_WITH_WARNINGS'
+
+# Finalize run history
 finalize_run_history(
-    status='SUCCESS',
+    status=run_status,
     entities=entities_delta_cnt,
     edges_created=total_edges_created,
     edges_updated=edges_new_cnt - total_edges_created if edges_new_cnt > total_edges_created else 0,
     clusters=cluster_cnt,
     iterations=iterations if 'iterations' in locals() else 0,
     sources=len(source_rows),
-    watermarks=watermarks
+    watermarks=watermarks,
+    groups_skipped=skipped_groups_cnt,
+    values_excluded=values_excluded_cnt,
+    large_clusters=large_cluster_cnt,
+    warnings=run_warnings if run_warnings else None
 )
 
-print("ℹ️ Run summary", {
-    "RUN_ID": RUN_ID,
-    "RUN_MODE": RUN_MODE,
-    "iterations": iterations if 'iterations' in locals() else 0,
-    "entities_delta": entities_delta_cnt,
-    "edges_new": edges_new_cnt,
-    "membership_current": membership_cnt,
-    "clusters": cluster_cnt,
-    "edges_created_by_rule": audit_rows,
-})
+# Enhanced run summary
+print("=" * 60)
+print("IDR RUN SUMMARY")
+print("=" * 60)
+print(f"Run ID:          {RUN_ID}")
+print(f"Mode:            {RUN_MODE}")
+print(f"Status:          {run_status}")
+print()
+print("PROCESSING:")
+print(f"  Sources:       {len(source_rows)} tables")
+print(f"  Entities:      {entities_delta_cnt:,} processed")
+print(f"  Edges:         {edges_new_cnt:,} total ({total_edges_created:,} new)")
+print(f"  LP Iterations: {iterations if 'iterations' in locals() else 0}")
+print(f"  Clusters:      {cluster_cnt:,}")
+print(f"  Membership:    {membership_cnt:,}")
 
-print("✅ IDR run completed", {"RUN_ID": RUN_ID, "RUN_MODE": RUN_MODE})
+if run_warnings:
+    print()
+    print("DATA QUALITY:")
+    for w in run_warnings:
+        print(f"  ⚠️ {w}")
+    print()
+    print("ACTIONS NEEDED:")
+    print(f"  → Review: SELECT * FROM idr_out.skipped_identifier_groups WHERE run_id = '{RUN_ID}'")
+
+print("=" * 60)
+print("✅ IDR run completed", {"RUN_ID": RUN_ID, "RUN_MODE": RUN_MODE, "STATUS": run_status})
+

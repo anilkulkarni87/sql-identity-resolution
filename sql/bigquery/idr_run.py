@@ -152,31 +152,107 @@ WHERE i.identifier_value IS NOT NULL
 """)
 
 # ============================================
-# BUILD EDGES (Anchor-based)
+# BUILD EDGES (Anchor-based with size limits)
 # ============================================
 print("🔗 Building edges...")
+
+# Track skipped groups for observability
+groups_skipped = 0
+values_excluded = 0
+
+# Step 1: Apply exclusion list filtering
+q(f"""
+CREATE OR REPLACE TABLE `{PROJECT}.idr_work.identifiers_filtered` AS
+SELECT i.*
+FROM `{PROJECT}.idr_work.identifiers_all` i
+WHERE NOT EXISTS (
+    SELECT 1 FROM `{PROJECT}.idr_meta.identifier_exclusion` e
+    WHERE e.identifier_type = i.identifier_type
+      AND (
+        (e.match_type = 'EXACT' AND i.identifier_value_norm = e.identifier_value_pattern)
+        OR (e.match_type = 'LIKE' AND i.identifier_value_norm LIKE e.identifier_value_pattern)
+      )
+)
+""")
+
+# Count excluded values
+excluded_cnt = collect_one(f"SELECT COUNT(*) FROM `{PROJECT}.idr_work.identifiers_all`") or 0
+filtered_cnt = collect_one(f"SELECT COUNT(*) FROM `{PROJECT}.idr_work.identifiers_filtered`") or 0
+values_excluded = excluded_cnt - filtered_cnt
+if values_excluded > 0:
+    print(f"  ⚠️ Excluded {values_excluded} identifier values (matched exclusion list)")
 
 q(f"""
 CREATE OR REPLACE TABLE `{PROJECT}.idr_work.delta_identifier_values` AS
 SELECT DISTINCT i.identifier_type, i.identifier_value_norm
 FROM `{PROJECT}.idr_work.entities_delta` e
-JOIN `{PROJECT}.idr_work.identifiers_all` i ON i.entity_key = e.entity_key
+JOIN `{PROJECT}.idr_work.identifiers_filtered` i ON i.entity_key = e.entity_key
 WHERE i.identifier_value_norm IS NOT NULL
 """)
 
 q(f"""
 CREATE OR REPLACE TABLE `{PROJECT}.idr_work.members_for_delta_values` AS
 SELECT a.table_id, a.entity_key, a.identifier_type, a.identifier_value_norm
-FROM `{PROJECT}.idr_work.identifiers_all` a
+FROM `{PROJECT}.idr_work.identifiers_filtered` a
 JOIN `{PROJECT}.idr_work.delta_identifier_values` d
   ON a.identifier_type = d.identifier_type AND a.identifier_value_norm = d.identifier_value_norm
 """)
 
+# Step 2: Calculate group sizes and identify oversized groups
 q(f"""
-CREATE OR REPLACE TABLE `{PROJECT}.idr_work.group_anchor` AS
-SELECT identifier_type, identifier_value_norm, MIN(entity_key) AS anchor_entity_key
+CREATE OR REPLACE TABLE `{PROJECT}.idr_work.group_sizes` AS
+SELECT 
+    identifier_type, 
+    identifier_value_norm, 
+    COUNT(*) as group_size,
+    MIN(entity_key) AS anchor_entity_key,
+    ARRAY_AGG(entity_key ORDER BY entity_key LIMIT 5) AS sample_keys
 FROM `{PROJECT}.idr_work.members_for_delta_values`
 GROUP BY identifier_type, identifier_value_norm
+""")
+
+# Step 3: Log oversized groups to audit table
+q(f"""
+INSERT INTO `{PROJECT}.idr_out.skipped_identifier_groups` 
+(run_id, identifier_type, identifier_value_norm, group_size, max_allowed, sample_entity_keys, reason, skipped_at)
+SELECT 
+    '{RUN_ID}',
+    gs.identifier_type,
+    gs.identifier_value_norm,
+    gs.group_size,
+    COALESCE(r.max_group_size, 10000),
+    TO_JSON_STRING(gs.sample_keys),
+    'EXCEEDED_MAX_GROUP_SIZE',
+    CURRENT_TIMESTAMP()
+FROM `{PROJECT}.idr_work.group_sizes` gs
+JOIN `{PROJECT}.idr_meta.rule` r ON r.is_active = TRUE AND r.identifier_type = gs.identifier_type
+WHERE gs.group_size > COALESCE(r.max_group_size, 10000)
+""")
+
+# Get skipped group count
+groups_skipped = collect_one(f"""
+    SELECT COUNT(*) FROM `{PROJECT}.idr_out.skipped_identifier_groups` WHERE run_id = '{RUN_ID}'
+""") or 0
+
+if groups_skipped > 0:
+    print(f"  ⚠️ Skipped {groups_skipped} identifier groups (exceeded max_group_size)")
+    skipped_details = collect(f"""
+        SELECT identifier_type, identifier_value_norm, group_size 
+        FROM `{PROJECT}.idr_out.skipped_identifier_groups` 
+        WHERE run_id = '{RUN_ID}'
+        ORDER BY group_size DESC
+        LIMIT 3
+    """)
+    for d in skipped_details:
+        print(f"     - {d['identifier_type']}: '{d['identifier_value_norm'][:30]}...' ({d['group_size']} entities)")
+
+# Step 4: Build anchors only for valid-sized groups
+q(f"""
+CREATE OR REPLACE TABLE `{PROJECT}.idr_work.group_anchor` AS
+SELECT gs.identifier_type, gs.identifier_value_norm, gs.anchor_entity_key
+FROM `{PROJECT}.idr_work.group_sizes` gs
+JOIN `{PROJECT}.idr_meta.rule` r ON r.is_active = TRUE AND r.identifier_type = gs.identifier_type
+WHERE gs.group_size <= COALESCE(r.max_group_size, 10000)
 """)
 
 q(f"""
@@ -429,27 +505,68 @@ WHEN MATCHED THEN UPDATE SET
 # ============================================
 # FINALIZE
 # ============================================
-entities_cnt = collect_one(f"SELECT COUNT(*) FROM `{PROJECT}.idr_work.entities_delta`")
-edges_cnt = collect_one(f"SELECT COUNT(*) FROM `{PROJECT}.idr_work.edges_new`")
-clusters_cnt = collect_one(f"SELECT COUNT(*) FROM `{PROJECT}.idr_out.identity_clusters_current`")
+entities_cnt = collect_one(f"SELECT COUNT(*) FROM `{PROJECT}.idr_work.entities_delta`") or 0
+edges_cnt = collect_one(f"SELECT COUNT(*) FROM `{PROJECT}.idr_work.edges_new`") or 0
+clusters_cnt = collect_one(f"SELECT COUNT(*) FROM `{PROJECT}.idr_out.identity_clusters_current`") or 0
 duration = int(time.time() - run_start)
+
+# Count large clusters (1000+ entities)
+large_clusters = collect_one(f"""
+    SELECT COUNT(*) FROM `{PROJECT}.idr_out.identity_clusters_current` WHERE cluster_size >= 1000
+""") or 0
+
+# Build warnings list
+warnings = []
+if groups_skipped > 0:
+    warnings.append(f"{groups_skipped} identifier groups skipped (exceeded max_group_size)")
+if values_excluded > 0:
+    warnings.append(f"{values_excluded} identifier values excluded (matched exclusion list)")
+if large_clusters > 0:
+    warnings.append(f"{large_clusters} large clusters detected (1000+ entities)")
+
+warnings_json = json.dumps(warnings) if warnings else None
+status = 'SUCCESS' if not warnings else 'SUCCESS_WITH_WARNINGS'
 
 q(f"""
 UPDATE `{PROJECT}.idr_out.run_history` SET
-  status = 'SUCCESS',
+  status = '{status}',
   ended_at = CURRENT_TIMESTAMP(),
   duration_seconds = {duration},
   entities_processed = {entities_cnt},
   edges_created = {edges_cnt},
   clusters_impacted = {clusters_cnt},
-  lp_iterations = {iterations}
+  lp_iterations = {iterations},
+  groups_skipped = {groups_skipped},
+  values_excluded = {values_excluded},
+  large_clusters = {large_clusters},
+  warnings = {f"'{warnings_json}'" if warnings_json else 'NULL'}
 WHERE run_id = '{RUN_ID}'
 """)
 
-print(f"\n✅ IDR run completed!")
-print(f"   Run ID: {RUN_ID}")
-print(f"   Entities processed: {entities_cnt}")
-print(f"   Edges created: {edges_cnt}")
-print(f"   Clusters: {clusters_cnt}")
-print(f"   LP iterations: {iterations}")
-print(f"   Duration: {duration}s")
+# Enhanced run summary
+print(f"\n{'='*60}")
+print("IDR RUN SUMMARY")
+print(f"{'='*60}")
+print(f"Run ID:          {RUN_ID}")
+print(f"Mode:            {RUN_MODE}")
+print(f"Duration:        {duration}s")
+print(f"Status:          {status}")
+print()
+print("PROCESSING:")
+print(f"  Sources:       {len(source_rows)} tables processed")
+print(f"  Entities:      {entities_cnt:,} processed")
+print(f"  Edges:         {edges_cnt:,} created")
+print(f"  LP Iterations: {iterations}")
+print(f"  Clusters:      {clusters_cnt:,} impacted")
+
+if warnings:
+    print()
+    print("DATA QUALITY:")
+    for w in warnings:
+        print(f"  ⚠️ {w}")
+    print()
+    print("ACTIONS NEEDED:")
+    print(f"  → Review: SELECT * FROM `{PROJECT}.idr_out.skipped_identifier_groups` WHERE run_id = '{RUN_ID}'")
+
+print(f"{'='*60}")
+print(f"✅ BigQuery IDR run completed!")

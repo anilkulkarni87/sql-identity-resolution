@@ -33,7 +33,8 @@ CREATE TABLE IF NOT EXISTS idr_meta.rule (
   identifier_type STRING,
   canonicalize STRING,
   allow_hashed BOOLEAN,
-  require_non_null BOOLEAN
+  require_non_null BOOLEAN,
+  max_group_size INT DEFAULT 10000  -- Skip identifier groups larger than this
 );
 
 CREATE TABLE IF NOT EXISTS idr_meta.identifier_mapping (
@@ -54,4 +55,14 @@ CREATE TABLE IF NOT EXISTS idr_meta.survivorship_rule (
   strategy STRING,
   source_priority_list STRING,
   recency_field STRING
+);
+
+-- Exclusion list for known bad identifier values
+CREATE TABLE IF NOT EXISTS idr_meta.identifier_exclusion (
+  identifier_type STRING,
+  identifier_value_pattern STRING,
+  match_type STRING DEFAULT 'EXACT',  -- EXACT or LIKE
+  reason STRING,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  created_by STRING
 );

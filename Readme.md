@@ -64,9 +64,10 @@ python sql/duckdb/idr_run.py --db=idr.duckdb --run-mode=FULL
 
 ## Documentation
 
+- [Metadata Configuration](docs/metadata_configuration.md) — Configure your source tables with custom column names
 - [Architecture & Concepts](docs/architecture.md) — Data model, algorithms, and design decisions
 - [Scale Considerations](docs/scale_considerations.md) — Performance at millions of rows
-- [Runbook](docs/runbook.md) — Operational guide
+- [Runbook](docs/runbook.md) — Operational guide, troubleshooting, and incident response
 
 ## How It Works
 

@@ -72,7 +72,7 @@ for schema in ['crm', 'sales', 'loyalty', 'digital', 'store']:
 # ============================================
 print(f"\n📝 Generating {N_PEOPLE:,} unique identities...")
 
-first_names = ['Anil','Rashmi','Asha','Rohan','Maya','Vikram','Neha','Arjun','Priya','Kiran',
+first_names = ['Sameer','Govind','Asha','Rohan','Maya','Vikram','Neha','Arjun','Priya','Kiran',
                'Raj','Sita','Kavita','Suresh','Anita','Deepak','Meera','Rahul','Pooja','Amit']
 last_names = ['Kulkarni','Sharma','Patel','Reddy','Gupta','Iyer','Nair','Singh','Das','Khan',
               'Verma','Joshi','Rao','Kumar','Mehta','Shah','Pandey','Thakur','Yadav','Mishra']

@@ -92,7 +92,8 @@ CREATE TABLE IF NOT EXISTS idr_meta.source (
 q("""
 CREATE TABLE IF NOT EXISTS idr_meta.rule (
   rule_id STRING, rule_name STRING, is_active BOOLEAN, priority INT,
-  identifier_type STRING, canonicalize STRING, allow_hashed BOOLEAN, require_non_null BOOLEAN
+  identifier_type STRING, canonicalize STRING, allow_hashed BOOLEAN, require_non_null BOOLEAN,
+  max_group_size INT DEFAULT 10000
 )""")
 
 q("""
@@ -108,6 +109,13 @@ CREATE TABLE IF NOT EXISTS idr_meta.entity_attribute_mapping (
 q("""
 CREATE TABLE IF NOT EXISTS idr_meta.survivorship_rule (
   attribute_name STRING, strategy STRING, source_priority_list STRING, recency_field STRING
+)""")
+
+# Identifier exclusion list for known bad values
+q("""
+CREATE TABLE IF NOT EXISTS idr_meta.identifier_exclusion (
+  identifier_type STRING, identifier_value_pattern STRING, match_type STRING DEFAULT 'EXACT',
+  reason STRING, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, created_by STRING
 )""")
 
 # Output tables
@@ -137,6 +145,79 @@ CREATE TABLE IF NOT EXISTS idr_out.golden_profile_current (
 q("""
 CREATE TABLE IF NOT EXISTS idr_out.rule_match_audit_current (
   run_id STRING, rule_id STRING, edges_created BIGINT, started_at TIMESTAMP, ended_at TIMESTAMP
+)""")
+
+# Audit table for skipped identifier groups
+q("""
+CREATE TABLE IF NOT EXISTS idr_out.skipped_identifier_groups (
+  run_id STRING, identifier_type STRING, identifier_value_norm STRING,
+  group_size BIGINT, max_allowed INT, sample_entity_keys STRING,
+  reason STRING DEFAULT 'EXCEEDED_MAX_GROUP_SIZE', skipped_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+)""")
+
+# Configuration table
+q("""
+CREATE TABLE IF NOT EXISTS idr_meta.config (
+  config_key STRING NOT NULL,
+  config_value STRING NOT NULL,
+  description STRING,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_by STRING
+)""")
+
+# Insert default config values
+q("""
+MERGE INTO idr_meta.config tgt
+USING (
+  SELECT 'large_cluster_threshold' AS config_key, '5000' AS config_value, 'Cluster size threshold for warnings' AS description
+  UNION ALL SELECT 'dry_run_retention_days', '7', 'Days to retain dry run results'
+  UNION ALL SELECT 'max_lp_iterations', '30', 'Maximum label propagation iterations'
+) src ON tgt.config_key = src.config_key
+WHEN NOT MATCHED THEN INSERT (config_key, config_value, description) VALUES (src.config_key, src.config_value, src.description)
+""")
+
+# Dry run results table
+q("""
+CREATE TABLE IF NOT EXISTS idr_out.dry_run_results (
+  run_id STRING NOT NULL,
+  entity_key STRING NOT NULL,
+  current_resolved_id STRING,
+  proposed_resolved_id STRING,
+  change_type STRING,
+  current_cluster_size INT,
+  proposed_cluster_size INT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+)""")
+
+# Dry run summary table
+q("""
+CREATE TABLE IF NOT EXISTS idr_out.dry_run_summary (
+  run_id STRING NOT NULL,
+  total_entities INT,
+  new_entities INT,
+  moved_entities INT,
+  merged_clusters INT,
+  split_clusters INT,
+  unchanged_entities INT,
+  largest_proposed_cluster INT,
+  edges_would_create INT,
+  groups_would_skip INT,
+  values_would_exclude INT,
+  execution_time_seconds INT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+)""")
+
+# Metrics export table (plugin framework)
+q("""
+CREATE TABLE IF NOT EXISTS idr_out.metrics_export (
+  metric_id STRING DEFAULT uuid(),
+  run_id STRING,
+  metric_name STRING NOT NULL,
+  metric_value DOUBLE NOT NULL,
+  metric_type STRING DEFAULT 'gauge',
+  dimensions STRING,
+  recorded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  exported_at TIMESTAMP
 )""")
 
 print("✅ Step 1 complete: Schemas and tables created")

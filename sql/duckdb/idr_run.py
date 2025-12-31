@@ -35,12 +35,14 @@ parser = argparse.ArgumentParser(description='DuckDB Identity Resolution Runner'
 parser.add_argument('--db', default='idr.duckdb', help='DuckDB database file')
 parser.add_argument('--run-mode', default='INCR', choices=['INCR', 'FULL'], help='Run mode')
 parser.add_argument('--max-iters', type=int, default=30, help='Max label propagation iterations')
+parser.add_argument('--dry-run', action='store_true', help='Preview changes without committing')
 args = parser.parse_args()
 
 DB_PATH = args.db
 RUN_MODE = args.run_mode
 MAX_ITERS = args.max_iters
-RUN_ID = f"run_{uuid.uuid4().hex[:12]}"
+DRY_RUN = args.dry_run
+RUN_ID = f"{'dry_run' if DRY_RUN else 'run'}_{uuid.uuid4().hex[:12]}"
 RUN_TS = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
 run_start = time.time()
 
@@ -61,9 +63,24 @@ def collect_one(sql: str):
     result = con.execute(sql).fetchone()
     return result[0] if result else None
 
+def record_metric(name: str, value: float, dimensions: dict = None, metric_type: str = 'gauge'):
+    """Record a metric to the metrics_export table."""
+    dim_json = json.dumps(dimensions).replace("'", "''") if dimensions else None
+    q(f"""
+    INSERT INTO idr_out.metrics_export (run_id, metric_name, metric_value, metric_type, dimensions)
+    VALUES ('{RUN_ID}', '{name}', {value}, '{metric_type}', {f"'{dim_json}'" if dim_json else 'NULL'})
+    """)
+
+def get_config(key: str, default: str = None) -> str:
+    """Get configuration value from idr_meta.config."""
+    val = collect_one(f"SELECT config_value FROM idr_meta.config WHERE config_key = '{key}'")
+    return val if val else default
+
 print(f"🦆 Starting DuckDB IDR run: {RUN_ID}")
 print(f"   Database: {DB_PATH}")
 print(f"   Mode: {RUN_MODE}, Max iterations: {MAX_ITERS}")
+if DRY_RUN:
+    print(f"   ⚠️  DRY RUN MODE - No changes will be committed")
 
 # ============================================
 # PREFLIGHT
@@ -168,31 +185,112 @@ WHERE i.identifier_value IS NOT NULL
 """)
 
 # ============================================
-# BUILD EDGES (Anchor-based)
+# BUILD EDGES (Anchor-based with size limits)
 # ============================================
 print("🔗 Building edges...")
+
+# Track skipped groups for observability
+groups_skipped = 0
+values_excluded = 0
+
+# Step 1: Apply exclusion list filtering
+q("""
+CREATE OR REPLACE TABLE idr_work.identifiers_filtered AS
+SELECT i.*
+FROM idr_work.identifiers_all i
+WHERE NOT EXISTS (
+    SELECT 1 FROM idr_meta.identifier_exclusion e
+    WHERE e.identifier_type = i.identifier_type
+      AND (
+        (e.match_type = 'EXACT' AND i.identifier_value_norm = e.identifier_value_pattern)
+        OR (e.match_type = 'LIKE' AND i.identifier_value_norm LIKE e.identifier_value_pattern)
+      )
+)
+""")
+
+# Count excluded values
+excluded_cnt = collect_one("""
+    SELECT COUNT(*) FROM idr_work.identifiers_all
+""") or 0
+filtered_cnt = collect_one("""
+    SELECT COUNT(*) FROM idr_work.identifiers_filtered
+""") or 0
+values_excluded = excluded_cnt - filtered_cnt
+if values_excluded > 0:
+    print(f"  ⚠️ Excluded {values_excluded} identifier values (matched exclusion list)")
 
 q("""
 CREATE OR REPLACE TABLE idr_work.delta_identifier_values AS
 SELECT DISTINCT i.identifier_type, i.identifier_value_norm
 FROM idr_work.entities_delta e
-JOIN idr_work.identifiers_all i ON i.entity_key = e.entity_key
+JOIN idr_work.identifiers_filtered i ON i.entity_key = e.entity_key
 WHERE i.identifier_value_norm IS NOT NULL
 """)
 
 q("""
 CREATE OR REPLACE TABLE idr_work.members_for_delta_values AS
 SELECT a.table_id, a.entity_key, a.identifier_type, a.identifier_value_norm
-FROM idr_work.identifiers_all a
+FROM idr_work.identifiers_filtered a
 JOIN idr_work.delta_identifier_values d
   ON a.identifier_type = d.identifier_type AND a.identifier_value_norm = d.identifier_value_norm
 """)
 
+# Step 2: Calculate group sizes and identify oversized groups
 q("""
-CREATE OR REPLACE TABLE idr_work.group_anchor AS
-SELECT identifier_type, identifier_value_norm, MIN(entity_key) AS anchor_entity_key
+CREATE OR REPLACE TABLE idr_work.group_sizes AS
+SELECT 
+    identifier_type, 
+    identifier_value_norm, 
+    COUNT(*) as group_size,
+    MIN(entity_key) AS anchor_entity_key,
+    LIST(entity_key ORDER BY entity_key LIMIT 5) AS sample_keys
 FROM idr_work.members_for_delta_values
 GROUP BY identifier_type, identifier_value_norm
+""")
+
+# Step 3: Log oversized groups to audit table
+q(f"""
+INSERT INTO idr_out.skipped_identifier_groups 
+(run_id, identifier_type, identifier_value_norm, group_size, max_allowed, sample_entity_keys, reason, skipped_at)
+SELECT 
+    '{RUN_ID}',
+    gs.identifier_type,
+    gs.identifier_value_norm,
+    gs.group_size,
+    COALESCE(r.max_group_size, 10000),
+    CAST(gs.sample_keys AS VARCHAR),
+    'EXCEEDED_MAX_GROUP_SIZE',
+    CURRENT_TIMESTAMP
+FROM idr_work.group_sizes gs
+JOIN idr_meta.rule r ON r.is_active = TRUE AND r.identifier_type = gs.identifier_type
+WHERE gs.group_size > COALESCE(r.max_group_size, 10000)
+""")
+
+# Get skipped group count
+groups_skipped = collect_one(f"""
+    SELECT COUNT(*) FROM idr_out.skipped_identifier_groups WHERE run_id = '{RUN_ID}'
+""") or 0
+
+if groups_skipped > 0:
+    print(f"  ⚠️ Skipped {groups_skipped} identifier groups (exceeded max_group_size)")
+    # Show top offenders
+    skipped_details = collect(f"""
+        SELECT identifier_type, identifier_value_norm, group_size 
+        FROM idr_out.skipped_identifier_groups 
+        WHERE run_id = '{RUN_ID}'
+        ORDER BY group_size DESC
+        LIMIT 3
+    """)
+    for d in skipped_details:
+        print(f"     - {d['identifier_type']}: '{d['identifier_value_norm'][:30]}...' ({d['group_size']} entities)")
+
+# Step 4: Build anchors only for valid-sized groups
+q("""
+CREATE OR REPLACE TABLE idr_work.group_anchor AS
+SELECT gs.identifier_type, gs.identifier_value_norm, gs.anchor_entity_key
+FROM idr_work.group_sizes gs
+JOIN idr_meta.rule r ON r.is_active = TRUE AND r.identifier_type = gs.identifier_type
+WHERE gs.group_size <= COALESCE(r.max_group_size, 10000)
 """)
 
 q(f"""
@@ -331,22 +429,23 @@ FROM idr_work.entities_delta
 WHERE entity_key NOT IN (SELECT entity_key FROM idr_work.lp_labels)
 """)
 
-# Upsert membership
-q("""
-INSERT INTO idr_out.identity_resolved_membership_current
-SELECT * FROM idr_work.membership_updates src
-WHERE NOT EXISTS (
-    SELECT 1 FROM idr_out.identity_resolved_membership_current tgt
-    WHERE tgt.entity_key = src.entity_key
-)
-""")
+# Upsert membership (skip in dry run)
+if not DRY_RUN:
+    q("""
+    INSERT INTO idr_out.identity_resolved_membership_current
+    SELECT * FROM idr_work.membership_updates src
+    WHERE NOT EXISTS (
+        SELECT 1 FROM idr_out.identity_resolved_membership_current tgt
+        WHERE tgt.entity_key = src.entity_key
+    )
+    """)
 
-q("""
-UPDATE idr_out.identity_resolved_membership_current AS tgt
-SET resolved_id = src.resolved_id, updated_ts = src.updated_ts
-FROM idr_work.membership_updates src
-WHERE tgt.entity_key = src.entity_key
-""")
+    q("""
+    UPDATE idr_out.identity_resolved_membership_current AS tgt
+    SET resolved_id = src.resolved_id, updated_ts = src.updated_ts
+    FROM idr_work.membership_updates src
+    WHERE tgt.entity_key = src.entity_key
+    """)
 
 
 q("""
@@ -354,23 +453,34 @@ CREATE OR REPLACE TABLE idr_work.impacted_resolved_ids AS
 SELECT DISTINCT resolved_id FROM idr_work.membership_updates
 """)
 
-q("""
-CREATE OR REPLACE TABLE idr_work.cluster_sizes_updates AS
-SELECT resolved_id, COUNT(*) AS cluster_size, CURRENT_TIMESTAMP AS updated_ts
-FROM idr_out.identity_resolved_membership_current
-WHERE resolved_id IN (SELECT resolved_id FROM idr_work.impacted_resolved_ids)
-GROUP BY resolved_id
-""")
+# Compute cluster sizes - in dry run, use work tables only
+if DRY_RUN:
+    # For dry run, compute proposed cluster sizes from membership_updates
+    q("""
+    CREATE OR REPLACE TABLE idr_work.cluster_sizes_updates AS
+    SELECT resolved_id, COUNT(*) AS cluster_size, CURRENT_TIMESTAMP AS updated_ts
+    FROM idr_work.membership_updates
+    GROUP BY resolved_id
+    """)
+else:
+    q("""
+    CREATE OR REPLACE TABLE idr_work.cluster_sizes_updates AS
+    SELECT resolved_id, COUNT(*) AS cluster_size, CURRENT_TIMESTAMP AS updated_ts
+    FROM idr_out.identity_resolved_membership_current
+    WHERE resolved_id IN (SELECT resolved_id FROM idr_work.impacted_resolved_ids)
+    GROUP BY resolved_id
+    """)
 
-# Upsert clusters
-q("""
-DELETE FROM idr_out.identity_clusters_current
-WHERE resolved_id IN (SELECT resolved_id FROM idr_work.cluster_sizes_updates)
-""")
-q("""
-INSERT INTO idr_out.identity_clusters_current
-SELECT * FROM idr_work.cluster_sizes_updates
-""")
+# Upsert clusters (skip in dry run)
+if not DRY_RUN:
+    q("""
+    DELETE FROM idr_out.identity_clusters_current
+    WHERE resolved_id IN (SELECT resolved_id FROM idr_work.cluster_sizes_updates)
+    """)
+    q("""
+    INSERT INTO idr_out.identity_clusters_current
+    SELECT * FROM idr_work.cluster_sizes_updates
+    """)
 
 # ============================================
 # BUILD GOLDEN PROFILE
@@ -449,20 +559,24 @@ LEFT JOIN first_name_ranked f ON f.resolved_id = i.resolved_id AND f.rn = 1
 LEFT JOIN last_name_ranked l ON l.resolved_id = i.resolved_id AND l.rn = 1
 """)
 
-# Upsert golden profiles
-q("""
-DELETE FROM idr_out.golden_profile_current
-WHERE resolved_id IN (SELECT resolved_id FROM idr_work.golden_updates)
-""")
-q("""
-INSERT INTO idr_out.golden_profile_current
-SELECT * FROM idr_work.golden_updates
-""")
+# Upsert golden profiles (skip in dry run)
+if not DRY_RUN:
+    q("""
+    DELETE FROM idr_out.golden_profile_current
+    WHERE resolved_id IN (SELECT resolved_id FROM idr_work.golden_updates)
+    """)
+    q("""
+    INSERT INTO idr_out.golden_profile_current
+    SELECT * FROM idr_work.golden_updates
+    """)
 
 # ============================================
 # UPDATE RUN STATE
 # ============================================
-print("💾 Updating run state...")
+if DRY_RUN:
+    print("📊 Computing dry run diff (no state updates)...")
+else:
+    print("💾 Updating run state...")
 
 q("""
 CREATE OR REPLACE TABLE idr_work.watermark_updates AS
@@ -471,14 +585,61 @@ FROM idr_work.entities_delta
 GROUP BY table_id
 """)
 
-q(f"""
-UPDATE idr_meta.run_state AS tgt
-SET last_watermark_value = src.new_watermark_value,
-    last_run_id = '{RUN_ID}',
-    last_run_ts = TIMESTAMP '{RUN_TS}'
-FROM idr_work.watermark_updates src
-WHERE tgt.table_id = src.table_id
-""")
+if not DRY_RUN:
+    q(f"""
+    UPDATE idr_meta.run_state AS tgt
+    SET last_watermark_value = src.new_watermark_value,
+        last_run_id = '{RUN_ID}',
+        last_run_ts = TIMESTAMP '{RUN_TS}'
+    FROM idr_work.watermark_updates src
+    WHERE tgt.table_id = src.table_id
+    """)
+
+# ============================================
+# DRY RUN DIFF COMPUTATION
+# ============================================
+if DRY_RUN:
+    # Compute change types for each entity
+    q(f"""
+    INSERT INTO idr_out.dry_run_results (run_id, entity_key, current_resolved_id, proposed_resolved_id, 
+                                         change_type, current_cluster_size, proposed_cluster_size)
+    SELECT
+        '{RUN_ID}' AS run_id,
+        COALESCE(proposed.entity_key, current.entity_key) AS entity_key,
+        current.resolved_id AS current_resolved_id,
+        proposed.resolved_id AS proposed_resolved_id,
+        CASE
+            WHEN current.entity_key IS NULL THEN 'NEW'
+            WHEN current.resolved_id = proposed.resolved_id THEN 'UNCHANGED'
+            ELSE 'MOVED'
+        END AS change_type,
+        current_clusters.cluster_size AS current_cluster_size,
+        proposed_clusters.cluster_size AS proposed_cluster_size
+    FROM idr_work.membership_updates proposed
+    FULL OUTER JOIN idr_out.identity_resolved_membership_current current
+        ON proposed.entity_key = current.entity_key
+    LEFT JOIN idr_out.identity_clusters_current current_clusters
+        ON current.resolved_id = current_clusters.resolved_id
+    LEFT JOIN idr_work.cluster_sizes_updates proposed_clusters
+        ON proposed.resolved_id = proposed_clusters.resolved_id
+    WHERE proposed.entity_key IN (SELECT entity_key FROM idr_work.entities_delta)
+    """)
+    
+    # Compute dry run summary
+    new_cnt = collect_one(f"SELECT COUNT(*) FROM idr_out.dry_run_results WHERE run_id='{RUN_ID}' AND change_type='NEW'") or 0
+    moved_cnt = collect_one(f"SELECT COUNT(*) FROM idr_out.dry_run_results WHERE run_id='{RUN_ID}' AND change_type='MOVED'") or 0
+    unchanged_cnt = collect_one(f"SELECT COUNT(*) FROM idr_out.dry_run_results WHERE run_id='{RUN_ID}' AND change_type='UNCHANGED'") or 0
+    largest_proposed = collect_one("SELECT MAX(cluster_size) FROM idr_work.cluster_sizes_updates") or 0
+    
+    q(f"""
+    INSERT INTO idr_out.dry_run_summary (run_id, total_entities, new_entities, moved_entities, unchanged_entities,
+                                          merged_clusters, split_clusters, largest_proposed_cluster, 
+                                          edges_would_create, groups_would_skip, values_would_exclude, execution_time_seconds)
+    VALUES ('{RUN_ID}', {new_cnt + moved_cnt + unchanged_cnt}, {new_cnt}, {moved_cnt}, {unchanged_cnt},
+            0, 0, {largest_proposed}, 
+            (SELECT COUNT(*) FROM idr_work.edges_new), {groups_skipped}, {values_excluded}, 
+            {int(time.time() - run_start)})
+    """)
 
 # ============================================
 # FINALIZE
@@ -488,25 +649,65 @@ edges_cnt = collect_one("SELECT COUNT(*) FROM idr_work.edges_new") or 0
 clusters_cnt = collect_one("SELECT COUNT(*) FROM idr_out.identity_clusters_current") or 0
 duration = int(time.time() - run_start)
 
+# Count large clusters (1000+ entities)
+large_clusters = collect_one("""
+    SELECT COUNT(*) FROM idr_out.identity_clusters_current WHERE cluster_size >= 1000
+""") or 0
+
+# Build warnings list
+warnings = []
+if groups_skipped > 0:
+    warnings.append(f"{groups_skipped} identifier groups skipped (exceeded max_group_size)")
+if values_excluded > 0:
+    warnings.append(f"{values_excluded} identifier values excluded (matched exclusion list)")
+if large_clusters > 0:
+    warnings.append(f"{large_clusters} large clusters detected (1000+ entities)")
+
+warnings_json = json.dumps(warnings) if warnings else None
+status = 'SUCCESS' if not warnings else 'SUCCESS_WITH_WARNINGS'
+
 q(f"""
 UPDATE idr_out.run_history
-SET status = 'SUCCESS',
+SET status = '{status}',
     ended_at = CURRENT_TIMESTAMP,
     duration_seconds = {duration},
     entities_processed = {entities_cnt},
     edges_created = {edges_cnt},
     clusters_impacted = {clusters_cnt},
-    lp_iterations = {iterations}
+    lp_iterations = {iterations},
+    groups_skipped = {groups_skipped},
+    values_excluded = {values_excluded},
+    large_clusters = {large_clusters},
+    warnings = {f"'{warnings_json}'" if warnings_json else 'NULL'}
 WHERE run_id = '{RUN_ID}'
 """)
 
 con.close()
 
-print(f"\n✅ DuckDB IDR run completed!")
-print(f"   Run ID: {RUN_ID}")
-print(f"   Database: {DB_PATH}")
-print(f"   Entities processed: {entities_cnt}")
-print(f"   Edges created: {edges_cnt}")
-print(f"   Clusters: {clusters_cnt}")
-print(f"   LP iterations: {iterations}")
-print(f"   Duration: {duration}s")
+# Enhanced run summary
+print(f"\n{'='*60}")
+print("IDR RUN SUMMARY")
+print(f"{'='*60}")
+print(f"Run ID:          {RUN_ID}")
+print(f"Mode:            {RUN_MODE}")
+print(f"Duration:        {duration}s")
+print(f"Status:          {status}")
+print()
+print("PROCESSING:")
+print(f"  Sources:       {len(source_rows)} tables processed")
+print(f"  Entities:      {entities_cnt:,} processed")
+print(f"  Edges:         {edges_cnt:,} created")
+print(f"  LP Iterations: {iterations}")
+print(f"  Clusters:      {clusters_cnt:,} impacted")
+
+if warnings:
+    print()
+    print("DATA QUALITY:")
+    for w in warnings:
+        print(f"  ⚠️ {w}")
+    print()
+    print("ACTIONS NEEDED:")
+    print(f"  → Review: SELECT * FROM idr_out.skipped_identifier_groups WHERE run_id = '{RUN_ID}'")
+
+print(f"{'='*60}")
+print(f"✅ DuckDB IDR run completed!")

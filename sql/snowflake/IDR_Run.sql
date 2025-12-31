@@ -153,24 +153,75 @@ $$
        WHERE i.identifier_value IS NOT NULL`);
     
     // =============================================
-    // BUILD EDGES (Anchor-based)
+    // BUILD EDGES (Anchor-based with size limits)
     // =============================================
+    var groups_skipped = 0;
+    var values_excluded = 0;
+    
+    // Step 1: Apply exclusion list filtering
+    q(`CREATE OR REPLACE TRANSIENT TABLE idr_work.identifiers_filtered AS
+       SELECT i.*
+       FROM idr_work.identifiers_all i
+       WHERE NOT EXISTS (
+           SELECT 1 FROM idr_meta.identifier_exclusion e
+           WHERE e.identifier_type = i.identifier_type
+             AND (
+               (e.match_type = 'EXACT' AND i.identifier_value_norm = e.identifier_value_pattern)
+               OR (e.match_type = 'LIKE' AND i.identifier_value_norm LIKE e.identifier_value_pattern)
+             )
+       )`);
+    
+    var excluded_cnt = collectOne(`SELECT COUNT(*) FROM idr_work.identifiers_all`) || 0;
+    var filtered_cnt = collectOne(`SELECT COUNT(*) FROM idr_work.identifiers_filtered`) || 0;
+    values_excluded = excluded_cnt - filtered_cnt;
+    
     q(`CREATE OR REPLACE TRANSIENT TABLE idr_work.delta_identifier_values AS
        SELECT DISTINCT i.identifier_type, i.identifier_value_norm
        FROM idr_work.entities_delta e
-       JOIN idr_work.identifiers_all i ON i.entity_key = e.entity_key
+       JOIN idr_work.identifiers_filtered i ON i.entity_key = e.entity_key
        WHERE i.identifier_value_norm IS NOT NULL`);
     
     q(`CREATE OR REPLACE TRANSIENT TABLE idr_work.members_for_delta_values AS
        SELECT a.table_id, a.entity_key, a.identifier_type, a.identifier_value_norm
-       FROM idr_work.identifiers_all a
+       FROM idr_work.identifiers_filtered a
        JOIN idr_work.delta_identifier_values d
          ON a.identifier_type = d.identifier_type AND a.identifier_value_norm = d.identifier_value_norm`);
     
-    q(`CREATE OR REPLACE TRANSIENT TABLE idr_work.group_anchor AS
-       SELECT identifier_type, identifier_value_norm, MIN(entity_key) AS anchor_entity_key
+    // Step 2: Calculate group sizes
+    q(`CREATE OR REPLACE TRANSIENT TABLE idr_work.group_sizes AS
+       SELECT 
+           identifier_type, 
+           identifier_value_norm, 
+           COUNT(*) as group_size,
+           MIN(entity_key) AS anchor_entity_key,
+           ARRAY_AGG(entity_key) WITHIN GROUP (ORDER BY entity_key) AS sample_keys
        FROM idr_work.members_for_delta_values
        GROUP BY identifier_type, identifier_value_norm`);
+    
+    // Step 3: Log oversized groups
+    q(`INSERT INTO idr_out.skipped_identifier_groups 
+       (run_id, identifier_type, identifier_value_norm, group_size, max_allowed, sample_entity_keys, reason, skipped_at)
+       SELECT 
+           '${run_id}',
+           gs.identifier_type,
+           gs.identifier_value_norm,
+           gs.group_size,
+           COALESCE(r.max_group_size, 10000),
+           ARRAY_TO_STRING(ARRAY_SLICE(gs.sample_keys, 0, 5), ','),
+           'EXCEEDED_MAX_GROUP_SIZE',
+           CURRENT_TIMESTAMP()
+       FROM idr_work.group_sizes gs
+       JOIN idr_meta.rule r ON r.is_active = TRUE AND r.identifier_type = gs.identifier_type
+       WHERE gs.group_size > COALESCE(r.max_group_size, 10000)`);
+    
+    groups_skipped = collectOne(`SELECT COUNT(*) FROM idr_out.skipped_identifier_groups WHERE run_id = '${run_id}'`) || 0;
+    
+    // Step 4: Build anchors only for valid-sized groups
+    q(`CREATE OR REPLACE TRANSIENT TABLE idr_work.group_anchor AS
+       SELECT gs.identifier_type, gs.identifier_value_norm, gs.anchor_entity_key
+       FROM idr_work.group_sizes gs
+       JOIN idr_meta.rule r ON r.is_active = TRUE AND r.identifier_type = gs.identifier_type
+       WHERE gs.group_size <= COALESCE(r.max_group_size, 10000)`);
     
     q(`CREATE OR REPLACE TRANSIENT TABLE idr_work.edges_new AS
        SELECT r.rule_id, ga.anchor_entity_key AS left_entity_key, m.entity_key AS right_entity_key,
@@ -378,20 +429,39 @@ $$
     // =============================================
     // FINALIZE
     // =============================================
-    var entities_cnt = collectOne(`SELECT COUNT(*) FROM idr_work.entities_delta`);
-    var edges_cnt = collectOne(`SELECT COUNT(*) FROM idr_work.edges_new`);
-    var clusters_cnt = collectOne(`SELECT COUNT(*) FROM idr_out.identity_clusters_current`);
+    var entities_cnt = collectOne(`SELECT COUNT(*) FROM idr_work.entities_delta`) || 0;
+    var edges_cnt = collectOne(`SELECT COUNT(*) FROM idr_work.edges_new`) || 0;
+    var clusters_cnt = collectOne(`SELECT COUNT(*) FROM idr_out.identity_clusters_current`) || 0;
+    var large_clusters = collectOne(`SELECT COUNT(*) FROM idr_out.identity_clusters_current WHERE cluster_size >= 1000`) || 0;
     var duration = Math.round((Date.now() - run_start) / 1000);
     
+    // Build warnings
+    var warnings = [];
+    if (groups_skipped > 0) warnings.push(groups_skipped + ' groups skipped (max_group_size)');
+    if (values_excluded > 0) warnings.push(values_excluded + ' values excluded (exclusion list)');
+    if (large_clusters > 0) warnings.push(large_clusters + ' large clusters (1000+)');
+    
+    var status = warnings.length > 0 ? 'SUCCESS_WITH_WARNINGS' : 'SUCCESS';
+    var warnings_json = warnings.length > 0 ? JSON.stringify(warnings) : null;
+    
     q(`UPDATE idr_out.run_history SET
-         status = 'SUCCESS',
+         status = '${status}',
          ended_at = CURRENT_TIMESTAMP(),
          duration_seconds = ${duration},
          entities_processed = ${entities_cnt},
          edges_created = ${edges_cnt},
          clusters_impacted = ${clusters_cnt},
-         lp_iterations = ${iterations}
+         lp_iterations = ${iterations},
+         groups_skipped = ${groups_skipped},
+         values_excluded = ${values_excluded},
+         large_clusters = ${large_clusters},
+         warnings = ${warnings_json ? "'" + warnings_json + "'" : 'NULL'}
        WHERE run_id = '${run_id}'`);
     
-    return `SUCCESS: run_id=${run_id}, entities=${entities_cnt}, edges=${edges_cnt}, iterations=${iterations}, duration=${duration}s`;
+    var result = `${status}: run_id=${run_id}, entities=${entities_cnt}, edges=${edges_cnt}, iterations=${iterations}, duration=${duration}s`;
+    if (warnings.length > 0) {
+        result += ` | WARNINGS: ${warnings.join(', ')}`;
+    }
+    return result;
 $$;
+
