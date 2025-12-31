@@ -564,6 +564,29 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#60-second-demo-fastest-way" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ⚡ 60-Second Demo (Fastest Way)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#full-setup-guide" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Full Setup Guide
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Full Setup Guide">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
   <a href="#prerequisites" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -573,8 +596,8 @@
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
+        
+          <li class="md-nav__item">
   <a href="#step-1-clone-the-repository" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -584,8 +607,8 @@
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
+        
+          <li class="md-nav__item">
   <a href="#step-2-choose-your-platform" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -593,6 +616,11 @@
       
     </span>
   </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -1563,6 +1591,29 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#60-second-demo-fastest-way" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ⚡ 60-Second Demo (Fastest Way)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#full-setup-guide" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Full Setup Guide
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Full Setup Guide">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
   <a href="#prerequisites" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1572,8 +1623,8 @@
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
+        
+          <li class="md-nav__item">
   <a href="#step-1-clone-the-repository" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1583,8 +1634,8 @@
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
+        
+          <li class="md-nav__item">
   <a href="#step-2-choose-your-platform" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1592,6 +1643,11 @@
       
     </span>
   </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -1729,57 +1785,74 @@
 <h1 id="quick-start">Quick Start</h1>
 <p>Get SQL Identity Resolution running in under 5 minutes.</p>
 <hr />
-<h2 id="prerequisites">Prerequisites</h2>
+<h2 id="60-second-demo-fastest-way">⚡ 60-Second Demo (Fastest Way)</h2>
+<p>Want to see it work immediately? Run one command:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/anilkulkarni87/sql-identity-resolution.git
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nb">cd</span><span class="w"> </span>sql-identity-resolution
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>make<span class="w"> </span>demo
+</code></pre></div>
+<p>This will:</p>
+<ol>
+<li>Create a DuckDB database</li>
+<li>Generate 10K sample customers with shared identifiers</li>
+<li>Run a dry run (preview changes)</li>
+<li>Run a live IDR pass (create clusters)</li>
+<li>Generate an HTML dashboard</li>
+</ol>
+<p>Open <code>demo_results.html</code> to explore the results!</p>
+<hr />
+<h2 id="full-setup-guide">Full Setup Guide</h2>
+<h3 id="prerequisites">Prerequisites</h3>
 <ul>
 <li>Python 3.9+ (for DuckDB/BigQuery CLI)</li>
 <li>Access to your target platform (Snowflake account, GCP project, Databricks workspace)</li>
 </ul>
 <hr />
-<h2 id="step-1-clone-the-repository">Step 1: Clone the Repository</h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/anilkulkarni87/sql-identity-resolution.git
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nb">cd</span><span class="w"> </span>sql-identity-resolution
+<h3 id="step-1-clone-the-repository">Step 1: Clone the Repository</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/anilkulkarni87/sql-identity-resolution.git
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="nb">cd</span><span class="w"> </span>sql-identity-resolution
 </code></pre></div>
 <hr />
-<h2 id="step-2-choose-your-platform">Step 2: Choose Your Platform</h2>
+<h3 id="step-2-choose-your-platform">Step 2: Choose Your Platform</h3>
 <div class="tabbed-set tabbed-alternate" data-tabs="1:4"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><input id="__tabbed_1_3" name="__tabbed_1" type="radio" /><input id="__tabbed_1_4" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">DuckDB (Local)</label><label for="__tabbed_1_2">Snowflake</label><label for="__tabbed_1_3">BigQuery</label><label for="__tabbed_1_4">Databricks</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
 <p><strong>Best for</strong>: Development, testing, small datasets (&lt;10M records)</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># Install DuckDB</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>pip<span class="w"> </span>install<span class="w"> </span>duckdb
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="c1"># Create database with schema</span>
-<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>duckdb<span class="w"> </span>idr.duckdb<span class="w"> </span>&lt;<span class="w"> </span>sql/duckdb/00_ddl_all.sql
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># Install DuckDB</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>pip<span class="w"> </span>install<span class="w"> </span>duckdb
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="c1"># Create database with schema</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>duckdb<span class="w"> </span>idr.duckdb<span class="w"> </span>&lt;<span class="w"> </span>sql/duckdb/00_ddl_all.sql
 </code></pre></div>
 </div>
 <div class="tabbed-block">
 <p><strong>Best for</strong>: Enterprise data warehouses, existing Snowflake users</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1">-- Run in Snowflake worksheet</span>
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="c1">-- Execute sql/snowflake/00_ddl_all.sql</span>
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="c1">-- Verify schemas created</span>
-<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="k">SHOW</span><span class="w"> </span><span class="n">SCHEMAS</span><span class="w"> </span><span class="k">IN</span><span class="w"> </span><span class="k">DATABASE</span><span class="w"> </span><span class="n">your_database</span><span class="p">;</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1">-- Run in Snowflake worksheet</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="c1">-- Execute sql/snowflake/00_ddl_all.sql</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="c1">-- Verify schemas created</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="k">SHOW</span><span class="w"> </span><span class="n">SCHEMAS</span><span class="w"> </span><span class="k">IN</span><span class="w"> </span><span class="k">DATABASE</span><span class="w"> </span><span class="n">your_database</span><span class="p">;</span>
 </code></pre></div>
 </div>
 <div class="tabbed-block">
 <p><strong>Best for</strong>: GCP users, serverless preference</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># Set credentials</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="nb">export</span><span class="w"> </span><span class="nv">GOOGLE_APPLICATION_CREDENTIALS</span><span class="o">=</span>/path/to/service-account.json
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="c1"># Create datasets</span>
-<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>bq<span class="w"> </span>mk<span class="w"> </span>--dataset<span class="w"> </span>your_project:idr_meta
-<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>bq<span class="w"> </span>mk<span class="w"> </span>--dataset<span class="w"> </span>your_project:idr_work
-<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>bq<span class="w"> </span>mk<span class="w"> </span>--dataset<span class="w"> </span>your_project:idr_out
-<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>
-<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="c1"># Run DDL</span>
-<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>bq<span class="w"> </span>query<span class="w"> </span>--use_legacy_sql<span class="o">=</span><span class="nb">false</span><span class="w"> </span>&lt;<span class="w"> </span>sql/bigquery/00_ddl_all.sql
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1"># Set credentials</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="nb">export</span><span class="w"> </span><span class="nv">GOOGLE_APPLICATION_CREDENTIALS</span><span class="o">=</span>/path/to/service-account.json
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="c1"># Create datasets</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>bq<span class="w"> </span>mk<span class="w"> </span>--dataset<span class="w"> </span>your_project:idr_meta
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>bq<span class="w"> </span>mk<span class="w"> </span>--dataset<span class="w"> </span>your_project:idr_work
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>bq<span class="w"> </span>mk<span class="w"> </span>--dataset<span class="w"> </span>your_project:idr_out
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>
+<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="c1"># Run DDL</span>
+<a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a>bq<span class="w"> </span>query<span class="w"> </span>--use_legacy_sql<span class="o">=</span><span class="nb">false</span><span class="w"> </span>&lt;<span class="w"> </span>sql/bigquery/00_ddl_all.sql
 </code></pre></div>
 </div>
 <div class="tabbed-block">
 <p><strong>Best for</strong>: Existing Databricks/Spark users, large-scale processing</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>1. Import notebooks from sql/databricks/notebooks/
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>2. Run IDR_QuickStart.py notebook
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>3. This creates schemas and sample data
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>1. Import notebooks from sql/databricks/notebooks/
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>2. Run IDR_QuickStart.py notebook
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>3. This creates schemas and sample data
 </code></pre></div>
 </div>
 </div>
@@ -1787,45 +1860,45 @@
 <hr />
 <h2 id="step-3-configure-your-sources">Step 3: Configure Your Sources</h2>
 <h3 id="31-register-source-tables">3.1 Register Source Tables</h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">INSERT</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="n">idr_meta</span><span class="p">.</span><span class="n">source_table</span><span class="w"> </span><span class="p">(</span>
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">  </span><span class="n">table_id</span><span class="p">,</span><span class="w"> </span>
-<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">  </span><span class="n">table_fqn</span><span class="p">,</span><span class="w"> </span>
-<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">  </span><span class="n">entity_type</span><span class="p">,</span><span class="w"> </span>
-<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="w">  </span><span class="n">entity_key_expr</span><span class="p">,</span><span class="w"> </span>
-<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="w">  </span><span class="n">watermark_column</span><span class="p">,</span><span class="w"> </span>
-<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="w">  </span><span class="n">watermark_lookback_minutes</span><span class="p">,</span><span class="w"> </span>
-<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="w">  </span><span class="n">is_active</span>
-<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="p">)</span><span class="w"> </span><span class="k">VALUES</span><span class="w"> </span><span class="p">(</span>
-<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="w">  </span><span class="s1">&#39;customers&#39;</span><span class="p">,</span><span class="w">           </span><span class="c1">-- Unique identifier for this source</span>
-<a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a><span class="w">  </span><span class="s1">&#39;crm.customers&#39;</span><span class="p">,</span><span class="w">       </span><span class="c1">-- Fully qualified table name</span>
-<a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a><span class="w">  </span><span class="s1">&#39;PERSON&#39;</span><span class="p">,</span><span class="w">              </span><span class="c1">-- Entity type</span>
-<a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a><span class="w">  </span><span class="s1">&#39;customer_id&#39;</span><span class="p">,</span><span class="w">         </span><span class="c1">-- Expression for entity key</span>
-<a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a><span class="w">  </span><span class="s1">&#39;updated_at&#39;</span><span class="p">,</span><span class="w">          </span><span class="c1">-- Watermark column for incremental</span>
-<a id="__codelineno-5-15" name="__codelineno-5-15" href="#__codelineno-5-15"></a><span class="w">  </span><span class="mi">0</span><span class="p">,</span><span class="w">                     </span><span class="c1">-- Lookback minutes</span>
-<a id="__codelineno-5-16" name="__codelineno-5-16" href="#__codelineno-5-16"></a><span class="w">  </span><span class="k">TRUE</span><span class="w">                   </span><span class="c1">-- Is active</span>
-<a id="__codelineno-5-17" name="__codelineno-5-17" href="#__codelineno-5-17"></a><span class="p">);</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">INSERT</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="n">idr_meta</span><span class="p">.</span><span class="n">source_table</span><span class="w"> </span><span class="p">(</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">  </span><span class="n">table_id</span><span class="p">,</span><span class="w"> </span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">  </span><span class="n">table_fqn</span><span class="p">,</span><span class="w"> </span>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">  </span><span class="n">entity_type</span><span class="p">,</span><span class="w"> </span>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="w">  </span><span class="n">entity_key_expr</span><span class="p">,</span><span class="w"> </span>
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="w">  </span><span class="n">watermark_column</span><span class="p">,</span><span class="w"> </span>
+<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="w">  </span><span class="n">watermark_lookback_minutes</span><span class="p">,</span><span class="w"> </span>
+<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="w">  </span><span class="n">is_active</span>
+<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="p">)</span><span class="w"> </span><span class="k">VALUES</span><span class="w"> </span><span class="p">(</span>
+<a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="w">  </span><span class="s1">&#39;customers&#39;</span><span class="p">,</span><span class="w">           </span><span class="c1">-- Unique identifier for this source</span>
+<a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a><span class="w">  </span><span class="s1">&#39;crm.customers&#39;</span><span class="p">,</span><span class="w">       </span><span class="c1">-- Fully qualified table name</span>
+<a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a><span class="w">  </span><span class="s1">&#39;PERSON&#39;</span><span class="p">,</span><span class="w">              </span><span class="c1">-- Entity type</span>
+<a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a><span class="w">  </span><span class="s1">&#39;customer_id&#39;</span><span class="p">,</span><span class="w">         </span><span class="c1">-- Expression for entity key</span>
+<a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a><span class="w">  </span><span class="s1">&#39;updated_at&#39;</span><span class="p">,</span><span class="w">          </span><span class="c1">-- Watermark column for incremental</span>
+<a id="__codelineno-6-15" name="__codelineno-6-15" href="#__codelineno-6-15"></a><span class="w">  </span><span class="mi">0</span><span class="p">,</span><span class="w">                     </span><span class="c1">-- Lookback minutes</span>
+<a id="__codelineno-6-16" name="__codelineno-6-16" href="#__codelineno-6-16"></a><span class="w">  </span><span class="k">TRUE</span><span class="w">                   </span><span class="c1">-- Is active</span>
+<a id="__codelineno-6-17" name="__codelineno-6-17" href="#__codelineno-6-17"></a><span class="p">);</span>
 </code></pre></div>
 <h3 id="32-define-matching-rules">3.2 Define Matching Rules</h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">INSERT</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="n">idr_meta</span><span class="p">.</span><span class="k">rule</span><span class="w"> </span><span class="p">(</span>
-<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">  </span><span class="n">rule_id</span><span class="p">,</span><span class="w"> </span>
-<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">  </span><span class="n">identifier_type</span><span class="p">,</span><span class="w"> </span>
-<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">  </span><span class="n">priority</span><span class="p">,</span><span class="w"> </span>
-<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="w">  </span><span class="n">is_active</span><span class="p">,</span>
-<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="w">  </span><span class="n">max_group_size</span>
-<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="p">)</span><span class="w"> </span><span class="k">VALUES</span><span class="w"> </span>
-<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="w">  </span><span class="p">(</span><span class="s1">&#39;email_exact&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;EMAIL&#39;</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="k">TRUE</span><span class="p">,</span><span class="w"> </span><span class="mi">10000</span><span class="p">),</span>
-<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="w">  </span><span class="p">(</span><span class="s1">&#39;phone_exact&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;PHONE&#39;</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="k">TRUE</span><span class="p">,</span><span class="w"> </span><span class="mi">5000</span><span class="p">),</span>
-<a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="w">  </span><span class="p">(</span><span class="s1">&#39;loyalty_id&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;LOYALTY&#39;</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="k">TRUE</span><span class="p">,</span><span class="w"> </span><span class="mi">1000</span><span class="p">);</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="k">INSERT</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="n">idr_meta</span><span class="p">.</span><span class="k">rule</span><span class="w"> </span><span class="p">(</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">  </span><span class="n">rule_id</span><span class="p">,</span><span class="w"> </span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">  </span><span class="n">identifier_type</span><span class="p">,</span><span class="w"> </span>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="w">  </span><span class="n">priority</span><span class="p">,</span><span class="w"> </span>
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="w">  </span><span class="n">is_active</span><span class="p">,</span>
+<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="w">  </span><span class="n">max_group_size</span>
+<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="p">)</span><span class="w"> </span><span class="k">VALUES</span><span class="w"> </span>
+<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="w">  </span><span class="p">(</span><span class="s1">&#39;email_exact&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;EMAIL&#39;</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="k">TRUE</span><span class="p">,</span><span class="w"> </span><span class="mi">10000</span><span class="p">),</span>
+<a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a><span class="w">  </span><span class="p">(</span><span class="s1">&#39;phone_exact&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;PHONE&#39;</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="k">TRUE</span><span class="p">,</span><span class="w"> </span><span class="mi">5000</span><span class="p">),</span>
+<a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a><span class="w">  </span><span class="p">(</span><span class="s1">&#39;loyalty_id&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;LOYALTY&#39;</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="k">TRUE</span><span class="p">,</span><span class="w"> </span><span class="mi">1000</span><span class="p">);</span>
 </code></pre></div>
 <h3 id="33-map-identifiers">3.3 Map Identifiers</h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="k">INSERT</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="n">idr_meta</span><span class="p">.</span><span class="n">identifier_mapping</span><span class="w"> </span><span class="p">(</span>
-<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">  </span><span class="n">table_id</span><span class="p">,</span><span class="w"> </span>
-<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">  </span><span class="n">identifier_type</span><span class="p">,</span><span class="w"> </span>
-<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="w">  </span><span class="n">column_expr</span><span class="p">,</span><span class="w"> </span>
-<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="w">  </span><span class="n">requires_normalization</span>
-<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="p">)</span><span class="w"> </span><span class="k">VALUES</span><span class="w"> </span>
-<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="w">  </span><span class="p">(</span><span class="s1">&#39;customers&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;EMAIL&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;email&#39;</span><span class="p">,</span><span class="w"> </span><span class="k">TRUE</span><span class="p">),</span>
-<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="w">  </span><span class="p">(</span><span class="s1">&#39;customers&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;PHONE&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;phone&#39;</span><span class="p">,</span><span class="w"> </span><span class="k">TRUE</span><span class="p">);</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="k">INSERT</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="n">idr_meta</span><span class="p">.</span><span class="n">identifier_mapping</span><span class="w"> </span><span class="p">(</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">  </span><span class="n">table_id</span><span class="p">,</span><span class="w"> </span>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">  </span><span class="n">identifier_type</span><span class="p">,</span><span class="w"> </span>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">  </span><span class="n">column_expr</span><span class="p">,</span><span class="w"> </span>
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="w">  </span><span class="n">requires_normalization</span>
+<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="p">)</span><span class="w"> </span><span class="k">VALUES</span><span class="w"> </span>
+<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="w">  </span><span class="p">(</span><span class="s1">&#39;customers&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;EMAIL&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;email&#39;</span><span class="p">,</span><span class="w"> </span><span class="k">TRUE</span><span class="p">),</span>
+<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="w">  </span><span class="p">(</span><span class="s1">&#39;customers&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;PHONE&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;phone&#39;</span><span class="p">,</span><span class="w"> </span><span class="k">TRUE</span><span class="p">);</span>
 </code></pre></div>
 <hr />
 <h2 id="step-4-run-a-dry-run">Step 4: Run a Dry Run</h2>
@@ -1836,21 +1909,21 @@
 <div class="tabbed-set tabbed-alternate" data-tabs="2:4"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><input id="__tabbed_2_2" name="__tabbed_2" type="radio" /><input id="__tabbed_2_3" name="__tabbed_2" type="radio" /><input id="__tabbed_2_4" name="__tabbed_2" type="radio" /><div class="tabbed-labels"><label for="__tabbed_2_1">DuckDB</label><label for="__tabbed_2_2">Snowflake</label><label for="__tabbed_2_3">BigQuery</label><label for="__tabbed_2_4">Databricks</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
-<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>python<span class="w"> </span>sql/duckdb/idr_run.py<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">  </span>--db<span class="o">=</span>idr.duckdb<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">  </span>--run-mode<span class="o">=</span>FULL<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">  </span>--dry-run
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>python<span class="w"> </span>sql/duckdb/idr_run.py<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">  </span>--db<span class="o">=</span>idr.duckdb<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">  </span>--run-mode<span class="o">=</span>FULL<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w">  </span>--dry-run
 </code></pre></div>
 </div>
 <div class="tabbed-block">
-<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="k">CALL</span><span class="w"> </span><span class="n">idr_run</span><span class="p">(</span><span class="s1">&#39;FULL&#39;</span><span class="p">,</span><span class="w"> </span><span class="mi">30</span><span class="p">,</span><span class="w"> </span><span class="k">TRUE</span><span class="p">);</span><span class="w">  </span><span class="c1">-- TRUE = dry run</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="k">CALL</span><span class="w"> </span><span class="n">idr_run</span><span class="p">(</span><span class="s1">&#39;FULL&#39;</span><span class="p">,</span><span class="w"> </span><span class="mi">30</span><span class="p">,</span><span class="w"> </span><span class="k">TRUE</span><span class="p">);</span><span class="w">  </span><span class="c1">-- TRUE = dry run</span>
 </code></pre></div>
 </div>
 <div class="tabbed-block">
-<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>python<span class="w"> </span>sql/bigquery/idr_run.py<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">  </span>--project<span class="o">=</span>your-project<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="w">  </span>--run-mode<span class="o">=</span>FULL<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="w">  </span>--dry-run
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>python<span class="w"> </span>sql/bigquery/idr_run.py<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="w">  </span>--project<span class="o">=</span>your-project<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="w">  </span>--run-mode<span class="o">=</span>FULL<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="w">  </span>--dry-run
 </code></pre></div>
 </div>
 <div class="tabbed-block">
@@ -1859,26 +1932,26 @@
 </div>
 </div>
 <h3 id="dry-run-output">Dry Run Output</h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>============================================================
-<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>DRY RUN SUMMARY (No changes committed)
-<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>============================================================
-<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>Run ID:          dry_run_abc123
-<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>Mode:            FULL (DRY RUN)
-<a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a>Duration:        5s
-<a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a>Status:          DRY_RUN_COMPLETE
-<a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a>
-<a id="__codelineno-11-9" name="__codelineno-11-9" href="#__codelineno-11-9"></a>IMPACT PREVIEW:
-<a id="__codelineno-11-10" name="__codelineno-11-10" href="#__codelineno-11-10"></a>  New Entities:      1,234
-<a id="__codelineno-11-11" name="__codelineno-11-11" href="#__codelineno-11-11"></a>  Moved Entities:    89
-<a id="__codelineno-11-12" name="__codelineno-11-12" href="#__codelineno-11-12"></a>  Edges Would Create: 5,678
-<a id="__codelineno-11-13" name="__codelineno-11-13" href="#__codelineno-11-13"></a>  Largest Cluster:   523 entities
-<a id="__codelineno-11-14" name="__codelineno-11-14" href="#__codelineno-11-14"></a>
-<a id="__codelineno-11-15" name="__codelineno-11-15" href="#__codelineno-11-15"></a>REVIEW QUERIES:
-<a id="__codelineno-11-16" name="__codelineno-11-16" href="#__codelineno-11-16"></a>  → All changes:  SELECT * FROM idr_out.dry_run_results WHERE run_id = &#39;dry_run_abc123&#39;
-<a id="__codelineno-11-17" name="__codelineno-11-17" href="#__codelineno-11-17"></a>  → Moved only:   SELECT * FROM idr_out.dry_run_results WHERE ... AND change_type = &#39;MOVED&#39;
-<a id="__codelineno-11-18" name="__codelineno-11-18" href="#__codelineno-11-18"></a>
-<a id="__codelineno-11-19" name="__codelineno-11-19" href="#__codelineno-11-19"></a>⚠️  THIS WAS A DRY RUN - NO CHANGES COMMITTED
-<a id="__codelineno-11-20" name="__codelineno-11-20" href="#__codelineno-11-20"></a>============================================================
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>============================================================
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>DRY RUN SUMMARY (No changes committed)
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>============================================================
+<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a>Run ID:          dry_run_abc123
+<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a>Mode:            FULL (DRY RUN)
+<a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a>Duration:        5s
+<a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a>Status:          DRY_RUN_COMPLETE
+<a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a>
+<a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a>IMPACT PREVIEW:
+<a id="__codelineno-12-10" name="__codelineno-12-10" href="#__codelineno-12-10"></a>  New Entities:      1,234
+<a id="__codelineno-12-11" name="__codelineno-12-11" href="#__codelineno-12-11"></a>  Moved Entities:    89
+<a id="__codelineno-12-12" name="__codelineno-12-12" href="#__codelineno-12-12"></a>  Edges Would Create: 5,678
+<a id="__codelineno-12-13" name="__codelineno-12-13" href="#__codelineno-12-13"></a>  Largest Cluster:   523 entities
+<a id="__codelineno-12-14" name="__codelineno-12-14" href="#__codelineno-12-14"></a>
+<a id="__codelineno-12-15" name="__codelineno-12-15" href="#__codelineno-12-15"></a>REVIEW QUERIES:
+<a id="__codelineno-12-16" name="__codelineno-12-16" href="#__codelineno-12-16"></a>  → All changes:  SELECT * FROM idr_out.dry_run_results WHERE run_id = &#39;dry_run_abc123&#39;
+<a id="__codelineno-12-17" name="__codelineno-12-17" href="#__codelineno-12-17"></a>  → Moved only:   SELECT * FROM idr_out.dry_run_results WHERE ... AND change_type = &#39;MOVED&#39;
+<a id="__codelineno-12-18" name="__codelineno-12-18" href="#__codelineno-12-18"></a>
+<a id="__codelineno-12-19" name="__codelineno-12-19" href="#__codelineno-12-19"></a>⚠️  THIS WAS A DRY RUN - NO CHANGES COMMITTED
+<a id="__codelineno-12-20" name="__codelineno-12-20" href="#__codelineno-12-20"></a>============================================================
 </code></pre></div>
 <hr />
 <h2 id="step-5-review-and-commit">Step 5: Review and Commit</h2>
@@ -1886,20 +1959,20 @@
 <div class="tabbed-set tabbed-alternate" data-tabs="3:4"><input checked="checked" id="__tabbed_3_1" name="__tabbed_3" type="radio" /><input id="__tabbed_3_2" name="__tabbed_3" type="radio" /><input id="__tabbed_3_3" name="__tabbed_3" type="radio" /><input id="__tabbed_3_4" name="__tabbed_3" type="radio" /><div class="tabbed-labels"><label for="__tabbed_3_1">DuckDB</label><label for="__tabbed_3_2">Snowflake</label><label for="__tabbed_3_3">BigQuery</label><label for="__tabbed_3_4">Databricks</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
-<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="c1"># Remove --dry-run to commit</span>
-<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>python<span class="w"> </span>sql/duckdb/idr_run.py<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="w">  </span>--db<span class="o">=</span>idr.duckdb<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="w">  </span>--run-mode<span class="o">=</span>FULL
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="c1"># Remove --dry-run to commit</span>
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>python<span class="w"> </span>sql/duckdb/idr_run.py<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="w">  </span>--db<span class="o">=</span>idr.duckdb<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="w">  </span>--run-mode<span class="o">=</span>FULL
 </code></pre></div>
 </div>
 <div class="tabbed-block">
-<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="k">CALL</span><span class="w"> </span><span class="n">idr_run</span><span class="p">(</span><span class="s1">&#39;FULL&#39;</span><span class="p">,</span><span class="w"> </span><span class="mi">30</span><span class="p">,</span><span class="w"> </span><span class="k">FALSE</span><span class="p">);</span><span class="w">  </span><span class="c1">-- FALSE = live run</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="k">CALL</span><span class="w"> </span><span class="n">idr_run</span><span class="p">(</span><span class="s1">&#39;FULL&#39;</span><span class="p">,</span><span class="w"> </span><span class="mi">30</span><span class="p">,</span><span class="w"> </span><span class="k">FALSE</span><span class="p">);</span><span class="w">  </span><span class="c1">-- FALSE = live run</span>
 </code></pre></div>
 </div>
 <div class="tabbed-block">
-<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>python<span class="w"> </span>sql/bigquery/idr_run.py<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="w">  </span>--project<span class="o">=</span>your-project<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="w">  </span>--run-mode<span class="o">=</span>FULL
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>python<span class="w"> </span>sql/bigquery/idr_run.py<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="w">  </span>--project<span class="o">=</span>your-project<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="w">  </span>--run-mode<span class="o">=</span>FULL
 </code></pre></div>
 </div>
 <div class="tabbed-block">
@@ -1909,24 +1982,24 @@
 </div>
 <hr />
 <h2 id="step-6-query-results">Step 6: Query Results</h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="c1">-- View cluster membership</span>
-<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="k">SELECT</span><span class="w"> </span>
-<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="w">  </span><span class="n">entity_key</span><span class="p">,</span>
-<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="w">  </span><span class="n">resolved_id</span><span class="p">,</span>
-<a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a><span class="w">  </span><span class="n">updated_ts</span>
-<a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a><span class="k">FROM</span><span class="w"> </span><span class="n">idr_out</span><span class="p">.</span><span class="n">identity_resolved_membership_current</span>
-<a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a><span class="k">LIMIT</span><span class="w"> </span><span class="mi">100</span><span class="p">;</span>
-<a id="__codelineno-15-8" name="__codelineno-15-8" href="#__codelineno-15-8"></a>
-<a id="__codelineno-15-9" name="__codelineno-15-9" href="#__codelineno-15-9"></a><span class="c1">-- View cluster sizes</span>
-<a id="__codelineno-15-10" name="__codelineno-15-10" href="#__codelineno-15-10"></a><span class="k">SELECT</span><span class="w"> </span>
-<a id="__codelineno-15-11" name="__codelineno-15-11" href="#__codelineno-15-11"></a><span class="w">  </span><span class="n">resolved_id</span><span class="p">,</span>
-<a id="__codelineno-15-12" name="__codelineno-15-12" href="#__codelineno-15-12"></a><span class="w">  </span><span class="n">cluster_size</span>
-<a id="__codelineno-15-13" name="__codelineno-15-13" href="#__codelineno-15-13"></a><span class="k">FROM</span><span class="w"> </span><span class="n">idr_out</span><span class="p">.</span><span class="n">identity_clusters_current</span>
-<a id="__codelineno-15-14" name="__codelineno-15-14" href="#__codelineno-15-14"></a><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">cluster_size</span><span class="w"> </span><span class="k">DESC</span>
-<a id="__codelineno-15-15" name="__codelineno-15-15" href="#__codelineno-15-15"></a><span class="k">LIMIT</span><span class="w"> </span><span class="mi">20</span><span class="p">;</span>
-<a id="__codelineno-15-16" name="__codelineno-15-16" href="#__codelineno-15-16"></a>
-<a id="__codelineno-15-17" name="__codelineno-15-17" href="#__codelineno-15-17"></a><span class="c1">-- View golden profiles</span>
-<a id="__codelineno-15-18" name="__codelineno-15-18" href="#__codelineno-15-18"></a><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">idr_out</span><span class="p">.</span><span class="n">golden_profile_current</span><span class="w"> </span><span class="k">LIMIT</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="c1">-- View cluster membership</span>
+<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="k">SELECT</span><span class="w"> </span>
+<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="w">  </span><span class="n">entity_key</span><span class="p">,</span>
+<a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="w">  </span><span class="n">resolved_id</span><span class="p">,</span>
+<a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a><span class="w">  </span><span class="n">updated_ts</span>
+<a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a><span class="k">FROM</span><span class="w"> </span><span class="n">idr_out</span><span class="p">.</span><span class="n">identity_resolved_membership_current</span>
+<a id="__codelineno-16-7" name="__codelineno-16-7" href="#__codelineno-16-7"></a><span class="k">LIMIT</span><span class="w"> </span><span class="mi">100</span><span class="p">;</span>
+<a id="__codelineno-16-8" name="__codelineno-16-8" href="#__codelineno-16-8"></a>
+<a id="__codelineno-16-9" name="__codelineno-16-9" href="#__codelineno-16-9"></a><span class="c1">-- View cluster sizes</span>
+<a id="__codelineno-16-10" name="__codelineno-16-10" href="#__codelineno-16-10"></a><span class="k">SELECT</span><span class="w"> </span>
+<a id="__codelineno-16-11" name="__codelineno-16-11" href="#__codelineno-16-11"></a><span class="w">  </span><span class="n">resolved_id</span><span class="p">,</span>
+<a id="__codelineno-16-12" name="__codelineno-16-12" href="#__codelineno-16-12"></a><span class="w">  </span><span class="n">cluster_size</span>
+<a id="__codelineno-16-13" name="__codelineno-16-13" href="#__codelineno-16-13"></a><span class="k">FROM</span><span class="w"> </span><span class="n">idr_out</span><span class="p">.</span><span class="n">identity_clusters_current</span>
+<a id="__codelineno-16-14" name="__codelineno-16-14" href="#__codelineno-16-14"></a><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">cluster_size</span><span class="w"> </span><span class="k">DESC</span>
+<a id="__codelineno-16-15" name="__codelineno-16-15" href="#__codelineno-16-15"></a><span class="k">LIMIT</span><span class="w"> </span><span class="mi">20</span><span class="p">;</span>
+<a id="__codelineno-16-16" name="__codelineno-16-16" href="#__codelineno-16-16"></a>
+<a id="__codelineno-16-17" name="__codelineno-16-17" href="#__codelineno-16-17"></a><span class="c1">-- View golden profiles</span>
+<a id="__codelineno-16-18" name="__codelineno-16-18" href="#__codelineno-16-18"></a><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">idr_out</span><span class="p">.</span><span class="n">golden_profile_current</span><span class="w"> </span><span class="k">LIMIT</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span>
 </code></pre></div>
 <hr />
 <h2 id="next-steps">Next Steps</h2>
