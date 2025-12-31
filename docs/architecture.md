@@ -90,6 +90,58 @@ erDiagram
     }
 ```
 
+### How Rules Work
+
+Rules define **how identifiers are matched** between entities. Each rule specifies an identifier type and how to normalize it.
+
+**Rule execution**: All active rules run in parallel during edge building. The `priority` column is used for tie-breaking when multiple rules could apply.
+
+#### Example: Rule Table
+
+| rule_id | priority | identifier_type | canonicalize | require_non_null |
+|---------|----------|-----------------|--------------|------------------|
+| R_EMAIL_EXACT | 1 | EMAIL | LOWERCASE | true |
+| R_PHONE_EXACT | 2 | PHONE | PHONE_DIGITS | true |
+| R_LOYALTY_EXACT | 3 | LOYALTY_ID | NONE | true |
+
+#### Canonicalize Options
+
+The `canonicalize` column determines how identifier values are normalized before comparison:
+
+| Option | Effect | Input → Output |
+|--------|--------|----------------|
+| `LOWERCASE` | Convert to lowercase | `John@Gmail.COM` → `john@gmail.com` |
+| `UPPERCASE` | Convert to uppercase | `john@gmail.com` → `JOHN@GMAIL.COM` |
+| `NONE` | No transformation | `L123456` → `L123456` |
+| `TRIM` | Remove whitespace | `" 9876543210 "` → `9876543210` |
+| `PHONE_DIGITS` | Keep only digits | `+1 (987) 654-3210` → `19876543210` |
+
+#### Example: How Canonicalization Creates Matches
+
+**Without canonicalization** (NONE):
+```
+CRM:  email = "John.Doe@Gmail.com"
+Web:  email = "JOHN.DOE@GMAIL.COM"
+→ NO MATCH (different strings)
+```
+
+**With canonicalization** (LOWERCASE):
+```
+CRM:  email = "John.Doe@Gmail.com"  → "john.doe@gmail.com"
+Web:  email = "JOHN.DOE@GMAIL.COM"  → "john.doe@gmail.com"
+→ MATCH! (same normalized value)
+```
+
+#### Rule Priority
+
+Lower `priority` = higher importance. When the same pair of entities could be matched by multiple rules, the lower priority rule's edge is kept.
+
+```
+Priority 1 (EMAIL)  → Most trusted match type
+Priority 2 (PHONE)  → Secondary match type  
+Priority 3 (LOYALTY_ID) → Tertiary match type
+```
+
 ### Output Tables (`idr_out.*`)
 
 | Table | Purpose | Key Columns |
