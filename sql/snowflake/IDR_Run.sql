@@ -374,14 +374,49 @@ $$
     // =============================================
     // BUILD GOLDEN PROFILE
     // =============================================
-    q(`CREATE OR REPLACE TRANSIENT TABLE idr_work.entities_all AS
-       SELECT 
-         e.entity_key, e.table_id,
-         c.email, c.phone, c.first_name, c.last_name,
-         c.rec_update_dt AS record_updated_at
-       FROM idr_work.entities_delta e
-       LEFT JOIN crm.customer c ON e.entity_key = 'customer:' || c.customer_id
-       WHERE e.table_id = 'customer'`);
+    
+    // Dynamically build entities_all from first registered source
+    var source_stmt = snowflake.createStatement({sqlText: `
+        SELECT table_fqn, entity_key_expr 
+        FROM idr_meta.source_table 
+        WHERE is_active = TRUE 
+        LIMIT 1
+    `});
+    var source_rs = source_stmt.execute();
+    
+    if (source_rs.next()) {
+        var source_table = source_rs.getColumnValue(1);
+        var entity_key_col = source_rs.getColumnValue(2);
+        
+        // Discover columns in source table
+        var col_stmt = snowflake.createStatement({sqlText: `DESCRIBE TABLE ${source_table}`});
+        var col_rs = col_stmt.execute();
+        var cols = [];
+        while (col_rs.next()) { cols.push(col_rs.getColumnValue(1).toLowerCase()); }
+        
+        var email_expr = cols.includes('email') ? 'src.email' : 'NULL';
+        var phone_expr = cols.includes('phone') ? 'src.phone' : 'NULL';
+        var first_name_expr = cols.includes('first_name') ? 'src.first_name' : 'NULL';
+        var last_name_expr = cols.includes('last_name') ? 'src.last_name' : 'NULL';
+        var updated_expr = cols.includes('created_at') ? 'src.created_at' : 'CURRENT_TIMESTAMP()';
+        
+        q(`CREATE OR REPLACE TRANSIENT TABLE idr_work.entities_all AS
+           SELECT 
+             e.entity_key, e.table_id,
+             ${email_expr} AS email, 
+             ${phone_expr} AS phone, 
+             ${first_name_expr} AS first_name, 
+             ${last_name_expr} AS last_name,
+             ${updated_expr} AS record_updated_at
+           FROM idr_work.entities_delta e
+           LEFT JOIN ${source_table} src ON e.entity_key = src.${entity_key_col}`);
+    } else {
+        // Fallback: empty entities_all
+        q(`CREATE OR REPLACE TRANSIENT TABLE idr_work.entities_all AS
+           SELECT NULL AS entity_key, NULL AS table_id, NULL AS email, NULL AS phone,
+                  NULL AS first_name, NULL AS last_name, NULL::TIMESTAMP AS record_updated_at
+           WHERE FALSE`);
+    }
     
     q(`CREATE OR REPLACE TRANSIENT TABLE idr_work.golden_updates AS
        WITH impacted AS (

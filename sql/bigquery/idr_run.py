@@ -436,16 +436,58 @@ if not DRY_RUN:
 # ============================================
 print("🏆 Building golden profiles...")
 
-q(f"""
-CREATE OR REPLACE TABLE `{PROJECT}.idr_work.entities_all` AS
-SELECT 
-    e.entity_key, e.table_id,
-    c.email, c.phone, c.first_name, c.last_name,
-    c.rec_update_dt AS record_updated_at
-FROM `{PROJECT}.idr_work.entities_delta` e
-LEFT JOIN `{PROJECT}.crm.customer` c ON e.entity_key = CONCAT('customer:', c.customer_id)
-WHERE e.table_id = 'customer'
-""")
+# Dynamically build entities_all from first registered source
+source_result = client.query(f"""
+    SELECT table_fqn, entity_key_expr 
+    FROM `{PROJECT}.idr_meta.source_table`
+    WHERE is_active = TRUE 
+    LIMIT 1
+""").result()
+
+source_rows = list(source_result)
+if source_rows:
+    source_table = source_rows[0].table_fqn
+    entity_key_col = source_rows[0].entity_key_expr
+    
+    # Discover columns
+    schema_result = client.query(f"""
+        SELECT column_name 
+        FROM `{PROJECT}.INFORMATION_SCHEMA.COLUMNS`
+        WHERE table_name = '{source_table.split(".")[-1]}'
+    """).result()
+    cols = [row.column_name.lower() for row in schema_result]
+    
+    email_expr = "src.email" if "email" in cols else "NULL"
+    phone_expr = "src.phone" if "phone" in cols else "NULL"
+    first_name_expr = "src.first_name" if "first_name" in cols else "NULL"
+    last_name_expr = "src.last_name" if "last_name" in cols else "NULL"
+    updated_expr = "src.created_at" if "created_at" in cols else "CURRENT_TIMESTAMP()"
+    
+    # Handle if source_table doesn't have project prefix
+    full_source_table = source_table if "." in source_table else f"{PROJECT}.{source_table}"
+    
+    q(f"""
+    CREATE OR REPLACE TABLE `{PROJECT}.idr_work.entities_all` AS
+    SELECT 
+        e.entity_key, e.table_id,
+        {email_expr} AS email, 
+        {phone_expr} AS phone, 
+        {first_name_expr} AS first_name, 
+        {last_name_expr} AS last_name,
+        {updated_expr} AS record_updated_at
+    FROM `{PROJECT}.idr_work.entities_delta` e
+    LEFT JOIN `{full_source_table}` src ON e.entity_key = src.{entity_key_col}
+    """)
+else:
+    # Fallback: empty entities_all
+    q(f"""
+    CREATE OR REPLACE TABLE `{PROJECT}.idr_work.entities_all` AS
+    SELECT CAST(NULL AS STRING) AS entity_key, CAST(NULL AS STRING) AS table_id, 
+           CAST(NULL AS STRING) AS email, CAST(NULL AS STRING) AS phone,
+           CAST(NULL AS STRING) AS first_name, CAST(NULL AS STRING) AS last_name,
+           CAST(NULL AS TIMESTAMP) AS record_updated_at
+    WHERE FALSE
+    """)
 
 q(f"""
 CREATE OR REPLACE TABLE `{PROJECT}.idr_work.golden_updates` AS

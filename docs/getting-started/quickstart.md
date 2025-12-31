@@ -4,14 +4,38 @@ Get SQL Identity Resolution running in under 5 minutes.
 
 ---
 
-## Prerequisites
+## ⚡ 60-Second Demo (Fastest Way)
+
+Want to see it work immediately? Run one command:
+
+```bash
+git clone https://github.com/anilkulkarni87/sql-identity-resolution.git
+cd sql-identity-resolution
+make demo
+```
+
+This will:
+
+1. Create a DuckDB database
+2. Generate 10K sample customers with shared identifiers
+3. Run a dry run (preview changes)
+4. Run a live IDR pass (create clusters)
+5. Generate an HTML dashboard
+
+Open `demo_results.html` to explore the results!
+
+---
+
+## Full Setup Guide
+
+### Prerequisites
 
 - Python 3.9+ (for DuckDB/BigQuery CLI)
 - Access to your target platform (Snowflake account, GCP project, Databricks workspace)
 
 ---
 
-## Step 1: Clone the Repository
+### Step 1: Clone the Repository
 
 ```bash
 git clone https://github.com/anilkulkarni87/sql-identity-resolution.git
@@ -20,7 +44,7 @@ cd sql-identity-resolution
 
 ---
 
-## Step 2: Choose Your Platform
+### Step 2: Choose Your Platform
 
 === "DuckDB (Local)"
 

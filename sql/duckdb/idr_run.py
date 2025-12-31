@@ -243,7 +243,7 @@ SELECT
     identifier_value_norm, 
     COUNT(*) as group_size,
     MIN(entity_key) AS anchor_entity_key,
-    LIST(entity_key ORDER BY entity_key LIMIT 5) AS sample_keys
+    list_slice(LIST(entity_key ORDER BY entity_key), 1, 5) AS sample_keys
 FROM idr_work.members_for_delta_values
 GROUP BY identifier_type, identifier_value_norm
 """)
@@ -487,21 +487,51 @@ if not DRY_RUN:
 # ============================================
 print("🏆 Building golden profiles...")
 
-# Build entities_all for golden profile
-q("""
-CREATE OR REPLACE TABLE idr_work.entities_all AS
-SELECT 
-    e.entity_key,
-    e.table_id,
-    c.email,
-    c.phone,
-    c.first_name,
-    c.last_name,
-    c.rec_update_dt AS record_updated_at
-FROM idr_work.entities_delta e
-LEFT JOIN crm.customer c ON e.entity_key = 'customer:' || c.customer_id
-WHERE e.table_id = 'customer'
-""")
+# Build entities_all for golden profile - dynamically from registered sources
+# Get the first registered source table
+source_info = con.execute("""
+    SELECT s.table_fqn, s.entity_key_expr 
+    FROM idr_meta.source_table s 
+    WHERE s.is_active = TRUE 
+    LIMIT 1
+""").fetchone()
+
+if source_info:
+    source_table, entity_key_col = source_info
+    
+    # Check what columns exist in the source table
+    cols = [row[0] for row in con.execute(f"DESCRIBE {source_table}").fetchall()]
+    
+    # Map available columns
+    email_expr = "src.email" if "email" in cols else "NULL"
+    phone_expr = "src.phone" if "phone" in cols else "NULL"
+    first_name_expr = "src.first_name" if "first_name" in cols else "NULL"
+    last_name_expr = "src.last_name" if "last_name" in cols else "NULL"
+    updated_expr = "src.created_at" if "created_at" in cols else "CURRENT_TIMESTAMP"
+    
+    q(f"""
+    CREATE OR REPLACE TABLE idr_work.entities_all AS
+    SELECT 
+        e.entity_key,
+        e.table_id,
+        {email_expr} AS email,
+        {phone_expr} AS phone,
+        {first_name_expr} AS first_name,
+        {last_name_expr} AS last_name,
+        {updated_expr} AS record_updated_at
+    FROM idr_work.entities_delta e
+    LEFT JOIN {source_table} src ON e.entity_key = src.{entity_key_col}
+    """)
+else:
+    # Fallback: empty entities_all if no sources
+    q("""
+    CREATE OR REPLACE TABLE idr_work.entities_all AS
+    SELECT NULL::VARCHAR AS entity_key, NULL::VARCHAR AS table_id, 
+           NULL::VARCHAR AS email, NULL::VARCHAR AS phone,
+           NULL::VARCHAR AS first_name, NULL::VARCHAR AS last_name,
+           NULL::TIMESTAMP AS record_updated_at
+    WHERE FALSE
+    """)
 
 # Golden profile with window functions
 q("""

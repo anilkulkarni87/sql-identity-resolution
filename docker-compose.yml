@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  # Run the full demo
+  demo:
+    build: .
+    volumes:
+      - ./output:/output
+    command: >
+      python -c "
+      import duckdb
+      import subprocess
+      import sys
+      print('🔗 SQL Identity Resolution - Docker Demo')
+      print('='*50)
+      conn = duckdb.connect('/output/demo.duckdb')
+      with open('sql/duckdb/00_ddl_all.sql') as f:
+          conn.execute(f.read())
+      subprocess.run([sys.executable, 'examples/sample_data/generate_demo_data.py', '--db=/output/demo.duckdb', '--rows=10000'])
+      subprocess.run([sys.executable, 'sql/duckdb/idr_run.py', '--db=/output/demo.duckdb', '--run-mode=FULL'])
+      subprocess.run([sys.executable, 'tools/dashboard/generator.py', '--platform=duckdb', '--connection=/output/demo.duckdb', '--output=/output/dashboard.html'])
+      print('✅ Demo complete! Check ./output/')
+      "
+
+  # Generate scale test data
+  generate-data:
+    build: .
+    volumes:
+      - ./data:/data
+    command: >
+      python tools/scale_test/data_generator.py 
+        --rows=20000000 
+        --seed=42 
+        --output=/data/
+
+  # Serve documentation
+  docs:
+    image: squidfunk/mkdocs-material
+    volumes:
+      - .:/docs
+    ports:
+      - "8000:8000"
+    command: serve --dev-addr=0.0.0.0:8000

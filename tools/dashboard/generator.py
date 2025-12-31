@@ -537,18 +537,26 @@ class DashboardGenerator:
         
         rows = []
         for run in runs:
-            status = run.get('status', 'UNKNOWN')
+            status = run.get('status', 'UNKNOWN') or 'UNKNOWN'
             badge_class = 'success' if 'SUCCESS' in status else ('warning' if 'WARNING' in status else ('info' if 'DRY' in status else 'danger'))
+            
+            # Handle None values
+            entities = run.get('entities_processed') or 0
+            edges = run.get('edges_created') or 0
+            clusters = run.get('clusters_impacted') or 0
+            duration = run.get('duration_seconds') or 0
+            run_id = run.get('run_id', '') or ''
+            run_mode = run.get('run_mode', '') or ''
             
             rows.append(f"""
                 <tr>
-                    <td><code>{run.get('run_id', '')[:16]}...</code></td>
-                    <td>{run.get('run_mode', '')}</td>
+                    <td><code>{run_id[:16]}...</code></td>
+                    <td>{run_mode}</td>
                     <td><span class="badge {badge_class}">{status}</span></td>
-                    <td>{run.get('entities_processed', 0):,}</td>
-                    <td>{run.get('edges_created', 0):,}</td>
-                    <td>{run.get('clusters_impacted', 0):,}</td>
-                    <td>{run.get('duration_seconds', 0)}s</td>
+                    <td>{entities:,}</td>
+                    <td>{edges:,}</td>
+                    <td>{clusters:,}</td>
+                    <td>{duration}s</td>
                 </tr>
             """)
         
