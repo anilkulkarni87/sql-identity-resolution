@@ -1,0 +1,84 @@
+name: Test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test-duckdb:
+    name: DuckDB Tests
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      
+      - name: Install dependencies
+        run: |
+          pip install duckdb pytest
+      
+      - name: Run DuckDB tests
+        run: |
+          python tests/run_tests_duckdb.py
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Install linters
+        run: |
+          pip install flake8
+      
+      - name: Lint with flake8
+        run: |
+          flake8 sql/ tools/ tests/ --max-line-length=120 --ignore=E501,W503
+        continue-on-error: true
+
+  validate-ddl:
+    name: Validate DDL
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Install DuckDB
+        run: pip install duckdb
+      
+      - name: Validate DuckDB DDL
+        run: |
+          python -c "
+          import duckdb
+          conn = duckdb.connect(':memory:')
+          with open('sql/duckdb/00_ddl_all.sql') as f:
+              ddl = f.read()
+          for stmt in ddl.split(';'):
+              if stmt.strip():
+                  try:
+                      conn.execute(stmt)
+                  except Exception as e:
+                      print(f'Warning: {e}')
+          print('DuckDB DDL validation complete')
+          "

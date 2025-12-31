@@ -2,12 +2,14 @@
 -- Stored procedure equivalent of Databricks IDR_Run.py
 -- 
 -- Usage:
---   CALL idr_run('FULL', 30);    -- Full run with max 30 iterations
---   CALL idr_run('INCR', 30);    -- Incremental run
+--   CALL idr_run('FULL', 30, FALSE);    -- Full run with max 30 iterations
+--   CALL idr_run('INCR', 30, FALSE);    -- Incremental run
+--   CALL idr_run('INCR', 30, TRUE);     -- Dry run (preview changes)
 
 CREATE OR REPLACE PROCEDURE idr_run(
     RUN_MODE VARCHAR,      -- 'INCR' or 'FULL'
-    MAX_ITERS INTEGER      -- Max label propagation iterations
+    MAX_ITERS INTEGER,     -- Max label propagation iterations
+    DRY_RUN BOOLEAN DEFAULT FALSE  -- Preview mode - no production writes
 )
 RETURNS VARCHAR
 LANGUAGE JAVASCRIPT
@@ -17,7 +19,8 @@ $$
     // =============================================
     // INITIALIZATION
     // =============================================
-    var run_id = 'run_' + Math.random().toString(36).substring(2, 15);
+    var dry_run = DRY_RUN || false;
+    var run_id = (dry_run ? 'dry_run_' : 'run_') + Math.random().toString(36).substring(2, 15);
     var run_ts = new Date().toISOString().replace('T', ' ').substring(0, 19);
     var run_start = Date.now();
     
@@ -42,6 +45,22 @@ $$
         var stmt = snowflake.execute({sqlText: sql});
         stmt.next();
         return stmt.getColumnValue(1);
+    }
+    
+    function recordMetric(name, value, dimensions, metricType) {
+        var dimJson = dimensions ? JSON.stringify(dimensions).replace(/'/g, "''") : null;
+        q(`
+            INSERT INTO idr_out.metrics_export (run_id, metric_name, metric_value, metric_type, dimensions)
+            VALUES ('${run_id}', '${name}', ${value}, '${metricType || 'gauge'}', ${dimJson ? "'" + dimJson + "'" : 'NULL'})
+        `);
+    }
+    
+    function getConfig(key, defaultVal) {
+        try {
+            return collectOne(`SELECT config_value FROM idr_meta.config WHERE config_key = '${key}'`);
+        } catch(e) {
+            return defaultVal;
+        }
     }
     
     // =============================================
@@ -319,24 +338,38 @@ $$
        FROM idr_work.entities_delta
        WHERE entity_key NOT IN (SELECT entity_key FROM idr_work.lp_labels)`);
     
-    q(`MERGE INTO idr_out.identity_resolved_membership_current tgt
-       USING idr_work.membership_updates src ON tgt.entity_key=src.entity_key
-       WHEN MATCHED THEN UPDATE SET tgt.resolved_id=src.resolved_id, tgt.updated_ts=src.updated_ts
-       WHEN NOT MATCHED THEN INSERT (entity_key,resolved_id,updated_ts) VALUES (src.entity_key,src.resolved_id,src.updated_ts)`);
+    // Upsert membership (skip in dry run)
+    if (!dry_run) {
+        q(`MERGE INTO idr_out.identity_resolved_membership_current tgt
+           USING idr_work.membership_updates src ON tgt.entity_key=src.entity_key
+           WHEN MATCHED THEN UPDATE SET tgt.resolved_id=src.resolved_id, tgt.updated_ts=src.updated_ts
+           WHEN NOT MATCHED THEN INSERT (entity_key,resolved_id,updated_ts) VALUES (src.entity_key,src.resolved_id,src.updated_ts)`);
+    }
     
     q(`CREATE OR REPLACE TRANSIENT TABLE idr_work.impacted_resolved_ids AS
        SELECT DISTINCT resolved_id FROM idr_work.membership_updates`);
     
-    q(`CREATE OR REPLACE TRANSIENT TABLE idr_work.cluster_sizes_updates AS
-       SELECT resolved_id, COUNT(*) AS cluster_size, CURRENT_TIMESTAMP() AS updated_ts
-       FROM idr_out.identity_resolved_membership_current
-       WHERE resolved_id IN (SELECT resolved_id FROM idr_work.impacted_resolved_ids)
-       GROUP BY resolved_id`);
+    // Compute cluster sizes - in dry run, use work tables only
+    if (dry_run) {
+        q(`CREATE OR REPLACE TRANSIENT TABLE idr_work.cluster_sizes_updates AS
+           SELECT resolved_id, COUNT(*) AS cluster_size, CURRENT_TIMESTAMP() AS updated_ts
+           FROM idr_work.membership_updates
+           GROUP BY resolved_id`);
+    } else {
+        q(`CREATE OR REPLACE TRANSIENT TABLE idr_work.cluster_sizes_updates AS
+           SELECT resolved_id, COUNT(*) AS cluster_size, CURRENT_TIMESTAMP() AS updated_ts
+           FROM idr_out.identity_resolved_membership_current
+           WHERE resolved_id IN (SELECT resolved_id FROM idr_work.impacted_resolved_ids)
+           GROUP BY resolved_id`);
+    }
     
-    q(`MERGE INTO idr_out.identity_clusters_current tgt
-       USING idr_work.cluster_sizes_updates src ON tgt.resolved_id=src.resolved_id
-       WHEN MATCHED THEN UPDATE SET tgt.cluster_size=src.cluster_size, tgt.updated_ts=src.updated_ts
-       WHEN NOT MATCHED THEN INSERT (resolved_id,cluster_size,updated_ts) VALUES (src.resolved_id,src.cluster_size,src.updated_ts)`);
+    // Upsert clusters (skip in dry run)
+    if (!dry_run) {
+        q(`MERGE INTO idr_out.identity_clusters_current tgt
+           USING idr_work.cluster_sizes_updates src ON tgt.resolved_id=src.resolved_id
+           WHEN MATCHED THEN UPDATE SET tgt.cluster_size=src.cluster_size, tgt.updated_ts=src.updated_ts
+           WHEN NOT MATCHED THEN INSERT (resolved_id,cluster_size,updated_ts) VALUES (src.resolved_id,src.cluster_size,src.updated_ts)`);
+    }
     
     // =============================================
     // BUILD GOLDEN PROFILE
@@ -403,13 +436,16 @@ $$
        LEFT JOIN first_name_ranked f ON f.resolved_id = i.resolved_id AND f.rn = 1
        LEFT JOIN last_name_ranked l ON l.resolved_id = i.resolved_id AND l.rn = 1`);
     
-    q(`MERGE INTO idr_out.golden_profile_current tgt
-       USING idr_work.golden_updates src ON tgt.resolved_id=src.resolved_id
-       WHEN MATCHED THEN UPDATE SET 
-         tgt.email_primary=src.email_primary, tgt.phone_primary=src.phone_primary,
-         tgt.first_name=src.first_name, tgt.last_name=src.last_name, tgt.updated_ts=src.updated_ts
-       WHEN NOT MATCHED THEN INSERT (resolved_id,email_primary,phone_primary,first_name,last_name,updated_ts) 
-         VALUES (src.resolved_id,src.email_primary,src.phone_primary,src.first_name,src.last_name,src.updated_ts)`);
+    // Upsert golden profiles (skip in dry run)
+    if (!dry_run) {
+        q(`MERGE INTO idr_out.golden_profile_current tgt
+           USING idr_work.golden_updates src ON tgt.resolved_id=src.resolved_id
+           WHEN MATCHED THEN UPDATE SET 
+             tgt.email_primary=src.email_primary, tgt.phone_primary=src.phone_primary,
+             tgt.first_name=src.first_name, tgt.last_name=src.last_name, tgt.updated_ts=src.updated_ts
+           WHEN NOT MATCHED THEN INSERT (resolved_id,email_primary,phone_primary,first_name,last_name,updated_ts) 
+             VALUES (src.resolved_id,src.email_primary,src.phone_primary,src.first_name,src.last_name,src.updated_ts)`);
+    }
     
     // =============================================
     // UPDATE RUN STATE
@@ -419,21 +455,75 @@ $$
        FROM idr_work.entities_delta
        GROUP BY table_id`);
     
-    q(`MERGE INTO idr_meta.run_state tgt
-       USING idr_work.watermark_updates src ON tgt.table_id=src.table_id
-       WHEN MATCHED THEN UPDATE SET 
-         tgt.last_watermark_value=src.new_watermark_value,
-         tgt.last_run_id='${run_id}',
-         tgt.last_run_ts='${run_ts}'::TIMESTAMP_NTZ`);
+    // Update watermarks (skip in dry run)
+    if (!dry_run) {
+        q(`MERGE INTO idr_meta.run_state tgt
+           USING idr_work.watermark_updates src ON tgt.table_id=src.table_id
+           WHEN MATCHED THEN UPDATE SET 
+             tgt.last_watermark_value=src.new_watermark_value,
+             tgt.last_run_id='${run_id}',
+             tgt.last_run_ts='${run_ts}'::TIMESTAMP_NTZ`);
+    }
+    
+    // =============================================
+    // DRY RUN DIFF COMPUTATION
+    // =============================================
+    if (dry_run) {
+        // Compute change types for each entity
+        q(`INSERT INTO idr_out.dry_run_results (run_id, entity_key, current_resolved_id, proposed_resolved_id, 
+                                                 change_type, current_cluster_size, proposed_cluster_size)
+           SELECT
+               '${run_id}' AS run_id,
+               COALESCE(proposed.entity_key, current.entity_key) AS entity_key,
+               current.resolved_id AS current_resolved_id,
+               proposed.resolved_id AS proposed_resolved_id,
+               CASE
+                   WHEN current.entity_key IS NULL THEN 'NEW'
+                   WHEN current.resolved_id = proposed.resolved_id THEN 'UNCHANGED'
+                   ELSE 'MOVED'
+               END AS change_type,
+               current_clusters.cluster_size AS current_cluster_size,
+               proposed_clusters.cluster_size AS proposed_cluster_size
+           FROM idr_work.membership_updates proposed
+           FULL OUTER JOIN idr_out.identity_resolved_membership_current current
+               ON proposed.entity_key = current.entity_key
+           LEFT JOIN idr_out.identity_clusters_current current_clusters
+               ON current.resolved_id = current_clusters.resolved_id
+           LEFT JOIN idr_work.cluster_sizes_updates proposed_clusters
+               ON proposed.resolved_id = proposed_clusters.resolved_id
+           WHERE proposed.entity_key IN (SELECT entity_key FROM idr_work.entities_delta)`);
+        
+        // Compute dry run summary
+        var new_cnt = collectOne(`SELECT COUNT(*) FROM idr_out.dry_run_results WHERE run_id='${run_id}' AND change_type='NEW'`) || 0;
+        var moved_cnt = collectOne(`SELECT COUNT(*) FROM idr_out.dry_run_results WHERE run_id='${run_id}' AND change_type='MOVED'`) || 0;
+        var unchanged_cnt = collectOne(`SELECT COUNT(*) FROM idr_out.dry_run_results WHERE run_id='${run_id}' AND change_type='UNCHANGED'`) || 0;
+        var largest_proposed = collectOne(`SELECT MAX(cluster_size) FROM idr_work.cluster_sizes_updates`) || 0;
+        
+        q(`INSERT INTO idr_out.dry_run_summary (run_id, total_entities, new_entities, moved_entities, unchanged_entities,
+                                                 merged_clusters, split_clusters, largest_proposed_cluster, 
+                                                 edges_would_create, groups_would_skip, values_would_exclude, execution_time_seconds)
+           VALUES ('${run_id}', ${new_cnt + moved_cnt + unchanged_cnt}, ${new_cnt}, ${moved_cnt}, ${unchanged_cnt},
+                   0, 0, ${largest_proposed}, 
+                   (SELECT COUNT(*) FROM idr_work.edges_new), ${groups_skipped}, ${values_excluded}, 
+                   ${Math.round((Date.now() - run_start) / 1000)})`);
+    }
     
     // =============================================
     // FINALIZE
     // =============================================
     var entities_cnt = collectOne(`SELECT COUNT(*) FROM idr_work.entities_delta`) || 0;
     var edges_cnt = collectOne(`SELECT COUNT(*) FROM idr_work.edges_new`) || 0;
-    var clusters_cnt = collectOne(`SELECT COUNT(*) FROM idr_out.identity_clusters_current`) || 0;
-    var large_clusters = collectOne(`SELECT COUNT(*) FROM idr_out.identity_clusters_current WHERE cluster_size >= 1000`) || 0;
     var duration = Math.round((Date.now() - run_start) / 1000);
+    
+    // Get cluster counts from appropriate source
+    var clusters_cnt, large_clusters;
+    if (dry_run) {
+        clusters_cnt = collectOne(`SELECT COUNT(*) FROM idr_work.cluster_sizes_updates`) || 0;
+        large_clusters = collectOne(`SELECT COUNT(*) FROM idr_work.cluster_sizes_updates WHERE cluster_size >= 1000`) || 0;
+    } else {
+        clusters_cnt = collectOne(`SELECT COUNT(*) FROM idr_out.identity_clusters_current`) || 0;
+        large_clusters = collectOne(`SELECT COUNT(*) FROM idr_out.identity_clusters_current WHERE cluster_size >= 1000`) || 0;
+    }
     
     // Build warnings
     var warnings = [];
@@ -441,8 +531,23 @@ $$
     if (values_excluded > 0) warnings.push(values_excluded + ' values excluded (exclusion list)');
     if (large_clusters > 0) warnings.push(large_clusters + ' large clusters (1000+)');
     
-    var status = warnings.length > 0 ? 'SUCCESS_WITH_WARNINGS' : 'SUCCESS';
+    // Set status based on mode
+    var status;
+    if (dry_run) {
+        status = 'DRY_RUN_COMPLETE';
+    } else {
+        status = warnings.length > 0 ? 'SUCCESS_WITH_WARNINGS' : 'SUCCESS';
+    }
     var warnings_json = warnings.length > 0 ? JSON.stringify(warnings) : null;
+    
+    // Record metrics
+    recordMetric('idr_run_duration_seconds', duration);
+    recordMetric('idr_entities_processed', entities_cnt);
+    recordMetric('idr_edges_created', edges_cnt, null, 'counter');
+    recordMetric('idr_clusters_impacted', clusters_cnt);
+    recordMetric('idr_lp_iterations', iterations);
+    recordMetric('idr_groups_skipped', groups_skipped, null, 'counter');
+    recordMetric('idr_large_clusters', large_clusters);
     
     q(`UPDATE idr_out.run_history SET
          status = '${status}',
@@ -458,9 +563,16 @@ $$
          warnings = ${warnings_json ? "'" + warnings_json + "'" : 'NULL'}
        WHERE run_id = '${run_id}'`);
     
-    var result = `${status}: run_id=${run_id}, entities=${entities_cnt}, edges=${edges_cnt}, iterations=${iterations}, duration=${duration}s`;
-    if (warnings.length > 0) {
-        result += ` | WARNINGS: ${warnings.join(', ')}`;
+    var result;
+    if (dry_run) {
+        var new_cnt = collectOne(`SELECT COUNT(*) FROM idr_out.dry_run_results WHERE run_id='${run_id}' AND change_type='NEW'`) || 0;
+        var moved_cnt = collectOne(`SELECT COUNT(*) FROM idr_out.dry_run_results WHERE run_id='${run_id}' AND change_type='MOVED'`) || 0;
+        result = `${status}: run_id=${run_id}, new_entities=${new_cnt}, moved_entities=${moved_cnt}, edges_would_create=${edges_cnt}, duration=${duration}s | DRY RUN - NO CHANGES COMMITTED`;
+    } else {
+        result = `${status}: run_id=${run_id}, entities=${entities_cnt}, edges=${edges_cnt}, iterations=${iterations}, duration=${duration}s`;
+        if (warnings.length > 0) {
+            result += ` | WARNINGS: ${warnings.join(', ')}`;
+        }
     }
     return result;
 $$;

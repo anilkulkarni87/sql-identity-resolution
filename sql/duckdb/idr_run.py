@@ -646,13 +646,19 @@ if DRY_RUN:
 # ============================================
 entities_cnt = collect_one("SELECT COUNT(*) FROM idr_work.entities_delta") or 0
 edges_cnt = collect_one("SELECT COUNT(*) FROM idr_work.edges_new") or 0
-clusters_cnt = collect_one("SELECT COUNT(*) FROM idr_out.identity_clusters_current") or 0
 duration = int(time.time() - run_start)
 
-# Count large clusters (1000+ entities)
-large_clusters = collect_one("""
-    SELECT COUNT(*) FROM idr_out.identity_clusters_current WHERE cluster_size >= 1000
-""") or 0
+# For dry run, get cluster count from work tables; for live run, from production
+if DRY_RUN:
+    clusters_cnt = collect_one("SELECT COUNT(*) FROM idr_work.cluster_sizes_updates") or 0
+    large_clusters = collect_one("SELECT COUNT(*) FROM idr_work.cluster_sizes_updates WHERE cluster_size >= 1000") or 0
+    # Get dry run change counts
+    new_entities = collect_one(f"SELECT COUNT(*) FROM idr_out.dry_run_results WHERE run_id='{RUN_ID}' AND change_type='NEW'") or 0
+    moved_entities = collect_one(f"SELECT COUNT(*) FROM idr_out.dry_run_results WHERE run_id='{RUN_ID}' AND change_type='MOVED'") or 0
+    largest_proposed = collect_one("SELECT MAX(cluster_size) FROM idr_work.cluster_sizes_updates") or 0
+else:
+    clusters_cnt = collect_one("SELECT COUNT(*) FROM idr_out.identity_clusters_current") or 0
+    large_clusters = collect_one("SELECT COUNT(*) FROM idr_out.identity_clusters_current WHERE cluster_size >= 1000") or 0
 
 # Build warnings list
 warnings = []
@@ -664,7 +670,21 @@ if large_clusters > 0:
     warnings.append(f"{large_clusters} large clusters detected (1000+ entities)")
 
 warnings_json = json.dumps(warnings) if warnings else None
-status = 'SUCCESS' if not warnings else 'SUCCESS_WITH_WARNINGS'
+
+# Set status based on mode
+if DRY_RUN:
+    status = 'DRY_RUN_COMPLETE'
+else:
+    status = 'SUCCESS' if not warnings else 'SUCCESS_WITH_WARNINGS'
+
+# Record metrics
+record_metric('idr_run_duration_seconds', duration)
+record_metric('idr_entities_processed', entities_cnt)
+record_metric('idr_edges_created', edges_cnt, metric_type='counter')
+record_metric('idr_clusters_impacted', clusters_cnt)
+record_metric('idr_lp_iterations', iterations)
+record_metric('idr_groups_skipped', groups_skipped, metric_type='counter')
+record_metric('idr_large_clusters', large_clusters)
 
 q(f"""
 UPDATE idr_out.run_history
@@ -686,28 +706,53 @@ con.close()
 
 # Enhanced run summary
 print(f"\n{'='*60}")
-print("IDR RUN SUMMARY")
+if DRY_RUN:
+    print("DRY RUN SUMMARY (No changes committed)")
+else:
+    print("IDR RUN SUMMARY")
 print(f"{'='*60}")
 print(f"Run ID:          {RUN_ID}")
-print(f"Mode:            {RUN_MODE}")
+print(f"Mode:            {RUN_MODE}{' (DRY RUN)' if DRY_RUN else ''}")
 print(f"Duration:        {duration}s")
 print(f"Status:          {status}")
 print()
-print("PROCESSING:")
-print(f"  Sources:       {len(source_rows)} tables processed")
-print(f"  Entities:      {entities_cnt:,} processed")
-print(f"  Edges:         {edges_cnt:,} created")
-print(f"  LP Iterations: {iterations}")
-print(f"  Clusters:      {clusters_cnt:,} impacted")
+
+if DRY_RUN:
+    print("IMPACT PREVIEW:")
+    print(f"  New Entities:      {new_entities:,}")
+    print(f"  Moved Entities:    {moved_entities:,}")
+    print(f"  Edges Would Create: {edges_cnt:,}")
+    print(f"  Largest Cluster:   {largest_proposed:,} entities")
+else:
+    print("PROCESSING:")
+    print(f"  Sources:       {len(source_rows)} tables processed")
+    print(f"  Entities:      {entities_cnt:,} processed")
+    print(f"  Edges:         {edges_cnt:,} created")
+    print(f"  LP Iterations: {iterations}")
+    print(f"  Clusters:      {clusters_cnt:,} impacted")
 
 if warnings:
     print()
     print("DATA QUALITY:")
     for w in warnings:
         print(f"  ⚠️ {w}")
+
+if DRY_RUN:
+    print()
+    print("REVIEW QUERIES:")
+    print(f"  → All changes:  SELECT * FROM idr_out.dry_run_results WHERE run_id = '{RUN_ID}'")
+    print(f"  → Moved only:   SELECT * FROM idr_out.dry_run_results WHERE run_id = '{RUN_ID}' AND change_type = 'MOVED'")
+    print(f"  → Summary:      SELECT * FROM idr_out.dry_run_summary WHERE run_id = '{RUN_ID}'")
+    print()
+    print("⚠️  THIS WAS A DRY RUN - NO CHANGES COMMITTED")
+elif warnings:
     print()
     print("ACTIONS NEEDED:")
     print(f"  → Review: SELECT * FROM idr_out.skipped_identifier_groups WHERE run_id = '{RUN_ID}'")
 
 print(f"{'='*60}")
-print(f"✅ DuckDB IDR run completed!")
+if DRY_RUN:
+    print(f"✅ DuckDB IDR dry run completed!")
+else:
+    print(f"✅ DuckDB IDR run completed!")
+

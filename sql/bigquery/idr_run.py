@@ -27,12 +27,14 @@ parser = argparse.ArgumentParser(description='BigQuery Identity Resolution Runne
 parser.add_argument('--project', required=True, help='GCP project ID')
 parser.add_argument('--run-mode', default='INCR', choices=['INCR', 'FULL'], help='Run mode')
 parser.add_argument('--max-iters', type=int, default=30, help='Max label propagation iterations')
+parser.add_argument('--dry-run', action='store_true', help='Preview changes without committing')
 args = parser.parse_args()
 
 PROJECT = args.project
 RUN_MODE = args.run_mode
 MAX_ITERS = args.max_iters
-RUN_ID = f"run_{uuid.uuid4().hex[:12]}"
+DRY_RUN = args.dry_run
+RUN_ID = f"{'dry_run' if DRY_RUN else 'run'}_{uuid.uuid4().hex[:12]}"
 RUN_TS = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
 run_start = time.time()
 
@@ -52,8 +54,23 @@ def collect_one(sql: str):
         return row[0]
     return None
 
+def record_metric(name: str, value: float, dimensions: dict = None, metric_type: str = 'gauge'):
+    """Record a metric to the metrics_export table."""
+    dim_json = json.dumps(dimensions).replace("'", "''") if dimensions else None
+    q(f"""
+    INSERT INTO `{PROJECT}.idr_out.metrics_export` (run_id, metric_name, metric_value, metric_type, dimensions)
+    VALUES ('{RUN_ID}', '{name}', {value}, '{metric_type}', {f"'{dim_json}'" if dim_json else 'NULL'})
+    """)
+
+def get_config(key: str, default: str = None) -> str:
+    """Get configuration value from idr_meta.config."""
+    val = collect_one(f"SELECT config_value FROM `{PROJECT}.idr_meta.config` WHERE config_key = '{key}'")
+    return val if val else default
+
 print(f"🚀 Starting IDR run: {RUN_ID}")
 print(f"   Mode: {RUN_MODE}, Max iterations: {MAX_ITERS}")
+if DRY_RUN:
+    print(f"   ⚠️  DRY RUN MODE - No changes will be committed")
 
 # ============================================
 # PREFLIGHT
@@ -374,32 +391,45 @@ FROM `{PROJECT}.idr_work.entities_delta`
 WHERE entity_key NOT IN (SELECT entity_key FROM `{PROJECT}.idr_work.lp_labels`)
 """)
 
-q(f"""
-MERGE INTO `{PROJECT}.idr_out.identity_resolved_membership_current` tgt
-USING `{PROJECT}.idr_work.membership_updates` src ON tgt.entity_key=src.entity_key
-WHEN MATCHED THEN UPDATE SET resolved_id=src.resolved_id, updated_ts=src.updated_ts
-WHEN NOT MATCHED THEN INSERT ROW
-""")
+# Upsert membership (skip in dry run)
+if not DRY_RUN:
+    q(f"""
+    MERGE INTO `{PROJECT}.idr_out.identity_resolved_membership_current` tgt
+    USING `{PROJECT}.idr_work.membership_updates` src ON tgt.entity_key=src.entity_key
+    WHEN MATCHED THEN UPDATE SET resolved_id=src.resolved_id, updated_ts=src.updated_ts
+    WHEN NOT MATCHED THEN INSERT ROW
+    """)
 
 q(f"""
 CREATE OR REPLACE TABLE `{PROJECT}.idr_work.impacted_resolved_ids` AS
 SELECT DISTINCT resolved_id FROM `{PROJECT}.idr_work.membership_updates`
 """)
 
-q(f"""
-CREATE OR REPLACE TABLE `{PROJECT}.idr_work.cluster_sizes_updates` AS
-SELECT resolved_id, COUNT(*) AS cluster_size, CURRENT_TIMESTAMP() AS updated_ts
-FROM `{PROJECT}.idr_out.identity_resolved_membership_current`
-WHERE resolved_id IN (SELECT resolved_id FROM `{PROJECT}.idr_work.impacted_resolved_ids`)
-GROUP BY resolved_id
-""")
+# Compute cluster sizes - use work tables for dry run, production for live
+if DRY_RUN:
+    q(f"""
+    CREATE OR REPLACE TABLE `{PROJECT}.idr_work.cluster_sizes_updates` AS
+    SELECT resolved_id, COUNT(*) AS cluster_size, CURRENT_TIMESTAMP() AS updated_ts
+    FROM `{PROJECT}.idr_work.membership_updates`
+    GROUP BY resolved_id
+    """)
+else:
+    q(f"""
+    CREATE OR REPLACE TABLE `{PROJECT}.idr_work.cluster_sizes_updates` AS
+    SELECT resolved_id, COUNT(*) AS cluster_size, CURRENT_TIMESTAMP() AS updated_ts
+    FROM `{PROJECT}.idr_out.identity_resolved_membership_current`
+    WHERE resolved_id IN (SELECT resolved_id FROM `{PROJECT}.idr_work.impacted_resolved_ids`)
+    GROUP BY resolved_id
+    """)
 
-q(f"""
-MERGE INTO `{PROJECT}.idr_out.identity_clusters_current` tgt
-USING `{PROJECT}.idr_work.cluster_sizes_updates` src ON tgt.resolved_id=src.resolved_id
-WHEN MATCHED THEN UPDATE SET cluster_size=src.cluster_size, updated_ts=src.updated_ts
-WHEN NOT MATCHED THEN INSERT ROW
-""")
+# Upsert clusters (skip in dry run)
+if not DRY_RUN:
+    q(f"""
+    MERGE INTO `{PROJECT}.idr_out.identity_clusters_current` tgt
+    USING `{PROJECT}.idr_work.cluster_sizes_updates` src ON tgt.resolved_id=src.resolved_id
+    WHEN MATCHED THEN UPDATE SET cluster_size=src.cluster_size, updated_ts=src.updated_ts
+    WHEN NOT MATCHED THEN INSERT ROW
+    """)
 
 # ============================================
 # BUILD GOLDEN PROFILE
@@ -472,14 +502,16 @@ LEFT JOIN first_name_ranked f ON f.resolved_id = i.resolved_id AND f.rn = 1
 LEFT JOIN last_name_ranked l ON l.resolved_id = i.resolved_id AND l.rn = 1
 """)
 
-q(f"""
-MERGE INTO `{PROJECT}.idr_out.golden_profile_current` tgt
-USING `{PROJECT}.idr_work.golden_updates` src ON tgt.resolved_id=src.resolved_id
-WHEN MATCHED THEN UPDATE SET 
-  email_primary=src.email_primary, phone_primary=src.phone_primary,
-  first_name=src.first_name, last_name=src.last_name, updated_ts=src.updated_ts
-WHEN NOT MATCHED THEN INSERT ROW
-""")
+# Upsert golden profiles (skip in dry run)
+if not DRY_RUN:
+    q(f"""
+    MERGE INTO `{PROJECT}.idr_out.golden_profile_current` tgt
+    USING `{PROJECT}.idr_work.golden_updates` src ON tgt.resolved_id=src.resolved_id
+    WHEN MATCHED THEN UPDATE SET 
+      email_primary=src.email_primary, phone_primary=src.phone_primary,
+      first_name=src.first_name, last_name=src.last_name, updated_ts=src.updated_ts
+    WHEN NOT MATCHED THEN INSERT ROW
+    """)
 
 # ============================================
 # UPDATE RUN STATE
@@ -493,27 +525,79 @@ FROM `{PROJECT}.idr_work.entities_delta`
 GROUP BY table_id
 """)
 
-q(f"""
-MERGE INTO `{PROJECT}.idr_meta.run_state` tgt
-USING `{PROJECT}.idr_work.watermark_updates` src ON tgt.table_id=src.table_id
-WHEN MATCHED THEN UPDATE SET 
-  last_watermark_value=src.new_watermark_value,
-  last_run_id='{RUN_ID}',
-  last_run_ts=TIMESTAMP('{RUN_TS}')
-""")
+# Update watermarks (skip in dry run)
+if not DRY_RUN:
+    q(f"""
+    MERGE INTO `{PROJECT}.idr_meta.run_state` tgt
+    USING `{PROJECT}.idr_work.watermark_updates` src ON tgt.table_id=src.table_id
+    WHEN MATCHED THEN UPDATE SET 
+      last_watermark_value=src.new_watermark_value,
+      last_run_id='{RUN_ID}',
+      last_run_ts=TIMESTAMP('{RUN_TS}')
+    """)
+
+# ============================================
+# DRY RUN DIFF COMPUTATION
+# ============================================
+if DRY_RUN:
+    print("📊 Computing dry run diff...")
+    
+    # Compute change types for each entity
+    q(f"""
+    INSERT INTO `{PROJECT}.idr_out.dry_run_results` (run_id, entity_key, current_resolved_id, proposed_resolved_id, 
+                                                     change_type, current_cluster_size, proposed_cluster_size)
+    SELECT
+        '{RUN_ID}' AS run_id,
+        COALESCE(proposed.entity_key, current.entity_key) AS entity_key,
+        current.resolved_id AS current_resolved_id,
+        proposed.resolved_id AS proposed_resolved_id,
+        CASE
+            WHEN current.entity_key IS NULL THEN 'NEW'
+            WHEN current.resolved_id = proposed.resolved_id THEN 'UNCHANGED'
+            ELSE 'MOVED'
+        END AS change_type,
+        current_clusters.cluster_size AS current_cluster_size,
+        proposed_clusters.cluster_size AS proposed_cluster_size
+    FROM `{PROJECT}.idr_work.membership_updates` proposed
+    FULL OUTER JOIN `{PROJECT}.idr_out.identity_resolved_membership_current` current
+        ON proposed.entity_key = current.entity_key
+    LEFT JOIN `{PROJECT}.idr_out.identity_clusters_current` current_clusters
+        ON current.resolved_id = current_clusters.resolved_id
+    LEFT JOIN `{PROJECT}.idr_work.cluster_sizes_updates` proposed_clusters
+        ON proposed.resolved_id = proposed_clusters.resolved_id
+    WHERE proposed.entity_key IN (SELECT entity_key FROM `{PROJECT}.idr_work.entities_delta`)
+    """)
+    
+    # Compute dry run summary
+    new_cnt = collect_one(f"SELECT COUNT(*) FROM `{PROJECT}.idr_out.dry_run_results` WHERE run_id='{RUN_ID}' AND change_type='NEW'") or 0
+    moved_cnt = collect_one(f"SELECT COUNT(*) FROM `{PROJECT}.idr_out.dry_run_results` WHERE run_id='{RUN_ID}' AND change_type='MOVED'") or 0
+    unchanged_cnt = collect_one(f"SELECT COUNT(*) FROM `{PROJECT}.idr_out.dry_run_results` WHERE run_id='{RUN_ID}' AND change_type='UNCHANGED'") or 0
+    largest_proposed = collect_one(f"SELECT MAX(cluster_size) FROM `{PROJECT}.idr_work.cluster_sizes_updates`") or 0
+    
+    q(f"""
+    INSERT INTO `{PROJECT}.idr_out.dry_run_summary` (run_id, total_entities, new_entities, moved_entities, unchanged_entities,
+                                                     merged_clusters, split_clusters, largest_proposed_cluster, 
+                                                     edges_would_create, groups_would_skip, values_would_exclude, execution_time_seconds)
+    VALUES ('{RUN_ID}', {new_cnt + moved_cnt + unchanged_cnt}, {new_cnt}, {moved_cnt}, {unchanged_cnt},
+            0, 0, {largest_proposed}, 
+            (SELECT COUNT(*) FROM `{PROJECT}.idr_work.edges_new`), {groups_skipped}, {values_excluded}, 
+            {int(time.time() - run_start)})
+    """)
 
 # ============================================
 # FINALIZE
 # ============================================
 entities_cnt = collect_one(f"SELECT COUNT(*) FROM `{PROJECT}.idr_work.entities_delta`") or 0
 edges_cnt = collect_one(f"SELECT COUNT(*) FROM `{PROJECT}.idr_work.edges_new`") or 0
-clusters_cnt = collect_one(f"SELECT COUNT(*) FROM `{PROJECT}.idr_out.identity_clusters_current`") or 0
 duration = int(time.time() - run_start)
 
-# Count large clusters (1000+ entities)
-large_clusters = collect_one(f"""
-    SELECT COUNT(*) FROM `{PROJECT}.idr_out.identity_clusters_current` WHERE cluster_size >= 1000
-""") or 0
+# Get cluster counts from appropriate source
+if DRY_RUN:
+    clusters_cnt = collect_one(f"SELECT COUNT(*) FROM `{PROJECT}.idr_work.cluster_sizes_updates`") or 0
+    large_clusters = collect_one(f"SELECT COUNT(*) FROM `{PROJECT}.idr_work.cluster_sizes_updates` WHERE cluster_size >= 1000") or 0
+else:
+    clusters_cnt = collect_one(f"SELECT COUNT(*) FROM `{PROJECT}.idr_out.identity_clusters_current`") or 0
+    large_clusters = collect_one(f"SELECT COUNT(*) FROM `{PROJECT}.idr_out.identity_clusters_current` WHERE cluster_size >= 1000") or 0
 
 # Build warnings list
 warnings = []
@@ -525,7 +609,21 @@ if large_clusters > 0:
     warnings.append(f"{large_clusters} large clusters detected (1000+ entities)")
 
 warnings_json = json.dumps(warnings) if warnings else None
-status = 'SUCCESS' if not warnings else 'SUCCESS_WITH_WARNINGS'
+
+# Set status based on mode
+if DRY_RUN:
+    status = 'DRY_RUN_COMPLETE'
+else:
+    status = 'SUCCESS' if not warnings else 'SUCCESS_WITH_WARNINGS'
+
+# Record metrics
+record_metric('idr_run_duration_seconds', duration)
+record_metric('idr_entities_processed', entities_cnt)
+record_metric('idr_edges_created', edges_cnt, metric_type='counter')
+record_metric('idr_clusters_impacted', clusters_cnt)
+record_metric('idr_lp_iterations', iterations)
+record_metric('idr_groups_skipped', groups_skipped, metric_type='counter')
+record_metric('idr_large_clusters', large_clusters)
 
 q(f"""
 UPDATE `{PROJECT}.idr_out.run_history` SET
@@ -545,10 +643,13 @@ WHERE run_id = '{RUN_ID}'
 
 # Enhanced run summary
 print(f"\n{'='*60}")
-print("IDR RUN SUMMARY")
+if DRY_RUN:
+    print("DRY RUN SUMMARY (No changes committed)")
+else:
+    print("IDR RUN SUMMARY")
 print(f"{'='*60}")
 print(f"Run ID:          {RUN_ID}")
-print(f"Mode:            {RUN_MODE}")
+print(f"Mode:            {RUN_MODE}{' (DRY RUN)' if DRY_RUN else ''}")
 print(f"Duration:        {duration}s")
 print(f"Status:          {status}")
 print()
@@ -564,9 +665,28 @@ if warnings:
     print("DATA QUALITY:")
     for w in warnings:
         print(f"  ⚠️ {w}")
+
+if DRY_RUN:
+    new_cnt = collect_one(f"SELECT COUNT(*) FROM `{PROJECT}.idr_out.dry_run_results` WHERE run_id='{RUN_ID}' AND change_type='NEW'") or 0
+    moved_cnt = collect_one(f"SELECT COUNT(*) FROM `{PROJECT}.idr_out.dry_run_results` WHERE run_id='{RUN_ID}' AND change_type='MOVED'") or 0
+    print()
+    print("IMPACT PREVIEW:")
+    print(f"  New Entities:    {new_cnt:,}")
+    print(f"  Moved Entities:  {moved_cnt:,}")
+    print()
+    print("REVIEW QUERIES:")
+    print(f"  → All changes:  SELECT * FROM `{PROJECT}.idr_out.dry_run_results` WHERE run_id = '{RUN_ID}'")
+    print(f"  → Moved only:   SELECT * FROM `{PROJECT}.idr_out.dry_run_results` WHERE run_id = '{RUN_ID}' AND change_type = 'MOVED'")
+    print(f"  → Summary:      SELECT * FROM `{PROJECT}.idr_out.dry_run_summary` WHERE run_id = '{RUN_ID}'")
+    print()
+    print("⚠️  THIS WAS A DRY RUN - NO CHANGES COMMITTED")
+elif warnings:
     print()
     print("ACTIONS NEEDED:")
     print(f"  → Review: SELECT * FROM `{PROJECT}.idr_out.skipped_identifier_groups` WHERE run_id = '{RUN_ID}'")
 
 print(f"{'='*60}")
-print(f"✅ BigQuery IDR run completed!")
+if DRY_RUN:
+    print(f"✅ BigQuery IDR dry run completed!")
+else:
+    print(f"✅ BigQuery IDR run completed!")

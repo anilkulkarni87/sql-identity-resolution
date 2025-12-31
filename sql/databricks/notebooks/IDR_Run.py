@@ -18,15 +18,17 @@ dbutils.widgets.text("RUN_MODE", "INCR")   # INCR | FULL
 dbutils.widgets.text("RUN_ID", "")         # optional
 dbutils.widgets.text("MAX_ITERS", "30")    # label propagation max iters
 dbutils.widgets.text("REPO_ROOT", "")      # optional override if notebook path detection fails
+dbutils.widgets.dropdown("DRY_RUN", "false", ["true", "false"])  # Preview mode - no production writes
 
 RUN_MODE = dbutils.widgets.get("RUN_MODE").strip().upper()
-RUN_ID = dbutils.widgets.get("RUN_ID").strip() or f"run_{uuid.uuid4().hex}"
+DRY_RUN = dbutils.widgets.get("DRY_RUN").strip().lower() == "true"
+RUN_ID = dbutils.widgets.get("RUN_ID").strip() or f"{'dry_run' if DRY_RUN else 'run'}_{uuid.uuid4().hex}"
 MAX_ITERS = int(dbutils.widgets.get("MAX_ITERS"))
 REPO_ROOT = dbutils.widgets.get("REPO_ROOT").strip()
 
 RUN_TS = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")  # UTC
 _run_start_ts = time.time()
-print({"RUN_MODE": RUN_MODE, "RUN_ID": RUN_ID, "RUN_TS_UTC": RUN_TS, "MAX_ITERS": MAX_ITERS})
+print({"RUN_MODE": RUN_MODE, "RUN_ID": RUN_ID, "RUN_TS_UTC": RUN_TS, "MAX_ITERS": MAX_ITERS, "DRY_RUN": DRY_RUN})
 
 # COMMAND ----------
 # Auto-detect repo root (no user input)
@@ -85,6 +87,19 @@ def run_sql_file(path: str, replacements=None):
         for k, v in replacements.items():
             sql_text = sql_text.replace(k, v)
     run_sql_text(sql_text)
+
+def record_metric(name: str, value: float, dimensions: dict = None, metric_type: str = 'gauge'):
+    """Record a metric to the metrics_export table."""
+    dim_json = json.dumps(dimensions).replace("'", "''") if dimensions else None
+    q(f"""
+    INSERT INTO idr_out.metrics_export (run_id, metric_name, metric_value, metric_type, dimensions)
+    VALUES ('{RUN_ID}', '{name}', {value}, '{metric_type}', {f"'{dim_json}'" if dim_json else 'NULL'})
+    """)
+
+def get_config(key: str, default: str = None) -> str:
+    """Get configuration value from idr_meta.config."""
+    rows = collect(f"SELECT config_value FROM idr_meta.config WHERE config_key = '{key}'")
+    return rows[0].config_value if rows else default
 
 # COMMAND ----------
 # Observability helpers
@@ -553,7 +568,20 @@ if values_excluded_cnt > 0:
 if large_cluster_cnt > 0:
     run_warnings.append(f"{large_cluster_cnt} large clusters detected (1000+ entities)")
 
-run_status = 'SUCCESS' if not run_warnings else 'SUCCESS_WITH_WARNINGS'
+# Set status based on mode
+if DRY_RUN:
+    run_status = 'DRY_RUN_COMPLETE'
+else:
+    run_status = 'SUCCESS' if not run_warnings else 'SUCCESS_WITH_WARNINGS'
+
+# Record metrics
+duration = int(time.time() - _run_start_ts)
+record_metric('idr_run_duration_seconds', duration)
+record_metric('idr_entities_processed', entities_delta_cnt)
+record_metric('idr_edges_created', total_edges_created, metric_type='counter')
+record_metric('idr_clusters_impacted', cluster_cnt)
+record_metric('idr_groups_skipped', skipped_groups_cnt, metric_type='counter')
+record_metric('idr_large_clusters', large_cluster_cnt)
 
 # Finalize run history
 finalize_run_history(
@@ -573,10 +601,13 @@ finalize_run_history(
 
 # Enhanced run summary
 print("=" * 60)
-print("IDR RUN SUMMARY")
+if DRY_RUN:
+    print("DRY RUN SUMMARY (No changes committed)")
+else:
+    print("IDR RUN SUMMARY")
 print("=" * 60)
 print(f"Run ID:          {RUN_ID}")
-print(f"Mode:            {RUN_MODE}")
+print(f"Mode:            {RUN_MODE}{' (DRY RUN)' if DRY_RUN else ''}")
 print(f"Status:          {run_status}")
 print()
 print("PROCESSING:")
@@ -592,10 +623,23 @@ if run_warnings:
     print("DATA QUALITY:")
     for w in run_warnings:
         print(f"  ⚠️ {w}")
+
+if DRY_RUN:
+    print()
+    print("REVIEW QUERIES:")
+    print(f"  → All changes:  SELECT * FROM idr_out.dry_run_results WHERE run_id = '{RUN_ID}'")
+    print(f"  → Moved only:   SELECT * FROM idr_out.dry_run_results WHERE run_id = '{RUN_ID}' AND change_type = 'MOVED'")
+    print(f"  → Summary:      SELECT * FROM idr_out.dry_run_summary WHERE run_id = '{RUN_ID}'")
+    print()
+    print("⚠️  THIS WAS A DRY RUN - NO CHANGES COMMITTED")
+elif run_warnings:
     print()
     print("ACTIONS NEEDED:")
     print(f"  → Review: SELECT * FROM idr_out.skipped_identifier_groups WHERE run_id = '{RUN_ID}'")
 
 print("=" * 60)
-print("✅ IDR run completed", {"RUN_ID": RUN_ID, "RUN_MODE": RUN_MODE, "STATUS": run_status})
+if DRY_RUN:
+    print("✅ IDR dry run completed", {"RUN_ID": RUN_ID, "RUN_MODE": RUN_MODE, "STATUS": run_status})
+else:
+    print("✅ IDR run completed", {"RUN_ID": RUN_ID, "RUN_MODE": RUN_MODE, "STATUS": run_status})
 
