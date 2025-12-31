@@ -1,6 +1,6 @@
 site_name: SQL Identity Resolution
 site_description: Production-grade deterministic identity resolution for DuckDB, Snowflake, BigQuery, and Databricks
-site_url: https://github.com/anilkulkarni87/sql-identity-resolution
+site_url: https://anilkulkarni87.github.io/sql-identity-resolution/
 repo_url: https://github.com/anilkulkarni87/sql-identity-resolution
 repo_name: sql-identity-resolution
 
