@@ -70,7 +70,7 @@ class BigQueryTestRunner(IDRTestBase):
         cmd = [
             'python', 
             os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
-                        'sql', 'bigquery', 'idr_run.py'),
+                        'sql', 'bigquery', 'core', 'idr_run.py'),
             f'--project={self.project}',
             f'--run-mode={run_mode}',
             f'--max-iters={max_iters}'
@@ -107,7 +107,7 @@ class BigQueryTestRunner(IDRTestBase):
         # Run DDL
         ddl_path = os.path.join(
             os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
-            'sql', 'bigquery', '00_ddl_all.sql'
+            'sql', 'bigquery', 'core', '00_ddl_all.sql'
         )
         if os.path.exists(ddl_path):
             with open(ddl_path) as f:

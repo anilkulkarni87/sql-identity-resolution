@@ -42,7 +42,7 @@ VERBOSE = args.verbose
 # Find repo root
 SCRIPT_DIR = Path(__file__).parent.absolute()
 REPO_ROOT = SCRIPT_DIR.parent
-DDL_PATH = REPO_ROOT / "sql" / "duckdb" / "00_ddl_all.sql"
+DDL_PATH = REPO_ROOT / "sql" / "duckdb" / "core" / "00_ddl_all.sql"
 
 
 # ============================================
@@ -253,8 +253,7 @@ class TestRunner:
             new_entities INT,
             moved_entities INT,
             merged_clusters INT,
-            split_clusters INT,
-            unchanged_entities INT,
+            split_clusters INT,    unchanged_entities INT,
             largest_proposed_cluster INT,
             edges_would_create INT,
             groups_would_skip INT,

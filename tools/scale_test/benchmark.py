@@ -164,7 +164,7 @@ class DuckDBBenchmarkAdapter(BenchmarkAdapter):
     def run_idr(self, run_mode: str = "FULL", dry_run: bool = False) -> Dict[str, Any]:
         """Run IDR pipeline."""
         cmd = [
-            "python", "sql/duckdb/idr_run.py",
+            "python", "sql/duckdb/core/idr_run.py",
             f"--db={self.db_path}",
             f"--run-mode={run_mode}",
         ]

@@ -73,12 +73,16 @@ nav:
     - Data Model: concepts/data-model.md
   - Guides:
     - Configuration: guides/configuration.md
+    - Metadata Management: guides/configuration.md  # We can reuse or create a specific page for the loader
     - Dry Run Mode: guides/dry-run-mode.md
     - Metrics & Monitoring: guides/metrics-monitoring.md
     - Production Hardening: guides/production-hardening.md
     - Troubleshooting: guides/troubleshooting.md
   - Deployment:
-    - Scheduling: deployment/scheduling.md
+    - Snowflake: guides/production-snowflake.md
+    - BigQuery: guides/production-bigquery.md
+    - Databricks: guides/production-databricks.md
+    - DuckDB: guides/production-duckdb.md
     - CI/CD: deployment/ci-cd.md
     - Security: deployment/security.md
   - Reference:

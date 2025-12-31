@@ -27,16 +27,16 @@ demo: install
 	@echo "============================================"
 	@echo ""
 	@echo "Step 1: Setting up DuckDB database..."
-	@python -c "import duckdb; conn = duckdb.connect('demo.duckdb'); conn.execute(open('sql/duckdb/00_ddl_all.sql').read()); print('  ✓ Schema created')"
+	@python -c "import duckdb; conn = duckdb.connect('demo.duckdb'); conn.execute(open('sql/duckdb/core/00_ddl_all.sql').read()); print('  ✓ Schema created')"
 	@echo ""
 	@echo "Step 2: Loading sample data (10K retail customers)..."
 	@python examples/sample_data/generate_demo_data.py --db=demo.duckdb --rows=10000
 	@echo ""
 	@echo "Step 3: Running identity resolution (dry run first)..."
-	@python sql/duckdb/idr_run.py --db=demo.duckdb --run-mode=FULL --dry-run
+	@python sql/duckdb/core/idr_run.py --db=demo.duckdb --run-mode=FULL --dry-run
 	@echo ""
 	@echo "Step 4: Committing changes..."
-	@python sql/duckdb/idr_run.py --db=demo.duckdb --run-mode=FULL
+	@python sql/duckdb/core/idr_run.py --db=demo.duckdb --run-mode=FULL
 	@echo ""
 	@echo "Step 5: Generating dashboard..."
 	@python tools/dashboard/generator.py --platform=duckdb --connection=demo.duckdb --output=demo_results.html

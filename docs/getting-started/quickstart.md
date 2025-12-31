@@ -55,7 +55,7 @@ cd sql-identity-resolution
     pip install duckdb
     
     # Create database with schema
-    duckdb idr.duckdb < sql/duckdb/00_ddl_all.sql
+    duckdb idr.duckdb < sql/duckdb/core/00_ddl_all.sql
     ```
 
 === "Snowflake"
@@ -64,7 +64,7 @@ cd sql-identity-resolution
 
     ```sql
     -- Run in Snowflake worksheet
-    -- Execute sql/snowflake/00_ddl_all.sql
+    -- Execute sql/snowflake/core/00_ddl_all.sql
     
     -- Verify schemas created
     SHOW SCHEMAS IN DATABASE your_database;
@@ -84,7 +84,7 @@ cd sql-identity-resolution
     bq mk --dataset your_project:idr_out
     
     # Run DDL
-    bq query --use_legacy_sql=false < sql/bigquery/00_ddl_all.sql
+    bq query --use_legacy_sql=false < sql/bigquery/core/00_ddl_all.sql
     ```
 
 === "Databricks"
@@ -92,7 +92,7 @@ cd sql-identity-resolution
     **Best for**: Existing Databricks/Spark users, large-scale processing
 
     ```
-    1. Import notebooks from sql/databricks/notebooks/
+    1. Import notebooks from sql/databricks/core/ and sql/databricks/ops/
     2. Run IDR_QuickStart.py notebook
     3. This creates schemas and sample data
     ```
@@ -161,7 +161,7 @@ INSERT INTO idr_meta.identifier_mapping (
 === "DuckDB"
 
     ```bash
-    python sql/duckdb/idr_run.py \
+    python sql/duckdb/core/idr_run.py \
       --db=idr.duckdb \
       --run-mode=FULL \
       --dry-run
@@ -176,7 +176,7 @@ INSERT INTO idr_meta.identifier_mapping (
 === "BigQuery"
 
     ```bash
-    python sql/bigquery/idr_run.py \
+    python sql/bigquery/core/idr_run.py \
       --project=your-project \
       --run-mode=FULL \
       --dry-run
@@ -221,7 +221,7 @@ After reviewing the dry run results:
 
     ```bash
     # Remove --dry-run to commit
-    python sql/duckdb/idr_run.py \
+    python sql/duckdb/core/idr_run.py \
       --db=idr.duckdb \
       --run-mode=FULL
     ```
@@ -235,7 +235,7 @@ After reviewing the dry run results:
 === "BigQuery"
 
     ```bash
-    python sql/bigquery/idr_run.py \
+    python sql/bigquery/core/idr_run.py \
       --project=your-project \
       --run-mode=FULL
     ```
