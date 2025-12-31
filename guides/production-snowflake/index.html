@@ -10,31 +10,31 @@
       
       
       
-        <link rel="canonical" href="https://anilkulkarni87.github.io/sql-identity-resolution/getting-started/platforms/duckdb/">
+        <link rel="canonical" href="https://anilkulkarni87.github.io/sql-identity-resolution/guides/production-snowflake/">
       
       
-        <link rel="prev" href="../../quickstart/">
+        <link rel="prev" href="../troubleshooting/">
       
       
-        <link rel="next" href="../snowflake/">
+        <link rel="next" href="../production-bigquery/">
       
       
         
       
       
-      <link rel="icon" href="../../../assets/images/favicon.png">
+      <link rel="icon" href="../../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
     
     
       
-        <title>DuckDB - SQL Identity Resolution</title>
+        <title>Snowflake - SQL Identity Resolution</title>
       
     
     
-      <link rel="stylesheet" href="../../../assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
       
         
-        <link rel="stylesheet" href="../../../assets/stylesheets/palette.ab4e12ef.min.css">
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
       
       
 
@@ -53,7 +53,7 @@
       
     
     
-    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -78,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#duckdb-setup" class="md-skip">
+        <a href="#production-deployment-snowflake" class="md-skip">
           Skip to content
         </a>
       
@@ -92,7 +92,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../.." title="SQL Identity Resolution" class="md-header__button md-logo" aria-label="SQL Identity Resolution" data-md-component="logo">
+    <a href="../.." title="SQL Identity Resolution" class="md-header__button md-logo" aria-label="SQL Identity Resolution" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -112,7 +112,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              DuckDB
+              Snowflake
             
           </span>
         </div>
@@ -225,7 +225,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../../.." class="md-tabs__link">
+      <a href="../.." class="md-tabs__link">
         
   
   
@@ -242,13 +242,11 @@
   
   
   
-    
-  
   
     
     
-      <li class="md-tabs__item md-tabs__item--active">
-        <a href="../../overview/" class="md-tabs__link">
+      <li class="md-tabs__item">
+        <a href="../../getting-started/overview/" class="md-tabs__link">
           
   
   
@@ -268,7 +266,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../../concepts/architecture/" class="md-tabs__link">
+        <a href="../../concepts/architecture/" class="md-tabs__link">
           
   
   
@@ -288,7 +286,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../../guides/configuration/" class="md-tabs__link">
+        <a href="../configuration/" class="md-tabs__link">
           
   
   
@@ -304,11 +302,13 @@
   
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
-        <a href="../../../guides/production-snowflake/" class="md-tabs__link">
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="./" class="md-tabs__link">
           
   
   
@@ -328,7 +328,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../../reference/cli-reference/" class="md-tabs__link">
+        <a href="../../reference/cli-reference/" class="md-tabs__link">
           
   
   
@@ -362,7 +362,7 @@
 
 <nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../.." title="SQL Identity Resolution" class="md-nav__button md-logo" aria-label="SQL Identity Resolution" data-md-component="logo">
+    <a href="../.." title="SQL Identity Resolution" class="md-nav__button md-logo" aria-label="SQL Identity Resolution" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -392,7 +392,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../.." class="md-nav__link">
+      <a href="../.." class="md-nav__link">
         
   
   
@@ -416,31 +416,28 @@
       
   
   
-    
   
   
-  
     
     
     
     
-      
-        
-        
       
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
         
           
-          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
             
   
   
@@ -458,7 +455,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_2">
             <span class="md-nav__icon md-icon"></span>
             
@@ -476,7 +473,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../overview/" class="md-nav__link">
+      <a href="../../getting-started/overview/" class="md-nav__link">
         
   
   
@@ -504,7 +501,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../quickstart/" class="md-nav__link">
+      <a href="../../getting-started/quickstart/" class="md-nav__link">
         
   
   
@@ -529,31 +526,28 @@
                 
   
   
-    
   
   
-  
     
     
     
     
       
       
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
         
           
-          
         
-      
-    
-    
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3" checked>
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2_3" >
         
           
-          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="">
+          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="0">
             
   
   
@@ -571,7 +565,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_3_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_3_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_2_3">
             <span class="md-nav__icon md-icon"></span>
             
@@ -586,37 +580,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    DuckDB
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../../getting-started/platforms/duckdb/" class="md-nav__link">
         
   
   
@@ -632,203 +599,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#prerequisites" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Prerequisites
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#installation" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Installation
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#create-database" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Create Database
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#configure-sources" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Configure Sources
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#run-idr" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Run IDR
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Run IDR">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#dry-run-preview" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Dry Run (Preview)
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#live-run" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Live Run
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#incremental-run" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Incremental Run
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#cli-options" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        CLI Options
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#verify-results" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Verify Results
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#scheduling" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Scheduling
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Scheduling">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#cron" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Cron
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#airflow" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Airflow
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#performance-tips" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Performance Tips
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#next-steps" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Next Steps
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -841,7 +611,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../snowflake/" class="md-nav__link">
+      <a href="../../getting-started/platforms/snowflake/" class="md-nav__link">
         
   
   
@@ -869,7 +639,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../bigquery/" class="md-nav__link">
+      <a href="../../getting-started/platforms/bigquery/" class="md-nav__link">
         
   
   
@@ -897,7 +667,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../databricks/" class="md-nav__link">
+      <a href="../../getting-started/platforms/databricks/" class="md-nav__link">
         
   
   
@@ -994,7 +764,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../concepts/architecture/" class="md-nav__link">
+      <a href="../../concepts/architecture/" class="md-nav__link">
         
   
   
@@ -1022,7 +792,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../concepts/matching-algorithm/" class="md-nav__link">
+      <a href="../../concepts/matching-algorithm/" class="md-nav__link">
         
   
   
@@ -1050,7 +820,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../concepts/data-model/" class="md-nav__link">
+      <a href="../../concepts/data-model/" class="md-nav__link">
         
   
   
@@ -1139,7 +909,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../guides/configuration/" class="md-nav__link">
+      <a href="../configuration/" class="md-nav__link">
         
   
   
@@ -1167,7 +937,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../guides/configuration/" class="md-nav__link">
+      <a href="../configuration/" class="md-nav__link">
         
   
   
@@ -1195,7 +965,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../guides/dry-run-mode/" class="md-nav__link">
+      <a href="../dry-run-mode/" class="md-nav__link">
         
   
   
@@ -1223,7 +993,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../guides/metrics-monitoring/" class="md-nav__link">
+      <a href="../metrics-monitoring/" class="md-nav__link">
         
   
   
@@ -1251,7 +1021,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../guides/production-hardening/" class="md-nav__link">
+      <a href="../production-hardening/" class="md-nav__link">
         
   
   
@@ -1279,7 +1049,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../guides/troubleshooting/" class="md-nav__link">
+      <a href="../troubleshooting/" class="md-nav__link">
         
   
   
@@ -1311,28 +1081,31 @@
       
   
   
+    
   
   
+  
     
     
     
     
+      
+        
+        
       
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
         
           
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
-        
-          
-          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
             
   
   
@@ -1350,7 +1123,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_5">
             <span class="md-nav__icon md-icon"></span>
             
@@ -1365,10 +1138,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../../../guides/production-snowflake/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Snowflake
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -1384,6 +1184,148 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#prerequisites" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prerequisites
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-1-schema-setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 1: Schema Setup
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Step 1: Schema Setup">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#11-create-tables" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.1 Create Tables
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#12-deploy-stored-procedure" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.2 Deploy Stored Procedure
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-2-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 2: Configuration
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-3-metadata-loading" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 3: Metadata Loading
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-4-execution-scheduling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 4: Execution &amp; Scheduling
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Step 4: Execution &amp; Scheduling">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#option-a-snowflake-tasks-recommended" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Option A: Snowflake Tasks (Recommended)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#option-b-dbt" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Option B: dbt
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-5-monitoring" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 5: Monitoring
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -1396,7 +1338,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../guides/production-bigquery/" class="md-nav__link">
+      <a href="../production-bigquery/" class="md-nav__link">
         
   
   
@@ -1424,7 +1366,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../guides/production-databricks/" class="md-nav__link">
+      <a href="../production-databricks/" class="md-nav__link">
         
   
   
@@ -1452,7 +1394,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../guides/production-duckdb/" class="md-nav__link">
+      <a href="../production-duckdb/" class="md-nav__link">
         
   
   
@@ -1480,7 +1422,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../deployment/ci-cd/" class="md-nav__link">
+      <a href="../../deployment/ci-cd/" class="md-nav__link">
         
   
   
@@ -1508,7 +1450,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../deployment/security/" class="md-nav__link">
+      <a href="../../deployment/security/" class="md-nav__link">
         
   
   
@@ -1597,7 +1539,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../reference/cli-reference/" class="md-nav__link">
+      <a href="../../reference/cli-reference/" class="md-nav__link">
         
   
   
@@ -1625,7 +1567,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../reference/schema-reference/" class="md-nav__link">
+      <a href="../../reference/schema-reference/" class="md-nav__link">
         
   
   
@@ -1653,7 +1595,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../reference/metrics-reference/" class="md-nav__link">
+      <a href="../../reference/metrics-reference/" class="md-nav__link">
         
   
   
@@ -1719,55 +1661,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#installation" class="md-nav__link">
+  <a href="#step-1-schema-setup" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Installation
+        Step 1: Schema Setup
       
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#create-database" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Create Database
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#configure-sources" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Configure Sources
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#run-idr" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Run IDR
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Run IDR">
+    <nav class="md-nav" aria-label="Step 1: Schema Setup">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#dry-run-preview" class="md-nav__link">
+  <a href="#11-create-tables" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Dry Run (Preview)
+        1.1 Create Tables
       
     </span>
   </a>
@@ -1775,21 +1684,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#live-run" class="md-nav__link">
+  <a href="#12-deploy-stored-procedure" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Live Run
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#incremental-run" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Incremental Run
+        1.2 Deploy Stored Procedure
       
     </span>
   </a>
@@ -1802,10 +1700,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#cli-options" class="md-nav__link">
+  <a href="#step-2-configuration" class="md-nav__link">
     <span class="md-ellipsis">
       
-        CLI Options
+        Step 2: Configuration
       
     </span>
   </a>
@@ -1813,10 +1711,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#verify-results" class="md-nav__link">
+  <a href="#step-3-metadata-loading" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Verify Results
+        Step 3: Metadata Loading
       
     </span>
   </a>
@@ -1824,22 +1722,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#scheduling" class="md-nav__link">
+  <a href="#step-4-execution-scheduling" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Scheduling
+        Step 4: Execution &amp; Scheduling
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Scheduling">
+    <nav class="md-nav" aria-label="Step 4: Execution &amp; Scheduling">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#cron" class="md-nav__link">
+  <a href="#option-a-snowflake-tasks-recommended" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Cron
+        Option A: Snowflake Tasks (Recommended)
       
     </span>
   </a>
@@ -1847,10 +1745,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#airflow" class="md-nav__link">
+  <a href="#option-b-dbt" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Airflow
+        Option B: dbt
       
     </span>
   </a>
@@ -1863,21 +1761,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#performance-tips" class="md-nav__link">
+  <a href="#step-5-monitoring" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Performance Tips
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#next-steps" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Next Steps
+        Step 5: Monitoring
       
     </span>
   </a>
@@ -1904,160 +1791,97 @@
   
 
 
-<h1 id="duckdb-setup">DuckDB Setup</h1>
-<p>DuckDB is the recommended platform for <strong>development, testing, and small-to-medium datasets</strong>.</p>
+<h1 id="production-deployment-snowflake">Production Deployment: Snowflake</h1>
+<p>This guide details the exact steps to deploy SQL Identity Resolution (IDR) to a production Snowflake environment.</p>
 <hr />
 <h2 id="prerequisites">Prerequisites</h2>
 <ul>
-<li>Python 3.9+</li>
-<li>DuckDB (<code>pip install duckdb</code>)</li>
+<li><strong>Snowflake Account</strong>: Usage of <code>ACCOUNTADMIN</code> or a role with <code>CREATE DATABASE/SCHEMA</code> privileges.</li>
+<li><strong>Python Environment</strong>: For running the metadata loader (CI/CD or orchestration server).</li>
+<li><strong>Source Data</strong>: Read access to the tables you wish to resolve.</li>
 </ul>
 <hr />
-<h2 id="installation">Installation</h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># Clone repository</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/anilkulkarni87/sql-identity-resolution.git
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="nb">cd</span><span class="w"> </span>sql-identity-resolution
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="c1"># Install dependencies</span>
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>pip<span class="w"> </span>install<span class="w"> </span>duckdb
+<h2 id="step-1-schema-setup">Step 1: Schema Setup</h2>
+<p>You need to create the tables and the stored procedure runner.</p>
+<h3 id="11-create-tables">1.1 Create Tables</h3>
+<p>Execute the content of <code>sql/snowflake/core/00_ddl_all.sql</code>. This creates:
+- <code>idr_meta</code>: Configuration and rules.
+- <code>idr_work</code>: Transient intermediate tables.
+- <code>idr_out</code>: Final output tables (clusters, golden profiles).</p>
+<h3 id="12-deploy-stored-procedure">1.2 Deploy Stored Procedure</h3>
+<p>Execute the content of <code>sql/snowflake/core/IDR_Run.sql</code>.
+This creates the <code>idr_run</code> stored procedure, which contains the entire resolution logic.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1">-- Verify deployment</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="k">SHOW</span><span class="w"> </span><span class="n">PROCEDURES</span><span class="w"> </span><span class="k">LIKE</span><span class="w"> </span><span class="s1">&#39;idr_run&#39;</span><span class="p">;</span>
 </code></pre></div>
 <hr />
-<h2 id="create-database">Create Database</h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># Create database with all schemas and tables</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>duckdb<span class="w"> </span>idr.duckdb<span class="w"> </span>&lt;<span class="w"> </span>sql/duckdb/00_ddl_all.sql
-</code></pre></div>
-<p>This creates three schemas:</p>
-<table>
-<thead>
-<tr>
-<th>Schema</th>
-<th>Purpose</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>idr_meta</code></td>
-<td>Configuration (sources, rules, mappings)</td>
-</tr>
-<tr>
-<td><code>idr_work</code></td>
-<td>Temporary processing tables</td>
-</tr>
-<tr>
-<td><code>idr_out</code></td>
-<td>Output tables (membership, clusters, metrics)</td>
-</tr>
-</tbody>
-</table>
+<h2 id="step-2-configuration">Step 2: Configuration</h2>
+<p>Create a <code>production.yaml</code> file defining your rules and sources.</p>
+<p><strong>Example <code>production.yaml</code>:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nt">rules</span><span class="p">:</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">rule_id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">email_exact</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">    </span><span class="nt">identifier_type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">EMAIL</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">    </span><span class="nt">priority</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">    </span><span class="nt">settings</span><span class="p">:</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">      </span><span class="nt">canonicalize</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">LOWERCASE</span>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="nt">sources</span><span class="p">:</span>
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">table_id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">crm_customers</span>
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="w">    </span><span class="nt">table_fqn</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">RAW.CRM.CUSTOMERS</span>
+<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="w">    </span><span class="nt">entity_key_expr</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">customer_id</span>
+<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="w">    </span><span class="nt">trust_rank</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
+<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="w">    </span><span class="nt">identifiers</span><span class="p">:</span>
+<a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">EMAIL</span>
+<a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a><span class="w">        </span><span class="nt">expr</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">email_address</span>
+<a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a><span class="w">    </span><span class="nt">attributes</span><span class="p">:</span>
+<a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a><span class="w">      </span><span class="nt">first_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">fname</span>
+<a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a><span class="w">      </span><span class="nt">last_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">lname</span>
+</code></pre></div></p>
 <hr />
-<h2 id="configure-sources">Configure Sources</h2>
-<p>Connect to DuckDB and insert your configuration:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>duckdb<span class="w"> </span>idr.duckdb
-</code></pre></div>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1">-- Register your source table</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="k">INSERT</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="n">idr_meta</span><span class="p">.</span><span class="n">source_table</span><span class="w"> </span><span class="k">VALUES</span>
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">  </span><span class="p">(</span><span class="s1">&#39;customers&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;main.customers&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;PERSON&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;customer_id&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;updated_at&#39;</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="k">TRUE</span><span class="p">);</span>
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>
-<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="c1">-- Define matching rules</span>
-<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="k">INSERT</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="n">idr_meta</span><span class="p">.</span><span class="k">rule</span><span class="w"> </span><span class="k">VALUES</span>
-<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="w">  </span><span class="p">(</span><span class="s1">&#39;email_exact&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;EMAIL&#39;</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="k">TRUE</span><span class="p">,</span><span class="w"> </span><span class="mi">10000</span><span class="p">),</span>
-<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="w">  </span><span class="p">(</span><span class="s1">&#39;phone_exact&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;PHONE&#39;</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="k">TRUE</span><span class="p">,</span><span class="w"> </span><span class="mi">5000</span><span class="p">);</span>
-<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>
-<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="c1">-- Map identifiers to columns</span>
-<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="k">INSERT</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="n">idr_meta</span><span class="p">.</span><span class="n">identifier_mapping</span><span class="w"> </span><span class="k">VALUES</span>
-<a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="w">  </span><span class="p">(</span><span class="s1">&#39;customers&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;EMAIL&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;email&#39;</span><span class="p">,</span><span class="w"> </span><span class="k">TRUE</span><span class="p">),</span>
-<a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a><span class="w">  </span><span class="p">(</span><span class="s1">&#39;customers&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;PHONE&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;phone&#39;</span><span class="p">,</span><span class="w"> </span><span class="k">TRUE</span><span class="p">);</span>
+<h2 id="step-3-metadata-loading">Step 3: Metadata Loading</h2>
+<p>Use the <code>load_metadata.py</code> tool to push your configuration to Snowflake. This ensures your config is version-controlled and deployed safely.</p>
+<p><strong>Run via CI/CD (GitHub Actions, Jenkins) or Airflow:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">SNOWFLAKE_ACCOUNT</span><span class="o">=</span><span class="s2">&quot;your_account&quot;</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="nb">export</span><span class="w"> </span><span class="nv">SNOWFLAKE_USER</span><span class="o">=</span><span class="s2">&quot;idr_service_user&quot;</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="nb">export</span><span class="w"> </span><span class="nv">SNOWFLAKE_PASSWORD</span><span class="o">=</span><span class="s2">&quot;***&quot;</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="nb">export</span><span class="w"> </span><span class="nv">SNOWFLAKE_DATABASE</span><span class="o">=</span><span class="s2">&quot;IDR_PROD&quot;</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="nb">export</span><span class="w"> </span><span class="nv">SNOWFLAKE_WAREHOUSE</span><span class="o">=</span><span class="s2">&quot;COMPUTE_WH&quot;</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>python<span class="w"> </span>tools/load_metadata.py<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="w">  </span>--platform<span class="o">=</span>snowflake<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="w">  </span>--config<span class="o">=</span>production.yaml
 </code></pre></div>
 <hr />
-<h2 id="run-idr">Run IDR</h2>
-<h3 id="dry-run-preview">Dry Run (Preview)</h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>python<span class="w"> </span>sql/duckdb/idr_run.py<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">  </span>--db<span class="o">=</span>idr.duckdb<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">  </span>--run-mode<span class="o">=</span>FULL<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">  </span>--dry-run
+<h2 id="step-4-execution-scheduling">Step 4: Execution &amp; Scheduling</h2>
+<p>The IDR process is triggered by calling the stored procedure. You can schedule this using <strong>Snowflake Tasks</strong> or an external orchestrator (Airflow, Prefect, dbt).</p>
+<h3 id="option-a-snowflake-tasks-recommended">Option A: Snowflake Tasks (Recommended)</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">CREATE</span><span class="w"> </span><span class="k">OR</span><span class="w"> </span><span class="k">REPLACE</span><span class="w"> </span><span class="n">TASK</span><span class="w"> </span><span class="n">run_idr_daily</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">  </span><span class="n">WAREHOUSE</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">COMPUTE_WH</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">  </span><span class="n">SCHEDULE</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;USING CRON 0 2 * * * America/Los_Angeles&#39;</span><span class="w"> </span><span class="c1">-- Daily at 2AM</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="k">AS</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">  </span><span class="k">CALL</span><span class="w"> </span><span class="n">idr_run</span><span class="p">(</span><span class="s1">&#39;FULL&#39;</span><span class="p">,</span><span class="w"> </span><span class="mi">30</span><span class="p">,</span><span class="w"> </span><span class="k">FALSE</span><span class="p">);</span>
 </code></pre></div>
-<h3 id="live-run">Live Run</h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>python<span class="w"> </span>sql/duckdb/idr_run.py<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">  </span>--db<span class="o">=</span>idr.duckdb<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">  </span>--run-mode<span class="o">=</span>FULL
-</code></pre></div>
-<h3 id="incremental-run">Incremental Run</h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>python<span class="w"> </span>sql/duckdb/idr_run.py<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">  </span>--db<span class="o">=</span>idr.duckdb<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">  </span>--run-mode<span class="o">=</span>INCR
-</code></pre></div>
-<hr />
-<h2 id="cli-options">CLI Options</h2>
-<table>
-<thead>
-<tr>
-<th>Option</th>
-<th>Description</th>
-<th>Default</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>--db</code></td>
-<td>Path to DuckDB database file</td>
-<td>Required</td>
-</tr>
-<tr>
-<td><code>--run-mode</code></td>
-<td><code>FULL</code> or <code>INCR</code></td>
-<td><code>INCR</code></td>
-</tr>
-<tr>
-<td><code>--max-iters</code></td>
-<td>Max label propagation iterations</td>
-<td>30</td>
-</tr>
-<tr>
-<td><code>--dry-run</code></td>
-<td>Preview mode (no commits)</td>
-<td>False</td>
-</tr>
-</tbody>
-</table>
-<hr />
-<h2 id="verify-results">Verify Results</h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c1">-- Check run history</span>
-<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="k">SELECT</span><span class="w"> </span><span class="n">run_id</span><span class="p">,</span><span class="w"> </span><span class="n">status</span><span class="p">,</span><span class="w"> </span><span class="n">entities_processed</span><span class="p">,</span><span class="w"> </span><span class="n">duration_seconds</span><span class="w"> </span>
-<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="k">FROM</span><span class="w"> </span><span class="n">idr_out</span><span class="p">.</span><span class="n">run_history</span><span class="w"> </span>
-<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">started_at</span><span class="w"> </span><span class="k">DESC</span><span class="p">;</span>
-<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>
-<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="c1">-- View cluster distribution</span>
-<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="k">SELECT</span><span class="w"> </span><span class="n">cluster_size</span><span class="p">,</span><span class="w"> </span><span class="k">COUNT</span><span class="p">(</span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="k">count</span>
-<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="k">FROM</span><span class="w"> </span><span class="n">idr_out</span><span class="p">.</span><span class="n">identity_clusters_current</span>
-<a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a><span class="k">GROUP</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">cluster_size</span>
-<a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">cluster_size</span><span class="p">;</span>
-<a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a>
-<a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a><span class="c1">-- Lookup specific entity</span>
-<a id="__codelineno-7-13" name="__codelineno-7-13" href="#__codelineno-7-13"></a><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">idr_out</span><span class="p">.</span><span class="n">identity_resolved_membership_current</span>
-<a id="__codelineno-7-14" name="__codelineno-7-14" href="#__codelineno-7-14"></a><span class="k">WHERE</span><span class="w"> </span><span class="n">entity_key</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;customers:12345&#39;</span><span class="p">;</span>
+<h3 id="option-b-dbt">Option B: dbt</h3>
+<p>You can use a <code>run-operation</code> in dbt:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1">-- macros/run_idr.sql</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="err">{</span><span class="o">%</span><span class="w"> </span><span class="n">macro</span><span class="w"> </span><span class="n">run_idr</span><span class="p">()</span><span class="w"> </span><span class="o">%</span><span class="err">}</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">  </span><span class="err">{</span><span class="o">%</span><span class="w"> </span><span class="k">do</span><span class="w"> </span><span class="n">run_query</span><span class="p">(</span><span class="ss">&quot;CALL idr_run(&#39;FULL&#39;, 30, FALSE)&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">%</span><span class="err">}</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="err">{</span><span class="o">%</span><span class="w"> </span><span class="n">endmacro</span><span class="w"> </span><span class="o">%</span><span class="err">}</span>
 </code></pre></div>
 <hr />
-<h2 id="scheduling">Scheduling</h2>
-<h3 id="cron">Cron</h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="c1"># Run every hour</span>
-<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="m">0</span><span class="w"> </span>*<span class="w"> </span>*<span class="w"> </span>*<span class="w"> </span>*<span class="w"> </span><span class="nb">cd</span><span class="w"> </span>/path/to/repo<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>python<span class="w"> </span>sql/duckdb/idr_run.py<span class="w"> </span>--db<span class="o">=</span>idr.duckdb<span class="w"> </span>--run-mode<span class="o">=</span>INCR
-</code></pre></div>
-<h3 id="airflow">Airflow</h3>
-<p>See <a href="../../../deployment/scheduling/">Scheduling Guide</a> for DAG templates.</p>
-<hr />
-<h2 id="performance-tips">Performance Tips</h2>
-<ol>
-<li><strong>Use Incremental Mode</strong>: After initial FULL run, use INCR for better performance</li>
-<li><strong>Set max_group_size</strong>: Limit overly generic identifiers (e.g., <code>test@test.com</code>)</li>
-<li><strong>Index source tables</strong>: Add indexes on entity key and watermark columns</li>
-</ol>
-<hr />
-<h2 id="next-steps">Next Steps</h2>
-<ul>
-<li><a href="../../../guides/configuration/">Configuration Guide</a></li>
-<li><a href="../../../guides/dry-run-mode/">Dry Run Mode</a></li>
-<li><a href="../../../guides/troubleshooting/">Troubleshooting</a></li>
-</ul>
+<h2 id="step-5-monitoring">Step 5: Monitoring</h2>
+<p>Monitor the pipeline using the <code>idr_out</code> tables.</p>
+<p><strong>Check Run Status:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">SELECT</span><span class="w"> </span><span class="n">run_id</span><span class="p">,</span><span class="w"> </span><span class="n">status</span><span class="p">,</span><span class="w"> </span><span class="n">duration_seconds</span><span class="p">,</span><span class="w"> </span><span class="n">entities_processed</span><span class="p">,</span><span class="w"> </span><span class="n">clusters_impacted</span><span class="w"> </span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="k">FROM</span><span class="w"> </span><span class="n">idr_out</span><span class="p">.</span><span class="n">run_history</span><span class="w"> </span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">started_at</span><span class="w"> </span><span class="k">DESC</span><span class="w"> </span>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="k">LIMIT</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span>
+</code></pre></div></p>
+<p><strong>Check for Warnings:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">idr_out</span><span class="p">.</span><span class="n">run_history</span><span class="w"> </span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="k">WHERE</span><span class="w"> </span><span class="n">warnings</span><span class="w"> </span><span class="k">IS</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">started_at</span><span class="w"> </span><span class="k">DESC</span><span class="p">;</span>
+</code></pre></div></p>
 
 
 
@@ -2131,10 +1955,10 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["content.code.copy", "content.code.annotate", "content.tabs.link", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.top", "search.suggest", "search.highlight"], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["content.code.copy", "content.code.annotate", "content.tabs.link", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.top", "search.suggest", "search.highlight"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
       
     
   </body>

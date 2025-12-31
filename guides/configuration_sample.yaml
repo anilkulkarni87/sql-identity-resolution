@@ -1,0 +1,105 @@
+# IDR Metadata Configuration Sample
+# This file serves as the "source of truth" for Identity Resolution logic.
+# A loader script would parse this and populate the idr_meta.* SQL tables.
+
+version: "1.0"
+
+# -----------------------------------------------------------------------------
+# 1. Matching Rules
+# 定义 rules defining how identities are connected.
+# -----------------------------------------------------------------------------
+rules:
+  - rule_id: email_exact
+    description: "Exact match on lowercased email address"
+    identifier_type: EMAIL
+    priority: 1
+    is_active: true
+    settings:
+      canonicalize: LOWERCASE  # Options: NONE, LOWERCASE, CLEAN_PHONE
+      allow_hashed: true
+      max_group_size: 10000    # Safety circuit breaker
+
+  - rule_id: phone_standard
+    description: "Exact match on normalized phone number"
+    identifier_type: PHONE
+    priority: 2
+    is_active: true
+    settings:
+      canonicalize: NONE
+      allow_hashed: true
+
+# -----------------------------------------------------------------------------
+# 2. Source Tables
+# Define where data comes from and how to extract features.
+# -----------------------------------------------------------------------------
+sources:
+  - table_id: crm_customers
+    # The physical table in your warehouse
+    table_fqn: analytics.crm.customers
+    
+    # Entity definition
+    entity_type: PERSON
+    entity_key_expr: customer_id  # Column ID
+    
+    # Incremental loading config
+    watermark_column: updated_at
+    lookback_minutes: 0
+    trust_rank: 1  # 1 = Highest trust for golden profile
+
+    # ----------------------------------------------
+    # Identifiers: What we match on
+    # ----------------------------------------------
+    identifiers:
+      - type: EMAIL
+        expr: email_address
+        is_hashed: false
+        
+      - type: PHONE
+        expr: REGEXP_REPLACE(phone, '[^0-9]', '')  # SQL expression allowed
+        is_hashed: false
+
+    # ----------------------------------------------
+    # Attributes: What goes into the Golden Profile
+    # ----------------------------------------------
+    attributes:
+      first_name: fname
+      last_name: lname
+      email_raw: email_address
+      phone_raw: phone
+
+  - table_id: web_events
+    table_fqn: analytics.digital.page_views
+    entity_key_expr: cookie_id
+    watermark_column: event_ts
+    trust_rank: 5  # Lower trust
+    
+    identifiers:
+      - type: EMAIL
+        expr: user_email
+    
+    attributes:
+      record_updated_at: event_ts
+
+# -----------------------------------------------------------------------------
+# 3. Survivorship
+# How to pick the "winner" for the Golden Profile
+# -----------------------------------------------------------------------------
+survivorship:
+  email_primary:
+    strategy: SOURCE_PRIORITY
+    priority_list:
+      - customers
+      - web_events
+    recency_field: record_updated_at
+
+# 4. Exclusions (Optional) - Block invalid identifiers
+exclusions:
+  - identifier_type: EMAIL
+    value: "unknown@example.com"
+    match_type: EXACT
+    reason: "Placeholder value"
+  - identifier_type: PHONE
+    value: "555-0000"
+    match_type: LIKE
+    reason: "Test numbers"
+```

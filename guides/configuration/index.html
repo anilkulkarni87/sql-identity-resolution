@@ -13,7 +13,7 @@
         <link rel="canonical" href="https://anilkulkarni87.github.io/sql-identity-resolution/guides/configuration/">
       
       
-        <link rel="prev" href="../../concepts/data-model/">
+        <link rel="prev" href="./">
       
       
         <link rel="next" href="../dry-run-mode/">
@@ -308,7 +308,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../deployment/scheduling/" class="md-tabs__link">
+        <a href="../production-snowflake/" class="md-tabs__link">
           
   
   
@@ -1301,6 +1301,398 @@
                 
   
   
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#configuration-overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration Overview
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#registering-source-tables" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Registering Source Tables
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Registering Source Tables">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#required-fields" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Required Fields
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#defining-matching-rules" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Defining Matching Rules
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Defining Matching Rules">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#rule-properties" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rule Properties
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#common-rules" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common Rules
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#max_group_size-guidelines" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        max_group_size Guidelines
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#mapping-identifiers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Mapping Identifiers
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Mapping Identifiers">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#basic-mapping" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Basic Mapping
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#examples_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#identifier-exclusions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Identifier Exclusions
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Identifier Exclusions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#exact-match-exclusions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exact Match Exclusions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pattern-exclusions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pattern Exclusions
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configuration-settings" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration Settings
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Configuration Settings">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#available-settings" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Available Settings
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reading-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reading Configuration
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#multi-entity-type-setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Multi-Entity Type Setup
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#validation-queries" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Validation Queries
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Validation Queries">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#check-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Check Configuration
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#updating-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Updating Configuration
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Updating Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#adding-a-new-source" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Adding a New Source
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#disabling-a-source" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Disabling a Source
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#changing-max_group_size" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Changing max_group_size
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#next-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Next Steps
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
   
   
     <li class="md-nav__item">
@@ -1477,14 +1869,98 @@
   
   
     <li class="md-nav__item">
-      <a href="../../deployment/scheduling/" class="md-nav__link">
+      <a href="../production-snowflake/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Scheduling
+    Snowflake
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../production-bigquery/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    BigQuery
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../production-databricks/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Databricks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../production-duckdb/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    DuckDB
   
 
     
