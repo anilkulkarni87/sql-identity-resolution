@@ -11,6 +11,7 @@
 from datetime import datetime
 import time
 import uuid
+import json
 
 # COMMAND ----------
 dbutils.widgets.text("RUN_MODE", "INCR")   # INCR | FULL
@@ -56,10 +57,27 @@ def collect(sql: str):
     return q(sql).collect()
 
 def run_sql_text(sql_text: str):
-    # Multi-statement safe execution (repo SQL does not contain semicolons inside string literals)
-    statements = [s.strip() for s in sql_text.split(";") if s.strip()]
+    # Execute multi-statement SQL safely (handles files without semicolons by splitting on blank lines).
+    statements = []
+    buffer = []
+    for line in sql_text.splitlines():
+        stripped = line.strip()
+        if not stripped or stripped.startswith("--"):
+            # Blank line or comment signals potential statement boundary.
+            if buffer and not stripped:
+                statements.append("\n".join(buffer))
+                buffer = []
+            continue
+        buffer.append(line)
+        if stripped.endswith(";"):
+            statements.append("\n".join(buffer))
+            buffer = []
+    if buffer:
+        statements.append("\n".join(buffer))
+
     for stmt in statements:
-        q(stmt)
+        if stmt.strip():
+            q(stmt)
 
 def run_sql_file(path: str, replacements=None):
     sql_text = open(path).read()
@@ -67,6 +85,100 @@ def run_sql_file(path: str, replacements=None):
         for k, v in replacements.items():
             sql_text = sql_text.replace(k, v)
     run_sql_text(sql_text)
+
+# COMMAND ----------
+# Observability helpers
+_stage_metrics = []
+_stage_order = 0
+
+def track_stage(stage_name: str, rows_in: int = None, rows_out: int = None, notes: str = None):
+    """Record timing for a processing stage."""
+    global _stage_order
+    _stage_order += 1
+    return {
+        "run_id": RUN_ID,
+        "stage_name": stage_name,
+        "stage_order": _stage_order,
+        "started_at": datetime.utcnow(),
+        "rows_in": rows_in,
+        "rows_out": rows_out,
+        "notes": notes
+    }
+
+def end_stage(stage: dict, rows_out: int = None):
+    """Complete a stage and record metrics."""
+    stage["ended_at"] = datetime.utcnow()
+    stage["duration_seconds"] = int((stage["ended_at"] - stage["started_at"]).total_seconds())
+    if rows_out is not None:
+        stage["rows_out"] = rows_out
+    _stage_metrics.append(stage)
+    print(f"  ⏱️ {stage['stage_name']}: {stage['duration_seconds']}s" + 
+          (f", rows_out={rows_out}" if rows_out else ""))
+
+def init_run_history():
+    """Create initial run_history record with RUNNING status."""
+    # Ensure observability tables exist
+    q("""
+    CREATE TABLE IF NOT EXISTS idr_out.run_history (
+      run_id STRING, run_mode STRING, status STRING,
+      started_at TIMESTAMP, ended_at TIMESTAMP, duration_seconds BIGINT,
+      entities_processed BIGINT, edges_created BIGINT, edges_updated BIGINT,
+      clusters_impacted BIGINT, lp_iterations INT,
+      source_tables_processed INT, watermarks_json STRING,
+      error_message STRING, error_stage STRING,
+      created_at TIMESTAMP
+    )""")
+    
+    q("""
+    CREATE TABLE IF NOT EXISTS idr_out.stage_metrics (
+      run_id STRING, stage_name STRING, stage_order INT,
+      started_at TIMESTAMP, ended_at TIMESTAMP, duration_seconds BIGINT,
+      rows_in BIGINT, rows_out BIGINT, notes STRING
+    )""")
+    
+    q(f"""
+    INSERT INTO idr_out.run_history 
+    (run_id, run_mode, status, started_at, source_tables_processed, created_at)
+    VALUES ('{RUN_ID}', '{RUN_MODE}', 'RUNNING', TIMESTAMP('{RUN_TS}'), 0, CURRENT_TIMESTAMP)
+    """)
+
+def finalize_run_history(status: str, entities: int, edges_created: int, edges_updated: int, 
+                         clusters: int, iterations: int, sources: int, watermarks: dict,
+                         error_msg: str = None, error_stage: str = None):
+    """Update run_history with final metrics."""
+    end_ts = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
+    duration = int(time.time() - _run_start_ts)
+    wm_json = json.dumps(watermarks).replace("'", "''")
+    err_msg = error_msg.replace("'", "''") if error_msg else None
+    
+    q(f"""
+    UPDATE idr_out.run_history SET
+      status = '{status}',
+      ended_at = TIMESTAMP('{end_ts}'),
+      duration_seconds = {duration},
+      entities_processed = {entities},
+      edges_created = {edges_created},
+      edges_updated = {edges_updated},
+      clusters_impacted = {clusters},
+      lp_iterations = {iterations},
+      source_tables_processed = {sources},
+      watermarks_json = '{wm_json}',
+      error_message = {f"'{err_msg}'" if err_msg else 'NULL'},
+      error_stage = {f"'{error_stage}'" if error_stage else 'NULL'}
+    WHERE run_id = '{RUN_ID}'
+    """)
+    
+    # Write stage metrics
+    for s in _stage_metrics:
+        q(f"""
+        INSERT INTO idr_out.stage_metrics VALUES (
+          '{s['run_id']}', '{s['stage_name']}', {s['stage_order']},
+          TIMESTAMP('{s['started_at'].strftime('%Y-%m-%d %H:%M:%S')}'),
+          TIMESTAMP('{s['ended_at'].strftime('%Y-%m-%d %H:%M:%S')}'),
+          {s['duration_seconds']},
+          {s.get('rows_in') or 'NULL'}, {s.get('rows_out') or 'NULL'},
+          {f"'{s.get('notes')}'" if s.get('notes') else 'NULL'}
+        )""")
 
 # COMMAND ----------
 # Preflight validation
@@ -160,6 +272,10 @@ if bad_types:
 
 print("✅ Preflight OK", {"active_tables": len(source_rows), "mappings": len(mapping_rows), "active_rules": len(active_rule_types)})
 print("ℹ️ Metadata counts", meta_counts)
+
+# Initialize run history tracking
+init_run_history()
+print("📊 Run tracking started")
 
 # COMMAND ----------
 # Builders
@@ -312,7 +428,7 @@ for i in range(MAX_ITERS):
         break
     q("ALTER TABLE idr_work.lp_labels RENAME TO lp_labels_old")
     q("ALTER TABLE idr_work.lp_labels_next RENAME TO lp_labels")
-    q("DROP TABLE idr_work.lp_labels_old")
+    q("DROP TABLE IF EXISTS idr_work.lp_labels_old")
 else:
     raise RuntimeError(f"Label propagation did not converge in {MAX_ITERS} iterations")
 
@@ -392,7 +508,27 @@ VALUES (src.run_id,src.rule_id,src.edges_created,src.started_at,src.ended_at)
 entities_delta_cnt = q("SELECT COUNT(*) AS c FROM idr_work.entities_delta").first()["c"]
 edges_new_cnt = q("SELECT COUNT(*) AS c FROM idr_work.edges_new").first()["c"]
 membership_cnt = q("SELECT COUNT(*) AS c FROM idr_out.identity_resolved_membership_current").first()["c"]
+cluster_cnt = q("SELECT COUNT(*) AS c FROM idr_out.identity_clusters_current").first()["c"]
 audit_rows = [row.asDict() for row in q("SELECT rule_id, edges_created FROM idr_work.audit_edges_created").collect()]
+total_edges_created = sum(r.get('edges_created', 0) for r in audit_rows)
+
+# Build watermarks dict for run history
+watermarks = {}
+for r in collect("SELECT table_id, new_watermark_value FROM idr_work.watermark_updates"):
+    watermarks[r['table_id']] = str(r['new_watermark_value'])
+
+# Finalize run history with success
+finalize_run_history(
+    status='SUCCESS',
+    entities=entities_delta_cnt,
+    edges_created=total_edges_created,
+    edges_updated=edges_new_cnt - total_edges_created if edges_new_cnt > total_edges_created else 0,
+    clusters=cluster_cnt,
+    iterations=iterations if 'iterations' in locals() else 0,
+    sources=len(source_rows),
+    watermarks=watermarks
+)
+
 print("ℹ️ Run summary", {
     "RUN_ID": RUN_ID,
     "RUN_MODE": RUN_MODE,
@@ -400,6 +536,7 @@ print("ℹ️ Run summary", {
     "entities_delta": entities_delta_cnt,
     "edges_new": edges_new_cnt,
     "membership_current": membership_cnt,
+    "clusters": cluster_cnt,
     "edges_created_by_rule": audit_rows,
 })
 

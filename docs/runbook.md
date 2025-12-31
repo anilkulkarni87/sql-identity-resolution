@@ -1,7 +1,7 @@
 # Runbook (Databricks-first)
 
 ## Quickstart (Databricks)
-1. Run `sql/databricks/notebooks/IDR_LoadMetadata.py` (defaults: runs DDLs, ingests `metadata_samples/*.csv` into `idr_meta.*`).
+1. Run `sql/databricks/notebooks/IDR_LoadMetadata_Simple.py` (point `META_ROOT` to your metadata folder or volume; defaults to repo `metadata_samples/`).
 2. Optionally generate sample source data with `sql/databricks/notebooks/IDR_SampleData_Generate.py`.
 3. Run `IDR_Run` with params:
    - `RUN_MODE`: INCR | FULL

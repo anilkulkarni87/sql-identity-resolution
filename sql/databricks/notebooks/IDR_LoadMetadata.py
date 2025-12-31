@@ -41,9 +41,25 @@ def q(sql: str):
     return spark.sql(sql)
 
 def run_sql_text(sql_text: str):
-    statements = [s.strip() for s in sql_text.split(";") if s.strip()]
+    statements = []
+    buffer = []
+    for line in sql_text.splitlines():
+        stripped = line.strip()
+        if not stripped or stripped.startswith("--"):
+            if buffer and not stripped:
+                statements.append("\n".join(buffer))
+                buffer = []
+            continue
+        buffer.append(line)
+        if stripped.endswith(";"):
+            statements.append("\n".join(buffer))
+            buffer = []
+    if buffer:
+        statements.append("\n".join(buffer))
+
     for stmt in statements:
-        q(stmt)
+        if stmt.strip():
+            q(stmt)
 
 def run_sql_file(path: str):
     sql_text = open(path).read()
