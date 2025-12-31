@@ -1,0 +1,1762 @@
+
+<!DOCTYPE html>
+
+<html class="no-js" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta content="Production-grade deterministic identity resolution for DuckDB, Snowflake, BigQuery, and Databricks" name="description"/>
+<link href="https://github.com/anilkulkarni87/sql-identity-resolution/concepts/data-model/" rel="canonical"/>
+<link href="../matching-algorithm/" rel="prev"/>
+<link href="../../guides/configuration/" rel="next"/>
+<link href="../../assets/images/favicon.png" rel="icon"/>
+<meta content="mkdocs-1.6.1, mkdocs-material-9.7.1" name="generator"/>
+<title>Data Model - SQL Identity Resolution</title>
+<link href="../../assets/stylesheets/main.484c7ddc.min.css" rel="stylesheet"/>
+<link href="../../assets/stylesheets/palette.ab4e12ef.min.css" rel="stylesheet"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&amp;display=fallback" rel="stylesheet"/>
+<style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+<script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+</head>
+<body data-md-color-accent="indigo" data-md-color-primary="indigo" data-md-color-scheme="default" dir="ltr">
+<input autocomplete="off" class="md-toggle" data-md-toggle="drawer" id="__drawer" type="checkbox"/>
+<input autocomplete="off" class="md-toggle" data-md-toggle="search" id="__search" type="checkbox"/>
+<label class="md-overlay" for="__drawer"></label>
+<div data-md-component="skip">
+<a class="md-skip" href="#data-model">
+          Skip to content
+        </a>
+</div>
+<div data-md-component="announce">
+</div>
+<header class="md-header" data-md-component="header">
+<nav aria-label="Header" class="md-header__inner md-grid">
+<a aria-label="SQL Identity Resolution" class="md-header__button md-logo" data-md-component="logo" href="../.." title="SQL Identity Resolution">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"></path></svg>
+</a>
+<label class="md-header__button md-icon" for="__drawer">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"></path></svg>
+</label>
+<div class="md-header__title" data-md-component="header-title">
+<div class="md-header__ellipsis">
+<div class="md-header__topic">
+<span class="md-ellipsis">
+            SQL Identity Resolution
+          </span>
+</div>
+<div class="md-header__topic" data-md-component="header-topic">
+<span class="md-ellipsis">
+            
+              Data Model
+            
+          </span>
+</div>
+</div>
+</div>
+<form class="md-header__option" data-md-component="palette">
+<input aria-label="Switch to dark mode" class="md-option" data-md-color-accent="indigo" data-md-color-media="" data-md-color-primary="indigo" data-md-color-scheme="default" id="__palette_0" name="__palette" type="radio"/>
+<label class="md-header__button md-icon" for="__palette_1" hidden="" title="Switch to dark mode">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"></path></svg>
+</label>
+<input aria-label="Switch to light mode" class="md-option" data-md-color-accent="indigo" data-md-color-media="" data-md-color-primary="indigo" data-md-color-scheme="slate" id="__palette_1" name="__palette" type="radio"/>
+<label class="md-header__button md-icon" for="__palette_0" hidden="" title="Switch to light mode">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"></path></svg>
+</label>
+</form>
+<script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+<label class="md-header__button md-icon" for="__search">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"></path></svg>
+</label>
+<div class="md-search" data-md-component="search" role="dialog">
+<label class="md-search__overlay" for="__search"></label>
+<div class="md-search__inner" role="search">
+<form class="md-search__form" name="search">
+<input aria-label="Search" autocapitalize="off" autocomplete="off" autocorrect="off" class="md-search__input" data-md-component="search-query" name="query" placeholder="Search" required="" spellcheck="false" type="text"/>
+<label class="md-search__icon md-icon" for="__search">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"></path></svg>
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"></path></svg>
+</label>
+<nav aria-label="Search" class="md-search__options">
+<button aria-label="Clear" class="md-search__icon md-icon" tabindex="-1" title="Clear" type="reset">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path></svg>
+</button>
+</nav>
+<div class="md-search__suggest" data-md-component="search-suggest"></div>
+</form>
+<div class="md-search__output">
+<div class="md-search__scrollwrap" data-md-scrollfix="" tabindex="0">
+<div class="md-search-result" data-md-component="search-result">
+<div class="md-search-result__meta">
+            Initializing search
+          </div>
+<ol class="md-search-result__list" role="presentation"></ol>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="md-header__source">
+<a class="md-source" data-md-component="source" href="https://github.com/anilkulkarni87/sql-identity-resolution" title="Go to repository">
+<div class="md-source__icon md-icon">
+<svg viewbox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"></path></svg>
+</div>
+<div class="md-source__repository">
+    sql-identity-resolution
+  </div>
+</a>
+</div>
+</nav>
+</header>
+<div class="md-container" data-md-component="container">
+<nav aria-label="Tabs" class="md-tabs" data-md-component="tabs">
+<div class="md-grid">
+<ul class="md-tabs__list">
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../..">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../../getting-started/overview/">
+          
+  
+  
+  Getting Started
+
+        </a>
+</li>
+<li class="md-tabs__item md-tabs__item--active">
+<a class="md-tabs__link" href="../architecture/">
+          
+  
+  
+  Concepts
+
+        </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../../guides/configuration/">
+          
+  
+  
+  Guides
+
+        </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../../deployment/scheduling/">
+          
+  
+  
+  Deployment
+
+        </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../../reference/cli-reference/">
+          
+  
+  
+  Reference
+
+        </a>
+</li>
+</ul>
+</div>
+</nav>
+<main class="md-main" data-md-component="main">
+<div class="md-main__inner md-grid">
+<div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation">
+<div class="md-sidebar__scrollwrap">
+<div class="md-sidebar__inner">
+<nav aria-label="Navigation" class="md-nav md-nav--primary md-nav--lifted" data-md-level="0">
+<label class="md-nav__title" for="__drawer">
+<a aria-label="SQL Identity Resolution" class="md-nav__button md-logo" data-md-component="logo" href="../.." title="SQL Identity Resolution">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"></path></svg>
+</a>
+    SQL Identity Resolution
+  </label>
+<div class="md-nav__source">
+<a class="md-source" data-md-component="source" href="https://github.com/anilkulkarni87/sql-identity-resolution" title="Go to repository">
+<div class="md-source__icon md-icon">
+<svg viewbox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"></path></svg>
+</div>
+<div class="md-source__repository">
+    sql-identity-resolution
+  </div>
+</a>
+</div>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../..">
+<span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_2" type="checkbox"/>
+<label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+<span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_2_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_2">
+<span class="md-nav__icon md-icon"></span>
+            
+  
+    Getting Started
+  
+
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../getting-started/overview/">
+<span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../getting-started/quickstart/">
+<span class="md-ellipsis">
+    
+  
+    Quick Start
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_2_3" type="checkbox"/>
+<label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="0">
+<span class="md-ellipsis">
+    
+  
+    Platform Setup
+  
+
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_2_3_label" class="md-nav" data-md-level="2">
+<label class="md-nav__title" for="__nav_2_3">
+<span class="md-nav__icon md-icon"></span>
+            
+  
+    Platform Setup
+  
+
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../getting-started/platforms/duckdb/">
+<span class="md-ellipsis">
+    
+  
+    DuckDB
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../getting-started/platforms/snowflake/">
+<span class="md-ellipsis">
+    
+  
+    Snowflake
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../getting-started/platforms/bigquery/">
+<span class="md-ellipsis">
+    
+  
+    BigQuery
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../getting-started/platforms/databricks/">
+<span class="md-ellipsis">
+    
+  
+    Databricks
+  
+
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+<input checked="" class="md-nav__toggle md-toggle" id="__nav_3" type="checkbox"/>
+<label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+<span class="md-ellipsis">
+    
+  
+    Concepts
+  
+
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="true" aria-labelledby="__nav_3_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_3">
+<span class="md-nav__icon md-icon"></span>
+            
+  
+    Concepts
+  
+
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../architecture/">
+<span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../matching-algorithm/">
+<span class="md-ellipsis">
+    
+  
+    Matching Algorithm
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item md-nav__item--active">
+<input class="md-nav__toggle md-toggle" id="__toc" type="checkbox"/>
+<label class="md-nav__link md-nav__link--active" for="__toc">
+<span class="md-ellipsis">
+    
+  
+    Data Model
+  
+
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<a class="md-nav__link md-nav__link--active" href="./">
+<span class="md-ellipsis">
+    
+  
+    Data Model
+  
+
+    
+  </span>
+</a>
+<nav aria-label="Table of contents" class="md-nav md-nav--secondary">
+<label class="md-nav__title" for="__toc">
+<span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+<ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#schema-overview">
+<span class="md-ellipsis">
+      
+        Schema Overview
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#idr_meta-schema">
+<span class="md-ellipsis">
+      
+        idr_meta Schema
+      
+    </span>
+</a>
+<nav aria-label="idr_meta Schema" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#source_table">
+<span class="md-ellipsis">
+      
+        source_table
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#rule">
+<span class="md-ellipsis">
+      
+        rule
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#identifier_mapping">
+<span class="md-ellipsis">
+      
+        identifier_mapping
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#run_state">
+<span class="md-ellipsis">
+      
+        run_state
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#config">
+<span class="md-ellipsis">
+      
+        config
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#identifier_exclusion">
+<span class="md-ellipsis">
+      
+        identifier_exclusion
+      
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#idr_out-schema">
+<span class="md-ellipsis">
+      
+        idr_out Schema
+      
+    </span>
+</a>
+<nav aria-label="idr_out Schema" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#identity_resolved_membership_current">
+<span class="md-ellipsis">
+      
+        identity_resolved_membership_current
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#identity_clusters_current">
+<span class="md-ellipsis">
+      
+        identity_clusters_current
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#golden_profile_current">
+<span class="md-ellipsis">
+      
+        golden_profile_current
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#run_history">
+<span class="md-ellipsis">
+      
+        run_history
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#dry_run_results">
+<span class="md-ellipsis">
+      
+        dry_run_results
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#dry_run_summary">
+<span class="md-ellipsis">
+      
+        dry_run_summary
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#metrics_export">
+<span class="md-ellipsis">
+      
+        metrics_export
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#skipped_identifier_groups">
+<span class="md-ellipsis">
+      
+        skipped_identifier_groups
+      
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#next-steps">
+<span class="md-ellipsis">
+      
+        Next Steps
+      
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_4" type="checkbox"/>
+<label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+<span class="md-ellipsis">
+    
+  
+    Guides
+  
+
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_4_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_4">
+<span class="md-nav__icon md-icon"></span>
+            
+  
+    Guides
+  
+
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../guides/configuration/">
+<span class="md-ellipsis">
+    
+  
+    Configuration
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../guides/dry-run-mode/">
+<span class="md-ellipsis">
+    
+  
+    Dry Run Mode
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../guides/metrics-monitoring/">
+<span class="md-ellipsis">
+    
+  
+    Metrics &amp; Monitoring
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../guides/production-hardening/">
+<span class="md-ellipsis">
+    
+  
+    Production Hardening
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../guides/troubleshooting/">
+<span class="md-ellipsis">
+    
+  
+    Troubleshooting
+  
+
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_5" type="checkbox"/>
+<label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+<span class="md-ellipsis">
+    
+  
+    Deployment
+  
+
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_5_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_5">
+<span class="md-nav__icon md-icon"></span>
+            
+  
+    Deployment
+  
+
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../deployment/scheduling/">
+<span class="md-ellipsis">
+    
+  
+    Scheduling
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../deployment/ci-cd/">
+<span class="md-ellipsis">
+    
+  
+    CI/CD
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../deployment/security/">
+<span class="md-ellipsis">
+    
+  
+    Security
+  
+
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_6" type="checkbox"/>
+<label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+<span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_6_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_6">
+<span class="md-nav__icon md-icon"></span>
+            
+  
+    Reference
+  
+
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../reference/cli-reference/">
+<span class="md-ellipsis">
+    
+  
+    CLI Reference
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../reference/schema-reference/">
+<span class="md-ellipsis">
+    
+  
+    Schema Reference
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../reference/metrics-reference/">
+<span class="md-ellipsis">
+    
+  
+    Metrics Reference
+  
+
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+</div>
+</div>
+</div>
+<div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc">
+<div class="md-sidebar__scrollwrap">
+<div class="md-sidebar__inner">
+<nav aria-label="Table of contents" class="md-nav md-nav--secondary">
+<label class="md-nav__title" for="__toc">
+<span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+<ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#schema-overview">
+<span class="md-ellipsis">
+      
+        Schema Overview
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#idr_meta-schema">
+<span class="md-ellipsis">
+      
+        idr_meta Schema
+      
+    </span>
+</a>
+<nav aria-label="idr_meta Schema" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#source_table">
+<span class="md-ellipsis">
+      
+        source_table
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#rule">
+<span class="md-ellipsis">
+      
+        rule
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#identifier_mapping">
+<span class="md-ellipsis">
+      
+        identifier_mapping
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#run_state">
+<span class="md-ellipsis">
+      
+        run_state
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#config">
+<span class="md-ellipsis">
+      
+        config
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#identifier_exclusion">
+<span class="md-ellipsis">
+      
+        identifier_exclusion
+      
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#idr_out-schema">
+<span class="md-ellipsis">
+      
+        idr_out Schema
+      
+    </span>
+</a>
+<nav aria-label="idr_out Schema" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#identity_resolved_membership_current">
+<span class="md-ellipsis">
+      
+        identity_resolved_membership_current
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#identity_clusters_current">
+<span class="md-ellipsis">
+      
+        identity_clusters_current
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#golden_profile_current">
+<span class="md-ellipsis">
+      
+        golden_profile_current
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#run_history">
+<span class="md-ellipsis">
+      
+        run_history
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#dry_run_results">
+<span class="md-ellipsis">
+      
+        dry_run_results
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#dry_run_summary">
+<span class="md-ellipsis">
+      
+        dry_run_summary
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#metrics_export">
+<span class="md-ellipsis">
+      
+        metrics_export
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#skipped_identifier_groups">
+<span class="md-ellipsis">
+      
+        skipped_identifier_groups
+      
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#next-steps">
+<span class="md-ellipsis">
+      
+        Next Steps
+      
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</div>
+</div>
+</div>
+<div class="md-content" data-md-component="content">
+<article class="md-content__inner md-typeset">
+<h1 id="data-model">Data Model</h1>
+<p>Complete reference for all tables in SQL Identity Resolution.</p>
+<hr/>
+<h2 id="schema-overview">Schema Overview</h2>
+<pre class="mermaid"><code>erDiagram
+    source_table ||--o{ identifier_mapping : "has"
+    source_table ||--o{ run_state : "tracks"
+    rule ||--o{ identifier_mapping : "applies_to"
+
+    source_table {
+        string table_id PK
+        string table_fqn
+        string entity_type
+        string entity_key_expr
+        string watermark_column
+        int watermark_lookback_minutes
+        boolean is_active
+    }
+
+    rule {
+        string rule_id PK
+        string identifier_type
+        int priority
+        boolean is_active
+        int max_group_size
+    }
+
+    identifier_mapping {
+        string table_id FK
+        string identifier_type FK
+        string column_expr
+        boolean requires_normalization
+    }
+
+    run_state {
+        string table_id FK
+        timestamp last_watermark_value
+        string last_run_id
+        timestamp last_run_ts
+    }
+
+    identity_resolved_membership_current {
+        string entity_key PK
+        string resolved_id
+        timestamp updated_ts
+    }
+
+    identity_clusters_current {
+        string resolved_id PK
+        int cluster_size
+        timestamp updated_ts
+    }</code></pre>
+<hr/>
+<h2 id="idr_meta-schema">idr_meta Schema</h2>
+<h3 id="source_table">source_table</h3>
+<p>Registry of source tables to process.</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>table_id</code></td>
+<td>VARCHAR</td>
+<td><strong>PK</strong> Unique identifier for this source</td>
+</tr>
+<tr>
+<td><code>table_fqn</code></td>
+<td>VARCHAR</td>
+<td>Fully qualified table name</td>
+</tr>
+<tr>
+<td><code>entity_type</code></td>
+<td>VARCHAR</td>
+<td>Entity type (e.g., PERSON, ACCOUNT)</td>
+</tr>
+<tr>
+<td><code>entity_key_expr</code></td>
+<td>VARCHAR</td>
+<td>SQL expression for entity key</td>
+</tr>
+<tr>
+<td><code>watermark_column</code></td>
+<td>VARCHAR</td>
+<td>Column for incremental processing</td>
+</tr>
+<tr>
+<td><code>watermark_lookback_minutes</code></td>
+<td>INT</td>
+<td>Lookback buffer for late-arriving data</td>
+</tr>
+<tr>
+<td><code>is_active</code></td>
+<td>BOOLEAN</td>
+<td>Include in processing</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example:</strong>
+<div class="highlight"><pre><span></span><code><a href="#__codelineno-0-1" id="__codelineno-0-1" name="__codelineno-0-1"></a><span class="k">INSERT</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="n">idr_meta</span><span class="p">.</span><span class="n">source_table</span><span class="w"> </span><span class="k">VALUES</span>
+<a href="#__codelineno-0-2" id="__codelineno-0-2" name="__codelineno-0-2"></a><span class="w">  </span><span class="p">(</span><span class="s1">'customers'</span><span class="p">,</span><span class="w"> </span><span class="s1">'crm.customers'</span><span class="p">,</span><span class="w"> </span><span class="s1">'PERSON'</span><span class="p">,</span><span class="w"> </span><span class="s1">'customer_id'</span><span class="p">,</span><span class="w"> </span><span class="s1">'updated_at'</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="k">TRUE</span><span class="p">),</span>
+<a href="#__codelineno-0-3" id="__codelineno-0-3" name="__codelineno-0-3"></a><span class="w">  </span><span class="p">(</span><span class="s1">'orders'</span><span class="p">,</span><span class="w"> </span><span class="s1">'ecom.orders'</span><span class="p">,</span><span class="w"> </span><span class="s1">'PERSON'</span><span class="p">,</span><span class="w"> </span><span class="s1">'user_id'</span><span class="p">,</span><span class="w"> </span><span class="s1">'order_date'</span><span class="p">,</span><span class="w"> </span><span class="mi">60</span><span class="p">,</span><span class="w"> </span><span class="k">TRUE</span><span class="p">);</span>
+</code></pre></div></p>
+<hr/>
+<h3 id="rule">rule</h3>
+<p>Matching rules defining how identifiers are used.</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>rule_id</code></td>
+<td>VARCHAR</td>
+<td><strong>PK</strong> Unique rule identifier</td>
+</tr>
+<tr>
+<td><code>identifier_type</code></td>
+<td>VARCHAR</td>
+<td>Type of identifier (EMAIL, PHONE, etc.)</td>
+</tr>
+<tr>
+<td><code>priority</code></td>
+<td>INT</td>
+<td>Processing priority (lower = higher priority)</td>
+</tr>
+<tr>
+<td><code>is_active</code></td>
+<td>BOOLEAN</td>
+<td>Include in processing</td>
+</tr>
+<tr>
+<td><code>max_group_size</code></td>
+<td>INT</td>
+<td>Max entities per identifier group</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example:</strong>
+<div class="highlight"><pre><span></span><code><a href="#__codelineno-1-1" id="__codelineno-1-1" name="__codelineno-1-1"></a><span class="k">INSERT</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="n">idr_meta</span><span class="p">.</span><span class="k">rule</span><span class="w"> </span><span class="k">VALUES</span>
+<a href="#__codelineno-1-2" id="__codelineno-1-2" name="__codelineno-1-2"></a><span class="w">  </span><span class="p">(</span><span class="s1">'email_exact'</span><span class="p">,</span><span class="w"> </span><span class="s1">'EMAIL'</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="k">TRUE</span><span class="p">,</span><span class="w"> </span><span class="mi">10000</span><span class="p">),</span>
+<a href="#__codelineno-1-3" id="__codelineno-1-3" name="__codelineno-1-3"></a><span class="w">  </span><span class="p">(</span><span class="s1">'phone_exact'</span><span class="p">,</span><span class="w"> </span><span class="s1">'PHONE'</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="k">TRUE</span><span class="p">,</span><span class="w"> </span><span class="mi">5000</span><span class="p">),</span>
+<a href="#__codelineno-1-4" id="__codelineno-1-4" name="__codelineno-1-4"></a><span class="w">  </span><span class="p">(</span><span class="s1">'loyalty_id'</span><span class="p">,</span><span class="w"> </span><span class="s1">'LOYALTY'</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="k">TRUE</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span>
+</code></pre></div></p>
+<hr/>
+<h3 id="identifier_mapping">identifier_mapping</h3>
+<p>Maps source columns to identifier types.</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>table_id</code></td>
+<td>VARCHAR</td>
+<td><strong>FK</strong> → source_table</td>
+</tr>
+<tr>
+<td><code>identifier_type</code></td>
+<td>VARCHAR</td>
+<td>Type of identifier</td>
+</tr>
+<tr>
+<td><code>column_expr</code></td>
+<td>VARCHAR</td>
+<td>SQL expression to extract identifier</td>
+</tr>
+<tr>
+<td><code>requires_normalization</code></td>
+<td>BOOLEAN</td>
+<td>Apply normalization (lowercase, etc.)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example:</strong>
+<div class="highlight"><pre><span></span><code><a href="#__codelineno-2-1" id="__codelineno-2-1" name="__codelineno-2-1"></a><span class="k">INSERT</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="n">idr_meta</span><span class="p">.</span><span class="n">identifier_mapping</span><span class="w"> </span><span class="k">VALUES</span>
+<a href="#__codelineno-2-2" id="__codelineno-2-2" name="__codelineno-2-2"></a><span class="w">  </span><span class="p">(</span><span class="s1">'customers'</span><span class="p">,</span><span class="w"> </span><span class="s1">'EMAIL'</span><span class="p">,</span><span class="w"> </span><span class="s1">'email'</span><span class="p">,</span><span class="w"> </span><span class="k">TRUE</span><span class="p">),</span>
+<a href="#__codelineno-2-3" id="__codelineno-2-3" name="__codelineno-2-3"></a><span class="w">  </span><span class="p">(</span><span class="s1">'customers'</span><span class="p">,</span><span class="w"> </span><span class="s1">'PHONE'</span><span class="p">,</span><span class="w"> </span><span class="s1">'phone'</span><span class="p">,</span><span class="w"> </span><span class="k">TRUE</span><span class="p">),</span>
+<a href="#__codelineno-2-4" id="__codelineno-2-4" name="__codelineno-2-4"></a><span class="w">  </span><span class="p">(</span><span class="s1">'orders'</span><span class="p">,</span><span class="w"> </span><span class="s1">'EMAIL'</span><span class="p">,</span><span class="w"> </span><span class="s1">'customer_email'</span><span class="p">,</span><span class="w"> </span><span class="k">TRUE</span><span class="p">);</span>
+</code></pre></div></p>
+<hr/>
+<h3 id="run_state">run_state</h3>
+<p>Tracks watermarks for incremental processing.</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>table_id</code></td>
+<td>VARCHAR</td>
+<td><strong>FK</strong> → source_table</td>
+</tr>
+<tr>
+<td><code>last_watermark_value</code></td>
+<td>TIMESTAMP</td>
+<td>Last processed watermark</td>
+</tr>
+<tr>
+<td><code>last_run_id</code></td>
+<td>VARCHAR</td>
+<td>ID of last run</td>
+</tr>
+<tr>
+<td><code>last_run_ts</code></td>
+<td>TIMESTAMP</td>
+<td>Timestamp of last run</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h3 id="config">config</h3>
+<p>Key-value configuration settings.</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>config_key</code></td>
+<td>VARCHAR</td>
+<td><strong>PK</strong> Configuration key</td>
+</tr>
+<tr>
+<td><code>config_value</code></td>
+<td>VARCHAR</td>
+<td>Configuration value</td>
+</tr>
+<tr>
+<td><code>description</code></td>
+<td>VARCHAR</td>
+<td>Human-readable description</td>
+</tr>
+<tr>
+<td><code>updated_at</code></td>
+<td>TIMESTAMP</td>
+<td>Last update time</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Default values:</strong>
+<div class="highlight"><pre><span></span><code><a href="#__codelineno-3-1" id="__codelineno-3-1" name="__codelineno-3-1"></a><span class="k">INSERT</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="n">idr_meta</span><span class="p">.</span><span class="n">config</span><span class="w"> </span><span class="k">VALUES</span>
+<a href="#__codelineno-3-2" id="__codelineno-3-2" name="__codelineno-3-2"></a><span class="w">  </span><span class="p">(</span><span class="s1">'dry_run_retention_days'</span><span class="p">,</span><span class="w"> </span><span class="s1">'7'</span><span class="p">,</span><span class="w"> </span><span class="s1">'Days to retain dry run results'</span><span class="p">,</span><span class="w"> </span><span class="n">NOW</span><span class="p">()),</span>
+<a href="#__codelineno-3-3" id="__codelineno-3-3" name="__codelineno-3-3"></a><span class="w">  </span><span class="p">(</span><span class="s1">'large_cluster_threshold'</span><span class="p">,</span><span class="w"> </span><span class="s1">'5000'</span><span class="p">,</span><span class="w"> </span><span class="s1">'Threshold for large cluster warnings'</span><span class="p">,</span><span class="w"> </span><span class="n">NOW</span><span class="p">());</span>
+</code></pre></div></p>
+<hr/>
+<h3 id="identifier_exclusion">identifier_exclusion</h3>
+<p>Values to exclude from matching.</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>identifier_type</code></td>
+<td>VARCHAR</td>
+<td>Type of identifier</td>
+</tr>
+<tr>
+<td><code>identifier_pattern</code></td>
+<td>VARCHAR</td>
+<td>Value or pattern to exclude</td>
+</tr>
+<tr>
+<td><code>is_pattern</code></td>
+<td>BOOLEAN</td>
+<td>TRUE if LIKE pattern</td>
+</tr>
+<tr>
+<td><code>reason</code></td>
+<td>VARCHAR</td>
+<td>Reason for exclusion</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example:</strong>
+<div class="highlight"><pre><span></span><code><a href="#__codelineno-4-1" id="__codelineno-4-1" name="__codelineno-4-1"></a><span class="k">INSERT</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="n">idr_meta</span><span class="p">.</span><span class="n">identifier_exclusion</span><span class="w"> </span><span class="k">VALUES</span>
+<a href="#__codelineno-4-2" id="__codelineno-4-2" name="__codelineno-4-2"></a><span class="w">  </span><span class="p">(</span><span class="s1">'EMAIL'</span><span class="p">,</span><span class="w"> </span><span class="s1">'test@test.com'</span><span class="p">,</span><span class="w"> </span><span class="k">FALSE</span><span class="p">,</span><span class="w"> </span><span class="s1">'Generic test email'</span><span class="p">),</span>
+<a href="#__codelineno-4-3" id="__codelineno-4-3" name="__codelineno-4-3"></a><span class="w">  </span><span class="p">(</span><span class="s1">'EMAIL'</span><span class="p">,</span><span class="w"> </span><span class="s1">'%@example.com'</span><span class="p">,</span><span class="w"> </span><span class="k">TRUE</span><span class="p">,</span><span class="w"> </span><span class="s1">'Example domain'</span><span class="p">),</span>
+<a href="#__codelineno-4-4" id="__codelineno-4-4" name="__codelineno-4-4"></a><span class="w">  </span><span class="p">(</span><span class="s1">'PHONE'</span><span class="p">,</span><span class="w"> </span><span class="s1">'0000000000'</span><span class="p">,</span><span class="w"> </span><span class="k">FALSE</span><span class="p">,</span><span class="w"> </span><span class="s1">'Invalid phone'</span><span class="p">);</span>
+</code></pre></div></p>
+<hr/>
+<h2 id="idr_out-schema">idr_out Schema</h2>
+<h3 id="identity_resolved_membership_current">identity_resolved_membership_current</h3>
+<p>Maps each entity to its resolved identity.</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>entity_key</code></td>
+<td>VARCHAR</td>
+<td><strong>PK</strong> Unique entity identifier</td>
+</tr>
+<tr>
+<td><code>resolved_id</code></td>
+<td>VARCHAR</td>
+<td>Cluster identifier (= entity_key of cluster anchor)</td>
+</tr>
+<tr>
+<td><code>updated_ts</code></td>
+<td>TIMESTAMP</td>
+<td>Last update time</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h3 id="identity_clusters_current">identity_clusters_current</h3>
+<p>Cluster metadata.</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>resolved_id</code></td>
+<td>VARCHAR</td>
+<td><strong>PK</strong> Cluster identifier</td>
+</tr>
+<tr>
+<td><code>cluster_size</code></td>
+<td>INT</td>
+<td>Number of entities in cluster</td>
+</tr>
+<tr>
+<td><code>updated_ts</code></td>
+<td>TIMESTAMP</td>
+<td>Last update time</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h3 id="golden_profile_current">golden_profile_current</h3>
+<p>Best-record golden profiles per cluster.</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>resolved_id</code></td>
+<td>VARCHAR</td>
+<td><strong>PK</strong> Cluster identifier</td>
+</tr>
+<tr>
+<td><code>email_primary</code></td>
+<td>VARCHAR</td>
+<td>Best email</td>
+</tr>
+<tr>
+<td><code>phone_primary</code></td>
+<td>VARCHAR</td>
+<td>Best phone</td>
+</tr>
+<tr>
+<td><code>first_name</code></td>
+<td>VARCHAR</td>
+<td>Best first name</td>
+</tr>
+<tr>
+<td><code>last_name</code></td>
+<td>VARCHAR</td>
+<td>Best last name</td>
+</tr>
+<tr>
+<td><code>updated_ts</code></td>
+<td>TIMESTAMP</td>
+<td>Last update time</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h3 id="run_history">run_history</h3>
+<p>Audit log of all runs.</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>run_id</code></td>
+<td>VARCHAR</td>
+<td><strong>PK</strong> Unique run identifier</td>
+</tr>
+<tr>
+<td><code>run_mode</code></td>
+<td>VARCHAR</td>
+<td>FULL or INCR</td>
+</tr>
+<tr>
+<td><code>started_at</code></td>
+<td>TIMESTAMP</td>
+<td>Run start time</td>
+</tr>
+<tr>
+<td><code>ended_at</code></td>
+<td>TIMESTAMP</td>
+<td>Run end time</td>
+</tr>
+<tr>
+<td><code>status</code></td>
+<td>VARCHAR</td>
+<td>SUCCESS, SUCCESS_WITH_WARNINGS, FAILED, DRY_RUN_COMPLETE</td>
+</tr>
+<tr>
+<td><code>entities_processed</code></td>
+<td>INT</td>
+<td>Number of entities processed</td>
+</tr>
+<tr>
+<td><code>edges_created</code></td>
+<td>INT</td>
+<td>Number of edges created</td>
+</tr>
+<tr>
+<td><code>clusters_impacted</code></td>
+<td>INT</td>
+<td>Number of clusters affected</td>
+</tr>
+<tr>
+<td><code>lp_iterations</code></td>
+<td>INT</td>
+<td>Label propagation iterations</td>
+</tr>
+<tr>
+<td><code>duration_seconds</code></td>
+<td>INT</td>
+<td>Total duration</td>
+</tr>
+<tr>
+<td><code>groups_skipped</code></td>
+<td>INT</td>
+<td>Groups skipped (max_group_size)</td>
+</tr>
+<tr>
+<td><code>values_excluded</code></td>
+<td>INT</td>
+<td>Values excluded (exclusion list)</td>
+</tr>
+<tr>
+<td><code>large_clusters</code></td>
+<td>INT</td>
+<td>Clusters above threshold</td>
+</tr>
+<tr>
+<td><code>warnings</code></td>
+<td>VARCHAR</td>
+<td>JSON array of warnings</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h3 id="dry_run_results">dry_run_results</h3>
+<p>Per-entity changes from dry run.</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>run_id</code></td>
+<td>VARCHAR</td>
+<td>Dry run identifier</td>
+</tr>
+<tr>
+<td><code>entity_key</code></td>
+<td>VARCHAR</td>
+<td>Entity identifier</td>
+</tr>
+<tr>
+<td><code>current_resolved_id</code></td>
+<td>VARCHAR</td>
+<td>Current cluster (NULL if new)</td>
+</tr>
+<tr>
+<td><code>proposed_resolved_id</code></td>
+<td>VARCHAR</td>
+<td>Proposed cluster</td>
+</tr>
+<tr>
+<td><code>change_type</code></td>
+<td>VARCHAR</td>
+<td>NEW, MOVED, UNCHANGED</td>
+</tr>
+<tr>
+<td><code>current_cluster_size</code></td>
+<td>INT</td>
+<td>Current cluster size</td>
+</tr>
+<tr>
+<td><code>proposed_cluster_size</code></td>
+<td>INT</td>
+<td>Proposed cluster size</td>
+</tr>
+<tr>
+<td><code>created_at</code></td>
+<td>TIMESTAMP</td>
+<td>Record creation time</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h3 id="dry_run_summary">dry_run_summary</h3>
+<p>Aggregate dry run statistics.</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>run_id</code></td>
+<td>VARCHAR</td>
+<td><strong>PK</strong> Dry run identifier</td>
+</tr>
+<tr>
+<td><code>total_entities</code></td>
+<td>INT</td>
+<td>Total entities analyzed</td>
+</tr>
+<tr>
+<td><code>new_entities</code></td>
+<td>INT</td>
+<td>Entities with NEW change type</td>
+</tr>
+<tr>
+<td><code>moved_entities</code></td>
+<td>INT</td>
+<td>Entities with MOVED change type</td>
+</tr>
+<tr>
+<td><code>unchanged_entities</code></td>
+<td>INT</td>
+<td>Entities with UNCHANGED change type</td>
+</tr>
+<tr>
+<td><code>merged_clusters</code></td>
+<td>INT</td>
+<td>Clusters that would merge</td>
+</tr>
+<tr>
+<td><code>split_clusters</code></td>
+<td>INT</td>
+<td>Clusters that would split</td>
+</tr>
+<tr>
+<td><code>largest_proposed_cluster</code></td>
+<td>INT</td>
+<td>Size of largest proposed cluster</td>
+</tr>
+<tr>
+<td><code>edges_would_create</code></td>
+<td>INT</td>
+<td>Edges that would be created</td>
+</tr>
+<tr>
+<td><code>groups_would_skip</code></td>
+<td>INT</td>
+<td>Groups that would be skipped</td>
+</tr>
+<tr>
+<td><code>values_would_exclude</code></td>
+<td>INT</td>
+<td>Values that would be excluded</td>
+</tr>
+<tr>
+<td><code>execution_time_seconds</code></td>
+<td>INT</td>
+<td>Processing time</td>
+</tr>
+<tr>
+<td><code>created_at</code></td>
+<td>TIMESTAMP</td>
+<td>Record creation time</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h3 id="metrics_export">metrics_export</h3>
+<p>Exportable metrics for monitoring.</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>metric_id</code></td>
+<td>VARCHAR</td>
+<td><strong>PK</strong> Unique metric ID</td>
+</tr>
+<tr>
+<td><code>run_id</code></td>
+<td>VARCHAR</td>
+<td>Associated run ID</td>
+</tr>
+<tr>
+<td><code>metric_name</code></td>
+<td>VARCHAR</td>
+<td>Metric name</td>
+</tr>
+<tr>
+<td><code>metric_value</code></td>
+<td>DOUBLE</td>
+<td>Metric value</td>
+</tr>
+<tr>
+<td><code>metric_type</code></td>
+<td>VARCHAR</td>
+<td>gauge, counter</td>
+</tr>
+<tr>
+<td><code>dimensions</code></td>
+<td>VARCHAR</td>
+<td>JSON dimensions</td>
+</tr>
+<tr>
+<td><code>recorded_at</code></td>
+<td>TIMESTAMP</td>
+<td>Recording time</td>
+</tr>
+<tr>
+<td><code>exported_at</code></td>
+<td>TIMESTAMP</td>
+<td>Export time (NULL if not exported)</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h3 id="skipped_identifier_groups">skipped_identifier_groups</h3>
+<p>Audit log of skipped identifier groups.</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>run_id</code></td>
+<td>VARCHAR</td>
+<td>Run identifier</td>
+</tr>
+<tr>
+<td><code>identifier_type</code></td>
+<td>VARCHAR</td>
+<td>Type of identifier</td>
+</tr>
+<tr>
+<td><code>identifier_value_norm</code></td>
+<td>VARCHAR</td>
+<td>Normalized identifier value</td>
+</tr>
+<tr>
+<td><code>group_size</code></td>
+<td>INT</td>
+<td>Size of skipped group</td>
+</tr>
+<tr>
+<td><code>max_allowed</code></td>
+<td>INT</td>
+<td>Configured max_group_size</td>
+</tr>
+<tr>
+<td><code>sample_entity_keys</code></td>
+<td>VARCHAR</td>
+<td>Sample of affected entity keys</td>
+</tr>
+<tr>
+<td><code>reason</code></td>
+<td>VARCHAR</td>
+<td>Reason for skip</td>
+</tr>
+<tr>
+<td><code>skipped_at</code></td>
+<td>TIMESTAMP</td>
+<td>Skip time</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h2 id="next-steps">Next Steps</h2>
+<ul>
+<li><a href="../../guides/configuration/">Configuration Guide</a></li>
+<li><a href="../architecture/">Architecture</a></li>
+<li><a href="../../reference/schema-reference/">Schema Reference</a> - Full DDL</li>
+</ul>
+</article>
+</div>
+<script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+</div>
+<button class="md-top md-icon" data-md-component="top" hidden="" type="button">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"></path></svg>
+  Back to top
+</button>
+</main>
+<footer class="md-footer">
+<div class="md-footer-meta md-typeset">
+<div class="md-footer-meta__inner md-grid">
+<div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" rel="noopener" target="_blank">
+      Material for MkDocs
+    </a>
+</div>
+<div class="md-social">
+<a class="md-social__link" href="https://github.com/anilkulkarni87/sql-identity-resolution" rel="noopener" target="_blank" title="github.com">
+<svg viewbox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"></path></svg>
+</a>
+</div>
+</div>
+</div>
+</footer>
+</div>
+<div class="md-dialog" data-md-component="dialog">
+<div class="md-dialog__inner md-typeset"></div>
+</div>
+<script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["content.code.copy", "content.code.annotate", "content.tabs.link", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.top", "search.suggest", "search.highlight"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+<script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+</body>
+</html>
