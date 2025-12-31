@@ -71,7 +71,7 @@ jobs:
           python -c "
           import duckdb
           conn = duckdb.connect(':memory:')
-          with open('sql/duckdb/00_ddl_all.sql') as f:
+          with open('sql/duckdb/core/00_ddl_all.sql') as f:
               ddl = f.read()
           for stmt in ddl.split(';'):
               if stmt.strip():
