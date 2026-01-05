@@ -68,23 +68,28 @@ nav:
       - BigQuery: getting-started/platforms/bigquery.md
       - Databricks: getting-started/platforms/databricks.md
   - Concepts:
-    - How It Works (Simple): concepts/how-it-works-simple.md
+    - How It Works: concepts/how-it-works-simple.md
     - Architecture: concepts/architecture.md
     - Matching Algorithm: concepts/matching-algorithm.md
     - Data Model: concepts/data-model.md
+    - Cluster Sizing: cluster_sizing.md
   - Guides:
     - Configuration: guides/configuration.md
+    - Metadata Configuration: metadata_configuration.md
     - Dry Run Mode: guides/dry-run-mode.md
     - Metrics & Monitoring: guides/metrics-monitoring.md
+    - Scale Considerations: scale_considerations.md
     - Production Hardening: guides/production-hardening.md
     - Troubleshooting: guides/troubleshooting.md
   - Deployment:
+    - DuckDB: guides/production-duckdb.md
     - Snowflake: guides/production-snowflake.md
     - BigQuery: guides/production-bigquery.md
     - Databricks: guides/production-databricks.md
-    - DuckDB: guides/production-duckdb.md
+    - Scheduling: deployment/scheduling.md
     - CI/CD: deployment/ci-cd.md
     - Security: deployment/security.md
+    - Operations Runbook: runbook.md
   - Reference:
     - CLI Reference: reference/cli-reference.md
     - Schema Reference: reference/schema-reference.md
