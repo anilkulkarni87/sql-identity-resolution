@@ -488,51 +488,51 @@ if not DRY_RUN:
 print("🏆 Building golden profiles...")
 
 # Build entities_all for golden profile - dynamically from registered sources
-# Get the first registered source table
-source_info = con.execute("""
-    SELECT s.table_fqn, s.entity_key_expr 
-    FROM idr_meta.source_table s 
-    WHERE s.is_active = TRUE 
-    LIMIT 1
-""").fetchone()
+# Key fix: entity_key format is 'table_id:raw_key', but source tables use raw_key
+q("""
+CREATE OR REPLACE TABLE idr_work.entities_all AS
+SELECT 
+    NULL::VARCHAR AS entity_key,
+    NULL::VARCHAR AS table_id,
+    NULL::VARCHAR AS email,
+    NULL::VARCHAR AS phone,
+    NULL::VARCHAR AS first_name,
+    NULL::VARCHAR AS last_name,
+    NULL::TIMESTAMP AS record_updated_at
+WHERE FALSE
+""")
 
-if source_info:
-    source_table, entity_key_col = source_info
+# For each source table, extract attributes and INSERT into entities_all
+for r in source_rows:
+    table_fqn = r['table_fqn']
+    table_id = r['table_id']
+    entity_key_expr = r['entity_key_expr']
     
     # Check what columns exist in the source table
-    cols = [row[0] for row in con.execute(f"DESCRIBE {source_table}").fetchall()]
+    cols = [row[0].lower() for row in con.execute(f"DESCRIBE {table_fqn}").fetchall()]
     
     # Map available columns
-    email_expr = "src.email" if "email" in cols else "NULL"
-    phone_expr = "src.phone" if "phone" in cols else "NULL"
+    email_expr = "src.email" if "email" in cols else ("src.customer_email" if "customer_email" in cols else "NULL")
+    phone_expr = "src.phone" if "phone" in cols else ("src.customer_phone" if "customer_phone" in cols else "NULL")
     first_name_expr = "src.first_name" if "first_name" in cols else "NULL"
     last_name_expr = "src.last_name" if "last_name" in cols else "NULL"
-    updated_expr = "src.created_at" if "created_at" in cols else "CURRENT_TIMESTAMP"
+    
+    # Use watermark column for record_updated_at if available
+    wm_col = r.get('watermark_column')
+    updated_expr = f"src.{wm_col}" if wm_col and wm_col.lower() in cols else "CURRENT_TIMESTAMP"
     
     q(f"""
-    CREATE OR REPLACE TABLE idr_work.entities_all AS
+    INSERT INTO idr_work.entities_all
     SELECT 
-        e.entity_key,
-        e.table_id,
+        '{table_id}' || ':' || CAST(({entity_key_expr}) AS VARCHAR) AS entity_key,
+        '{table_id}' AS table_id,
         {email_expr} AS email,
         {phone_expr} AS phone,
         {first_name_expr} AS first_name,
         {last_name_expr} AS last_name,
         {updated_expr} AS record_updated_at
-    FROM idr_work.entities_delta e
-    LEFT JOIN {source_table} src ON e.entity_key = src.{entity_key_col}
+    FROM {table_fqn} src
     """)
-else:
-    # Fallback: empty entities_all if no sources
-    q("""
-    CREATE OR REPLACE TABLE idr_work.entities_all AS
-    SELECT NULL::VARCHAR AS entity_key, NULL::VARCHAR AS table_id, 
-           NULL::VARCHAR AS email, NULL::VARCHAR AS phone,
-           NULL::VARCHAR AS first_name, NULL::VARCHAR AS last_name,
-           NULL::TIMESTAMP AS record_updated_at
-    WHERE FALSE
-    """)
-
 # Golden profile with window functions
 q("""
 CREATE OR REPLACE TABLE idr_work.golden_updates AS

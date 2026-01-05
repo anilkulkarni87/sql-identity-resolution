@@ -261,7 +261,7 @@ For performance testing with larger datasets:
 cd sql-identity-resolution/sql/duckdb
 
 # Run scale test (100K to 2M for DuckDB)
-python idr_scale_test.py --db=scale_test.duckdb --scale=500K --overlap-rate=0.6
+python sql/duckdb/testing/idr_scale_test.py --db=scale_test.duckdb --scale=500K --overlap-rate=0.6
 ```
 
 **RAM Requirements:**

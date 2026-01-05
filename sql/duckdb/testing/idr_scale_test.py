@@ -61,7 +61,10 @@ con = duckdb.connect(DB_PATH)
 
 # Run DDL
 print("\n🔧 Setting up schemas...")
-con.execute(open('00_ddl_all.sql').read())
+import os
+script_dir = os.path.dirname(os.path.abspath(__file__))
+ddl_path = os.path.join(script_dir, '..', 'core', '00_ddl_all.sql')
+con.execute(open(ddl_path).read())
 
 # Create source schemas
 for schema in ['crm', 'sales', 'loyalty', 'digital', 'store']:
@@ -267,10 +270,10 @@ con.executemany("INSERT INTO idr_meta.source VALUES (?, ?, ?, ?)", [
     ('web_events', 'Digital', 4, True),
 ])
 
-con.executemany("INSERT INTO idr_meta.rule VALUES (?, ?, ?, ?, ?, ?, ?, ?)", [
-    ('R_EMAIL_EXACT', 'Email exact match', True, 1, 'EMAIL', 'LOWERCASE', True, True),
-    ('R_PHONE_EXACT', 'Phone exact match', True, 2, 'PHONE', 'NONE', True, True),
-    ('R_LOYALTY_EXACT', 'Loyalty ID exact match', True, 3, 'LOYALTY_ID', 'NONE', True, True),
+con.executemany("INSERT INTO idr_meta.rule VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", [
+    ('R_EMAIL_EXACT', 'Email exact match', True, 1, 'EMAIL', 'LOWERCASE', True, True, 10000),
+    ('R_PHONE_EXACT', 'Phone exact match', True, 2, 'PHONE', 'NONE', True, True, 10000),
+    ('R_LOYALTY_EXACT', 'Loyalty ID exact match', True, 3, 'LOYALTY_ID', 'NONE', True, True, 10000),
 ])
 
 con.executemany("INSERT INTO idr_meta.identifier_mapping VALUES (?, ?, ?, ?)", [
@@ -298,12 +301,13 @@ print("\n🚀 Running IDR benchmark...")
 benchmark_start = time.time()
 
 import subprocess
+idr_run_path = os.path.join(script_dir, '..', 'core', 'idr_run.py')
 result = subprocess.run([
-    'python', 'idr_run.py',
+    'python', idr_run_path,
     f'--db={DB_PATH}',
     '--run-mode=FULL',
     '--max-iters=50'
-], capture_output=True, text=True, cwd='.')
+], capture_output=True, text=True)
 
 print(result.stdout)
 if result.returncode != 0:

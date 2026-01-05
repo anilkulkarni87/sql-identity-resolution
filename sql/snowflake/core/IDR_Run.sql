@@ -375,47 +375,47 @@ $$
     // BUILD GOLDEN PROFILE
     // =============================================
     
-    // Dynamically build entities_all from first registered source
-    var source_stmt = snowflake.createStatement({sqlText: `
-        SELECT table_fqn, entity_key_expr 
-        FROM idr_meta.source_table 
-        WHERE is_active = TRUE 
-        LIMIT 1
-    `});
-    var source_rs = source_stmt.execute();
+    // Dynamically build entities_all from ALL registered sources
+    // Key fix: entity_key format is 'table_id:raw_key', must construct same prefix
     
-    if (source_rs.next()) {
-        var source_table = source_rs.getColumnValue(1);
-        var entity_key_col = source_rs.getColumnValue(2);
+    // First create empty table
+    q(`CREATE OR REPLACE TRANSIENT TABLE idr_work.entities_all AS
+       SELECT NULL::VARCHAR AS entity_key, NULL::VARCHAR AS table_id, 
+              NULL::VARCHAR AS email, NULL::VARCHAR AS phone,
+              NULL::VARCHAR AS first_name, NULL::VARCHAR AS last_name, 
+              NULL::TIMESTAMP AS record_updated_at
+       WHERE FALSE`);
+    
+    // For each source table, extract attributes and INSERT into entities_all
+    for (var i = 0; i < source_rows.length; i++) {
+        var r = source_rows[i];
+        var table_fqn = r.TABLE_FQN;
+        var table_id = r.TABLE_ID;
+        var entity_key_expr = r.ENTITY_KEY_EXPR;
+        var wm_col = r.WATERMARK_COLUMN;
         
         // Discover columns in source table
-        var col_stmt = snowflake.createStatement({sqlText: `DESCRIBE TABLE ${source_table}`});
+        var col_stmt = snowflake.createStatement({sqlText: `DESCRIBE TABLE ${table_fqn}`});
         var col_rs = col_stmt.execute();
         var cols = [];
         while (col_rs.next()) { cols.push(col_rs.getColumnValue(1).toLowerCase()); }
         
-        var email_expr = cols.includes('email') ? 'src.email' : 'NULL';
-        var phone_expr = cols.includes('phone') ? 'src.phone' : 'NULL';
+        var email_expr = cols.includes('email') ? 'src.email' : (cols.includes('customer_email') ? 'src.customer_email' : 'NULL');
+        var phone_expr = cols.includes('phone') ? 'src.phone' : (cols.includes('customer_phone') ? 'src.customer_phone' : 'NULL');
         var first_name_expr = cols.includes('first_name') ? 'src.first_name' : 'NULL';
         var last_name_expr = cols.includes('last_name') ? 'src.last_name' : 'NULL';
-        var updated_expr = cols.includes('created_at') ? 'src.created_at' : 'CURRENT_TIMESTAMP()';
+        var updated_expr = wm_col && cols.includes(wm_col.toLowerCase()) ? `src.${wm_col}` : 'CURRENT_TIMESTAMP()';
         
-        q(`CREATE OR REPLACE TRANSIENT TABLE idr_work.entities_all AS
+        q(`INSERT INTO idr_work.entities_all
            SELECT 
-             e.entity_key, e.table_id,
+             '${table_id}' || ':' || CAST((${entity_key_expr}) AS VARCHAR) AS entity_key,
+             '${table_id}' AS table_id,
              ${email_expr} AS email, 
              ${phone_expr} AS phone, 
              ${first_name_expr} AS first_name, 
              ${last_name_expr} AS last_name,
              ${updated_expr} AS record_updated_at
-           FROM idr_work.entities_delta e
-           LEFT JOIN ${source_table} src ON e.entity_key = src.${entity_key_col}`);
-    } else {
-        // Fallback: empty entities_all
-        q(`CREATE OR REPLACE TRANSIENT TABLE idr_work.entities_all AS
-           SELECT NULL AS entity_key, NULL AS table_id, NULL AS email, NULL AS phone,
-                  NULL AS first_name, NULL AS last_name, NULL::TIMESTAMP AS record_updated_at
-           WHERE FALSE`);
+           FROM ${table_fqn} src`);
     }
     
     q(`CREATE OR REPLACE TRANSIENT TABLE idr_work.golden_updates AS

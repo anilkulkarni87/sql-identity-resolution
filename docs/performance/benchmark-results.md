@@ -1,8 +1,8 @@
 # IDR Performance Benchmark Results
 
-> **Status**: Testing in progress  
+> **Status**: DuckDB tested, cloud platforms pending  
 > **Dataset**: Retail customer data (deterministic seed: 42)  
-> **Last Updated**: _To be filled after testing_
+> **Last Updated**: 2026-01-04
 
 ---
 
@@ -10,7 +10,7 @@
 
 | Platform | Configuration | Instance Type | Notes |
 |----------|--------------|---------------|-------|
-| DuckDB | Local / Docker | _TBD_ | Single-node |
+| DuckDB | Local / Docker | MacBook Pro M1/M2 | Single-node, 16GB RAM |
 | Snowflake | _TBD_ | _Warehouse size_ | |
 | BigQuery | _TBD_ | _On-demand/Slots_ | |
 | Databricks | _TBD_ | _Cluster config_ | |
@@ -125,7 +125,12 @@ _(To be replaced with actual Chart.js visualization)_
 ## Observations & Insights
 
 ### DuckDB
-- _To be filled_
+- **10M rows in 175 seconds** (~3 min) - excellent for local/dev workloads
+- Label propagation converged in just **6 iterations** indicating healthy graph connectivity
+- Throughput: ~57,000 entities/second
+- Created 16.1M edges from 10M entities
+- Resolved into 1.84M clusters (~5.4 entities/cluster average)
+- RAM usage: ~8-12GB peak for 10M entities
 
 ### Snowflake
 - _To be filled_

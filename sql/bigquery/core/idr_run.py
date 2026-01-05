@@ -436,57 +436,68 @@ if not DRY_RUN:
 # ============================================
 print("🏆 Building golden profiles...")
 
-# Dynamically build entities_all from first registered source
-source_result = client.query(f"""
-    SELECT table_fqn, entity_key_expr 
-    FROM `{PROJECT}.idr_meta.source_table`
-    WHERE is_active = TRUE 
-    LIMIT 1
-""").result()
+# Dynamically build entities_all from ALL registered sources
+# Key fix: entity_key format is 'table_id:raw_key', must construct same prefix
 
-source_rows = list(source_result)
-if source_rows:
-    source_table = source_rows[0].table_fqn
-    entity_key_col = source_rows[0].entity_key_expr
+# First create empty table
+q(f"""
+CREATE OR REPLACE TABLE `{PROJECT}.idr_work.entities_all` AS
+SELECT 
+    CAST(NULL AS STRING) AS entity_key,
+    CAST(NULL AS STRING) AS table_id,
+    CAST(NULL AS STRING) AS email,
+    CAST(NULL AS STRING) AS phone,
+    CAST(NULL AS STRING) AS first_name,
+    CAST(NULL AS STRING) AS last_name,
+    CAST(NULL AS TIMESTAMP) AS record_updated_at
+WHERE FALSE
+""")
+
+# Reload source_rows (we overwrote it above)
+source_rows_for_golden = collect(f"""
+    SELECT st.table_id, st.table_fqn, st.entity_key_expr, st.watermark_column
+    FROM `{PROJECT}.idr_meta.source_table` st
+    WHERE st.is_active = TRUE
+""")
+
+# For each source table, extract attributes and INSERT into entities_all
+for r in source_rows_for_golden:
+    table_fqn = r['table_fqn']
+    table_id = r['table_id']
+    entity_key_expr = r['entity_key_expr']
     
-    # Discover columns
+    # Discover columns in source table
     schema_result = client.query(f"""
         SELECT column_name 
         FROM `{PROJECT}.INFORMATION_SCHEMA.COLUMNS`
-        WHERE table_name = '{source_table.split(".")[-1]}'
+        WHERE table_name = '{table_fqn.split(".")[-1]}'
     """).result()
     cols = [row.column_name.lower() for row in schema_result]
     
-    email_expr = "src.email" if "email" in cols else "NULL"
-    phone_expr = "src.phone" if "phone" in cols else "NULL"
+    # Map available columns
+    email_expr = "src.email" if "email" in cols else ("src.customer_email" if "customer_email" in cols else "NULL")
+    phone_expr = "src.phone" if "phone" in cols else ("src.customer_phone" if "customer_phone" in cols else "NULL")
     first_name_expr = "src.first_name" if "first_name" in cols else "NULL"
     last_name_expr = "src.last_name" if "last_name" in cols else "NULL"
-    updated_expr = "src.created_at" if "created_at" in cols else "CURRENT_TIMESTAMP()"
+    
+    # Use watermark column for record_updated_at if available
+    wm_col = r.get('watermark_column')
+    updated_expr = f"src.{wm_col}" if wm_col and wm_col.lower() in cols else "CURRENT_TIMESTAMP()"
     
     # Handle if source_table doesn't have project prefix
-    full_source_table = source_table if "." in source_table else f"{PROJECT}.{source_table}"
+    full_source_table = table_fqn if "." in table_fqn else f"{PROJECT}.{table_fqn}"
     
     q(f"""
-    CREATE OR REPLACE TABLE `{PROJECT}.idr_work.entities_all` AS
+    INSERT INTO `{PROJECT}.idr_work.entities_all`
     SELECT 
-        e.entity_key, e.table_id,
-        {email_expr} AS email, 
-        {phone_expr} AS phone, 
-        {first_name_expr} AS first_name, 
+        CONCAT('{table_id}', ':', CAST(({entity_key_expr}) AS STRING)) AS entity_key,
+        '{table_id}' AS table_id,
+        {email_expr} AS email,
+        {phone_expr} AS phone,
+        {first_name_expr} AS first_name,
         {last_name_expr} AS last_name,
         {updated_expr} AS record_updated_at
-    FROM `{PROJECT}.idr_work.entities_delta` e
-    LEFT JOIN `{full_source_table}` src ON e.entity_key = src.{entity_key_col}
-    """)
-else:
-    # Fallback: empty entities_all
-    q(f"""
-    CREATE OR REPLACE TABLE `{PROJECT}.idr_work.entities_all` AS
-    SELECT CAST(NULL AS STRING) AS entity_key, CAST(NULL AS STRING) AS table_id, 
-           CAST(NULL AS STRING) AS email, CAST(NULL AS STRING) AS phone,
-           CAST(NULL AS STRING) AS first_name, CAST(NULL AS STRING) AS last_name,
-           CAST(NULL AS TIMESTAMP) AS record_updated_at
-    WHERE FALSE
+    FROM `{full_source_table}` src
     """)
 
 q(f"""
