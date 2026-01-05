@@ -144,16 +144,16 @@ Pre-built configurations for common use cases:
 
 ## 📊 Performance
 
-Tested on retail customer data:
+Tested on retail customer data (10M rows):
 
-| Rows | Platform | Duration | Clusters |
-|------|----------|----------|----------|
-| 20M | DuckDB | ~X min | ~Y M |
-| 20M | Snowflake | ~X min | ~Y M |
-| 20M | BigQuery | ~X min | ~Y M |
-| 20M | Databricks | ~X min | ~Y M |
+| Platform | Duration | Cost | Clusters |
+|----------|----------|------|----------|
+| DuckDB | 143s | Free | 1.84M |
+| Snowflake | 168s | ~$0.25 | 1.84M |
+| BigQuery | 295s | ~$0.50 | 1.84M |
+| Databricks | 317s | TBD | 1.84M |
 
-See [Benchmark Results](docs/performance/benchmark-results.md) for full details.
+See [benchmarks/](benchmarks/) for full testing suite and results.
 
 ## 🤝 Contributing
 
