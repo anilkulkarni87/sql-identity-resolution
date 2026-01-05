@@ -14,6 +14,67 @@ Your Source Tables → Metadata Configuration → IDR Run → Unified Identities
 
 ---
 
+## Quick Start: Complete Example
+
+> **Copy-paste this example** and modify table/column names to match your schema.
+
+This example shows a typical retail setup with two source tables: CRM customers and web signups.
+
+```sql
+-- ============================================
+-- STEP 1: Register your source tables
+-- ============================================
+INSERT INTO idr_meta.source_table (table_id, table_fqn, entity_type, entity_key_expr, watermark_column, watermark_lookback_minutes, is_active) VALUES
+    ('crm',     'mydb.sales.customers',     'PERSON', 'customer_id', 'updated_at', 0, TRUE),
+    ('web',     'mydb.web.signups',         'PERSON', 'user_id',     'created_at', 0, TRUE);
+
+-- ============================================
+-- STEP 2: Define trust rankings (lower = more trusted)
+-- ============================================
+INSERT INTO idr_meta.source (table_id, source_name, trust_rank, is_active) VALUES
+    ('crm', 'CRM Master Data',     1, TRUE),   -- Most trusted
+    ('web', 'Web Registrations',   2, TRUE);
+
+-- ============================================
+-- STEP 3: Map columns to identifier types
+-- ============================================
+INSERT INTO idr_meta.identifier_mapping (table_id, identifier_type, identifier_value_expr, is_hashed) VALUES
+    -- CRM source
+    ('crm', 'EMAIL', 'email',    FALSE),
+    ('crm', 'PHONE', 'phone',    FALSE),
+    
+    -- Web source
+    ('web', 'EMAIL', 'email',    FALSE),
+    ('web', 'PHONE', 'mobile',   FALSE);  -- Different column name, same identifier type
+
+-- ============================================
+-- STEP 4: Map attributes for golden profile
+-- ============================================
+INSERT INTO idr_meta.entity_attribute_mapping (table_id, attribute_name, attribute_expr) VALUES
+    ('crm', 'first_name',        'first_name'),
+    ('crm', 'last_name',         'last_name'),
+    ('crm', 'email_raw',         'email'),
+    ('crm', 'phone_raw',         'phone'),
+    ('crm', 'record_updated_at', 'updated_at'),
+    
+    ('web', 'first_name',        'name'),         -- Column has different name
+    ('web', 'email_raw',         'email'),
+    ('web', 'phone_raw',         'mobile'),
+    ('web', 'record_updated_at', 'created_at');
+
+-- ============================================
+-- DONE! Now run: python idr_run.py --run-mode=FULL --dry-run
+-- ============================================
+```
+
+**What this does:**
+1. Entities from `crm.customers` and `web.signups` are extracted
+2. Entities sharing the same `EMAIL` or `PHONE` are linked into clusters
+3. Golden profiles are built using CRM data first (trust_rank=1), falling back to web data
+
+---
+
+
 ## Configuration Tables
 
 | Table | Purpose |
@@ -142,6 +203,44 @@ You can use SQL expressions, not just column names:
 -- Handle NULL-like values
 ('web_signups', 'EMAIL', 'NULLIF(email, ''N/A'')', FALSE)
 ```
+
+#### Phone Number Normalization Patterns
+
+Phone numbers are tricky because formats vary by region and source system. Use `identifier_value_expr` to normalize:
+
+| Scenario | Pattern | Example |
+|----------|---------|---------|
+| US only (10 digits) | `RIGHT(REGEXP_REPLACE(phone, '[^0-9]', ''), 10)` | `+1 (555) 123-4567` → `5551234567` |
+| Keep country code | `REGEXP_REPLACE(phone, '[^0-9+]', '')` | `+44 20 7946 0958` → `+442079460958` |
+| Strip leading 1 (US) | `REGEXP_REPLACE(REGEXP_REPLACE(phone, '[^0-9]', ''), '^1', '')` | `1-555-123-4567` → `5551234567` |
+
+**Platform-specific examples:**
+
+=== "DuckDB / Snowflake"
+
+    ```sql
+    -- US: Strip to last 10 digits
+    ('crm', 'PHONE', 'RIGHT(REGEXP_REPLACE(phone, ''[^0-9]'', ''''), 10)', FALSE)
+    
+    -- International: Keep + and digits
+    ('crm', 'PHONE', 'REGEXP_REPLACE(phone, ''[^0-9+]'', '''')', FALSE)
+    ```
+
+=== "BigQuery"
+
+    ```sql
+    -- US: Strip to last 10 digits  
+    ('crm', 'PHONE', 'RIGHT(REGEXP_REPLACE(phone, r''[^0-9]'', ''''), 10)', FALSE)
+    ```
+
+=== "Databricks"
+
+    ```sql
+    -- US: Strip to last 10 digits
+    ('crm', 'PHONE', 'RIGHT(REGEXP_REPLACE(phone, ''[^0-9]'', ''''), 10)', FALSE)
+    ```
+
+> **Tip:** Test your regex on sample data before running: `SELECT REGEXP_REPLACE('+1 (555) 123-4567', '[^0-9]', '')`
 
 ---
 

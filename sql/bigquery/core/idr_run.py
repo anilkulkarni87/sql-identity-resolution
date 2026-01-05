@@ -135,8 +135,24 @@ if not source_rows:
     raise RuntimeError("No active source tables found")
 
 mapping_rows = collect(f"SELECT table_id, identifier_type, identifier_value_expr, is_hashed FROM `{PROJECT}.idr_meta.identifier_mapping`")
+rule_rows = collect(f"SELECT identifier_type FROM `{PROJECT}.idr_meta.rule` WHERE is_active = TRUE")
 
-print(f"✅ Preflight OK: {len(source_rows)} sources, {len(mapping_rows)} mappings")
+# Validate identifier_types have matching rules
+active_table_ids = {r['table_id'] for r in source_rows}
+active_rule_types = {r['identifier_type'] for r in rule_rows}
+
+bad_types = sorted({m['identifier_type'] for m in mapping_rows if m['identifier_type'] not in active_rule_types})
+if bad_types:
+    raise RuntimeError(f"PREFLIGHT FAILED: identifier_mapping contains identifier_type(s) with no active rule: {', '.join(bad_types)}. Add rules or remove these mappings.")
+
+# Validate source tables exist
+for r in source_rows:
+    try:
+        collect_one(f"SELECT 1 FROM `{r['table_fqn']}` LIMIT 1")
+    except Exception as e:
+        raise RuntimeError(f"PREFLIGHT FAILED: Source table not found: {r['table_fqn']} (table_id: {r['table_id']})")
+
+print(f"✅ Preflight OK: {len(source_rows)} sources, {len(mapping_rows)} mappings, {len(active_rule_types)} rules")
 
 # Insert initial run history
 q(f"""

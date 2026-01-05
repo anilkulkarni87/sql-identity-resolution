@@ -136,6 +136,37 @@ $$
     `);
     
     var mapping_rows = collect(`SELECT table_id, identifier_type, identifier_value_expr, is_hashed FROM idr_meta.identifier_mapping`);
+    var rule_rows = collect(`SELECT identifier_type FROM idr_meta.rule WHERE is_active = true`);
+    
+    // Validate identifier_types have matching rules
+    var active_rule_types = {};
+    for (var i = 0; i < rule_rows.length; i++) {
+        active_rule_types[rule_rows[i].IDENTIFIER_TYPE] = true;
+    }
+    
+    var bad_types = [];
+    for (var i = 0; i < mapping_rows.length; i++) {
+        if (!active_rule_types[mapping_rows[i].IDENTIFIER_TYPE]) {
+            bad_types.push(mapping_rows[i].IDENTIFIER_TYPE);
+        }
+    }
+    
+    // Deduplicate
+    bad_types = bad_types.filter(function(v, i, a) { return a.indexOf(v) === i; });
+    
+    if (bad_types.length > 0) {
+        throw new Error('PREFLIGHT FAILED: identifier_mapping contains identifier_type(s) with no active rule in idr_meta.rule: ' + bad_types.join(', ') + '. Add rules or remove these mappings.');
+    }
+    
+    // Validate source tables exist
+    for (var i = 0; i < source_rows.length; i++) {
+        var r = source_rows[i];
+        try {
+            q(`SELECT 1 FROM ${r.TABLE_FQN} LIMIT 1`);
+        } catch (e) {
+            throw new Error('PREFLIGHT FAILED: Source table not found: ' + r.TABLE_FQN + ' (table_id: ' + r.TABLE_ID + ')');
+        }
+    }
     
     // Insert initial run history
     q(`INSERT INTO idr_out.run_history (run_id, run_mode, status, started_at, source_tables_processed, created_at)
