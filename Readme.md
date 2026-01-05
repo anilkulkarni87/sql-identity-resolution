@@ -3,7 +3,14 @@
 [![Tests](https://github.com/anilkulkarni87/sql-identity-resolution/actions/workflows/test.yml/badge.svg)](https://github.com/anilkulkarni87/sql-identity-resolution/actions/workflows/test.yml)
 [![Docs](https://github.com/anilkulkarni87/sql-identity-resolution/actions/workflows/docs.yml/badge.svg)](https://anilkulkarni87.github.io/sql-identity-resolution/)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-[![Platforms](https://img.shields.io/badge/Platforms-DuckDB%20%7C%20Snowflake%20%7C%20BigQuery%20%7C%20Databricks-green.svg)](#supported-platforms)
+[![GitHub stars](https://img.shields.io/github/stars/anilkulkarni87/sql-identity-resolution?style=social)](https://github.com/anilkulkarni87/sql-identity-resolution/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/anilkulkarni87/sql-identity-resolution?style=social)](https://github.com/anilkulkarni87/sql-identity-resolution/network/members)
+
+[![Snowflake](https://img.shields.io/badge/Snowflake-✓-29B5E8?logo=snowflake&logoColor=white)](https://www.snowflake.com/)
+[![BigQuery](https://img.shields.io/badge/BigQuery-✓-4285F4?logo=google-cloud&logoColor=white)](https://cloud.google.com/bigquery)
+[![Databricks](https://img.shields.io/badge/Databricks-✓-FF3621?logo=databricks&logoColor=white)](https://databricks.com/)
+[![DuckDB](https://img.shields.io/badge/DuckDB-✓-FFF000?logo=duckdb&logoColor=black)](https://duckdb.org/)
+[![GitHub last commit](https://img.shields.io/github/last-commit/anilkulkarni87/sql-identity-resolution)](https://github.com/anilkulkarni87/sql-identity-resolution/commits/main)
 
 **Production-grade deterministic identity resolution** for modern data warehouses. Unify customer identities across CRM, transactions, web events, and loyalty data—**no ML required**.
 
@@ -35,6 +42,22 @@ docker run -it --rm -v $(pwd)/output:/output ghcr.io/anilkulkarni87/sql-identity
 | **Black-box ML** | Deterministic rules, fully auditable |
 | **Vendor lock-in** | Same logic across 4 platforms |
 | **Scale limits** | Tested to 100M+ rows |
+
+### How We Compare
+
+| | vs CDPs | vs ML-based (Zingg, Dedupe) | vs dbt packages |
+|---|---------|---------------------------|-----------------|
+| **Cost** | Free vs $5K-50K/mo | No Spark cluster needed | More complete pipeline |
+| **Control** | No vendor lock-in | No ML training required | Production-hardened |
+| **Transparency** | Full auditability | Deterministic output | Multi-platform |
+
+### Who Is This For?
+
+- 🏢 **SMBs** wanting customer 360 without CDP costs
+- 🔧 **Data engineers** building composable CDPs
+- 📊 **Analysts** who prefer SQL over Python/Spark
+- ⚖️ **Compliance teams** needing auditable matching logic
+
 
 ## 🏗️ Supported Platforms
 
