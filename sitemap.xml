@@ -5,10 +5,6 @@
          <lastmod>2026-01-05</lastmod>
     </url>
     <url>
-         <loc>https://anilkulkarni87.github.io/sql-identity-resolution/architecture/</loc>
-         <lastmod>2026-01-05</lastmod>
-    </url>
-    <url>
          <loc>https://anilkulkarni87.github.io/sql-identity-resolution/cluster_sizing/</loc>
          <lastmod>2026-01-05</lastmod>
     </url>
@@ -21,27 +17,7 @@
          <lastmod>2026-01-05</lastmod>
     </url>
     <url>
-         <loc>https://anilkulkarni87.github.io/sql-identity-resolution/sample_data/</loc>
-         <lastmod>2026-01-05</lastmod>
-    </url>
-    <url>
          <loc>https://anilkulkarni87.github.io/sql-identity-resolution/scale_considerations/</loc>
-         <lastmod>2026-01-05</lastmod>
-    </url>
-    <url>
-         <loc>https://anilkulkarni87.github.io/sql-identity-resolution/testing_bigquery/</loc>
-         <lastmod>2026-01-05</lastmod>
-    </url>
-    <url>
-         <loc>https://anilkulkarni87.github.io/sql-identity-resolution/testing_databricks/</loc>
-         <lastmod>2026-01-05</lastmod>
-    </url>
-    <url>
-         <loc>https://anilkulkarni87.github.io/sql-identity-resolution/testing_duckdb/</loc>
-         <lastmod>2026-01-05</lastmod>
-    </url>
-    <url>
-         <loc>https://anilkulkarni87.github.io/sql-identity-resolution/testing_snowflake/</loc>
          <lastmod>2026-01-05</lastmod>
     </url>
     <url>
@@ -130,6 +106,10 @@
     </url>
     <url>
          <loc>https://anilkulkarni87.github.io/sql-identity-resolution/guides/troubleshooting/</loc>
+         <lastmod>2026-01-05</lastmod>
+    </url>
+    <url>
+         <loc>https://anilkulkarni87.github.io/sql-identity-resolution/performance/benchmark-results/</loc>
          <lastmod>2026-01-05</lastmod>
     </url>
     <url>

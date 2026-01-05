@@ -13,6 +13,10 @@
         <link rel="canonical" href="https://anilkulkarni87.github.io/sql-identity-resolution/scale_considerations/">
       
       
+        <link rel="prev" href="../guides/metrics-monitoring/">
+      
+      
+        <link rel="next" href="../guides/production-hardening/">
       
       
         
@@ -278,10 +282,12 @@
   
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
+      <li class="md-tabs__item md-tabs__item--active">
         <a href="../guides/configuration/" class="md-tabs__link">
           
   
@@ -302,7 +308,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../guides/production-snowflake/" class="md-tabs__link">
+        <a href="../guides/production-duckdb/" class="md-tabs__link">
           
   
   
@@ -342,7 +348,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../performance/benchmark-results.md" class="md-tabs__link">
+        <a href="../performance/benchmark-results/" class="md-tabs__link">
           
   
   
@@ -785,7 +791,7 @@
   <span class="md-ellipsis">
     
   
-    How It Works (Simple)
+    How It Works
   
 
     
@@ -883,6 +889,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cluster_sizing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cluster Sizing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -894,28 +928,31 @@
       
   
   
+    
   
   
+  
     
     
     
     
+      
+        
+        
       
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
         
           
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
-        
-          
-          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
             
   
   
@@ -933,7 +970,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_4">
             <span class="md-nav__icon md-icon"></span>
             
@@ -959,6 +996,34 @@
     
   
     Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../metadata_configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Metadata Configuration
   
 
     
@@ -1023,6 +1088,392 @@
   
 
       </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Scale Considerations
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Scale Considerations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#performance-characteristics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Performance Characteristics
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Performance Characteristics">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#complexity-analysis" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Complexity Analysis
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#expected-scale" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Expected Scale
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#bottleneck-analysis" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Bottleneck Analysis
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Bottleneck Analysis">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-large-identifier-groups" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Large Identifier Groups
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-deeply-connected-graphs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Deeply Connected Graphs
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-identifier-table-scans" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Identifier Table Scans
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-golden-profile-correlated-subqueries" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Golden Profile Correlated Subqueries
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cluster-sizing-guidelines" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cluster Sizing Guidelines
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Cluster Sizing Guidelines">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#databricks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Databricks
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#key-settings" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Key Settings
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#incremental-vs-full-processing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Incremental vs Full Processing
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Incremental vs Full Processing">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#when-to-use-incremental-run_modeincr" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        When to Use Incremental (RUN_MODE=INCR)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#when-to-use-full-run_modefull" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        When to Use Full (RUN_MODE=FULL)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hybrid-strategy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hybrid Strategy
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#partitioning-strategy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Partitioning Strategy
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Partitioning Strategy">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#recommended-partitioning" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Recommended Partitioning
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#for-very-large-deployments-100m" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        For Very Large Deployments (&gt; 100M)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#monitoring-queries" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Monitoring Queries
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Monitoring Queries">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#check-cluster-size-distribution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Check Cluster Size Distribution
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#identify-problematic-identifiers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Identify Problematic Identifiers
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#track-run-performance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Track Run Performance
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#common-scale-issues-solutions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common Scale Issues &amp; Solutions
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#recommended-testing-path" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Recommended Testing Path
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#further-reading" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Further Reading
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -1152,6 +1603,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../guides/production-duckdb/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    DuckDB
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../guides/production-snowflake/" class="md-nav__link">
         
   
@@ -1236,14 +1715,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../guides/production-duckdb/" class="md-nav__link">
+      <a href="../deployment/scheduling/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    DuckDB
+    Scheduling
   
 
     
@@ -1300,6 +1779,34 @@
     
   
     Security
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../runbook/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Operations Runbook
   
 
     
@@ -1526,7 +2033,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../performance/benchmark-results.md" class="md-nav__link">
+      <a href="../performance/benchmark-results/" class="md-nav__link">
         
   
   
@@ -2212,7 +2719,7 @@
 <hr />
 <h2 id="further-reading">Further Reading</h2>
 <ul>
-<li><a href="../architecture/">Architecture</a> — Core algorithms and data model</li>
+<li><a href="architecture.md">Architecture</a> — Core algorithms and data model</li>
 <li><a href="../runbook/">Runbook</a> — Operational guide</li>
 </ul>
 

@@ -13,6 +13,10 @@
         <link rel="canonical" href="https://anilkulkarni87.github.io/sql-identity-resolution/deployment/scheduling/">
       
       
+        <link rel="prev" href="../../guides/production-databricks/">
+      
+      
+        <link rel="next" href="../ci-cd/">
       
       
         
@@ -298,11 +302,13 @@
   
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
-        <a href="../../guides/production-snowflake/" class="md-tabs__link">
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../../guides/production-duckdb/" class="md-tabs__link">
           
   
   
@@ -342,7 +348,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../performance/benchmark-results.md" class="md-tabs__link">
+        <a href="../../performance/benchmark-results/" class="md-tabs__link">
           
   
   
@@ -785,7 +791,7 @@
   <span class="md-ellipsis">
     
   
-    How It Works (Simple)
+    How It Works
   
 
     
@@ -870,6 +876,34 @@
     
   
     Data Model
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cluster_sizing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cluster Sizing
   
 
     
@@ -979,6 +1013,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../metadata_configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Metadata Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../guides/dry-run-mode/" class="md-nav__link">
         
   
@@ -1015,6 +1077,34 @@
     
   
     Metrics & Monitoring
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../scale_considerations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Scale Considerations
   
 
     
@@ -1095,28 +1185,31 @@
       
   
   
+    
   
   
+  
     
     
     
     
+      
+        
+        
       
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
         
           
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
-        
-          
-          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
             
   
   
@@ -1134,7 +1227,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_5">
             <span class="md-nav__icon md-icon"></span>
             
@@ -1144,6 +1237,34 @@
 
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/production-duckdb/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    DuckDB
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
             
               
                 
@@ -1233,17 +1354,44 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../../guides/production-duckdb/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Scheduling
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
   <span class="md-ellipsis">
     
   
-    DuckDB
+    Scheduling
   
 
     
@@ -1252,6 +1400,259 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#platform-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Platform Options
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#duckdb-scheduling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DuckDB Scheduling
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="DuckDB Scheduling">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cron" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cron
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#airflow-dag" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Airflow DAG
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#snowflake-tasks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Snowflake Tasks
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Snowflake Tasks">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#create-task" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Create Task
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#monitor-tasks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Monitor Tasks
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task-with-dry-run-validation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task with Dry Run Validation
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#bigquery-scheduling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        BigQuery Scheduling
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="BigQuery Scheduling">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cloud-functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cloud Functions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#deploy-function" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Deploy Function
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cloud-scheduler" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cloud Scheduler
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#terraform" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Terraform
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#databricks-workflows" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Databricks Workflows
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Databricks Workflows">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#create-job-ui" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Create Job (UI)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#create-job-api" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Create Job (API)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#terraform_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Terraform
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#best-practices" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Best Practices
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#next-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Next Steps
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -1300,6 +1701,34 @@
     
   
     Security
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../runbook/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Operations Runbook
   
 
     
@@ -1526,7 +1955,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../performance/benchmark-results.md" class="md-nav__link">
+      <a href="../../performance/benchmark-results/" class="md-nav__link">
         
   
   
