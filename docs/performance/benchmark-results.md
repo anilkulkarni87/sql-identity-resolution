@@ -26,7 +26,7 @@
 | DuckDB | 1s | 7s | 33s | 81s | 12s | **143s** |
 | Snowflake | _TBD_ | _TBD_ | _TBD_ | _TBD_ | _TBD_ | **_TBD_** |
 | BigQuery | 5s | 10s | 50s | 101s | 91s | **295s** |
-| Databricks | _TBD_ | _TBD_ | _TBD_ | _TBD_ | _TBD_ | **_TBD_** |
+| Databricks | 14s | 36s | 77s | 115s | ~75s | **317s** |
 
 ### Metrics Results
 
@@ -35,7 +35,7 @@
 | DuckDB | 10,000,000 | 16,124,751 | 1,839,324 | _TBD_ | _TBD_ | 6 |
 | Snowflake | _TBD_ | _TBD_ | _TBD_ | _TBD_ | _TBD_ | _TBD_ |
 | BigQuery | 10,000,000 | 16,124,751 | 1,839,324 | _TBD_ | _TBD_ | 6 |
-| Databricks | _TBD_ | _TBD_ | _TBD_ | _TBD_ | _TBD_ | _TBD_ |
+| Databricks | 10,000,000 | 16,124,751 | 1,839,324 | _TBD_ | _TBD_ | 6 |
 
 ### Consistency Check  
 - [ ] All platforms produced same cluster count
@@ -108,7 +108,7 @@ Platform     | 10M       | 50M      | 100M
 DuckDB       | ███ 143s  |          |         
 Snowflake    |           |          |         
 BigQuery     | ██████ 295s|         |         
-Databricks   |           |          |         
+Databricks   | ██████ 317s|         |         
 ```
 _(To be replaced with actual Chart.js visualization)_
 
@@ -149,7 +149,12 @@ _(To be replaced with actual Chart.js visualization)_
 - BigQuery wins at larger scales due to horizontal scaling
 
 ### Databricks
-- _To be filled_
+- **10M rows in 317 seconds** (~5.3 min) - 2.2x slower than DuckDB
+- Similar to BigQuery performance
+- Identical metrics: 16.1M edges, 1.84M clusters, 6 LP iterations
+- Throughput: ~31,500 entities/second
+- Unity Catalog adds overhead for table operations
+- Better suited for larger datasets with Spark parallelism
 
 ---
 

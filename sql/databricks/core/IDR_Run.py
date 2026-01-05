@@ -130,6 +130,19 @@ def end_stage(stage: dict, rows_out: int = None):
     print(f"  ⏱️ {stage['stage_name']}: {stage['duration_seconds']}s" + 
           (f", rows_out={rows_out}" if rows_out else ""))
 
+def save_stage_metrics():
+    """Persist stage metrics to database."""
+    for s in _stage_metrics:
+        started_str = s["started_at"].strftime("%Y-%m-%d %H:%M:%S")
+        ended_str = s["ended_at"].strftime("%Y-%m-%d %H:%M:%S")
+        q(f"""
+        INSERT INTO idr_out.stage_metrics (run_id, stage_name, stage_order, started_at, ended_at, duration_seconds, rows_in, rows_out, notes)
+        VALUES ('{s["run_id"]}', '{s["stage_name"]}', {s["stage_order"]}, 
+                TIMESTAMP'{started_str}', TIMESTAMP'{ended_str}',
+                {s["duration_seconds"]}, {s.get("rows_in") or "NULL"}, {s.get("rows_out") or "NULL"}, 
+                {f"'{s['notes']}'" if s.get("notes") else "NULL"})
+        """)
+
 def init_run_history():
     """Create initial run_history record with RUNNING status."""
     # Ensure observability tables exist
@@ -391,8 +404,11 @@ FROM {r['table_fqn']}
 
 # COMMAND ----------
 # Build delta tables
+stage_entities = track_stage('Entity Extraction')
 q(f"CREATE OR REPLACE TABLE idr_work.entities_delta AS {build_entities_delta_sql(source_rows)}")
 q(f"CREATE OR REPLACE TABLE idr_work.identifiers_extracted AS {build_identifiers_sql(source_rows, mapping_rows, delta_only=True)}")
+entities_delta_cnt = q("SELECT COUNT(*) FROM idr_work.entities_delta").first()[0]
+end_stage(stage_entities, entities_delta_cnt)
 
 q(f"""
 CREATE OR REPLACE TABLE idr_work.identifiers_delta AS
@@ -430,6 +446,7 @@ WHERE i.identifier_value IS NOT NULL
 
 # COMMAND ----------
 # Edges + merge
+stage_edges = track_stage('Edge Building')
 run_sql_file(f"{sql_common_root}/20_build_edges_incremental.sql", replacements={"${RUN_TS}": RUN_TS})
 
 q(f"""
@@ -444,10 +461,17 @@ WHEN MATCHED THEN UPDATE SET tgt.last_seen_ts=src.last_seen_ts
 WHEN NOT MATCHED THEN INSERT (rule_id,left_entity_key,right_entity_key,identifier_type,identifier_value_norm,first_seen_ts,last_seen_ts)
 VALUES (src.rule_id,src.left_entity_key,src.right_entity_key,src.identifier_type,src.identifier_value_norm,src.first_seen_ts,src.last_seen_ts)
 """)
+edges_new_cnt = q("SELECT COUNT(*) FROM idr_work.edges_new").first()[0]
+end_stage(stage_edges, edges_new_cnt)
 
 # COMMAND ----------
 # Subgraph + label propagation
+stage_subgraph = track_stage('Subgraph Building')
 run_sql_file(f"{sql_common_root}/30_build_impacted_subgraph.sql")
+subgraph_cnt = q("SELECT COUNT(*) FROM idr_work.subgraph_nodes").first()[0]
+end_stage(stage_subgraph, subgraph_cnt)
+
+stage_lp = track_stage('Label Propagation')
 
 q('''
 CREATE OR REPLACE TABLE idr_work.lp_labels AS
@@ -463,14 +487,16 @@ for i in range(MAX_ITERS):
     print(f"iter={i+1} delta_changed={delta}")
     if delta == 0:
         break
-    q("ALTER TABLE idr_work.lp_labels RENAME TO lp_labels_old")
-    q("ALTER TABLE idr_work.lp_labels_next RENAME TO lp_labels")
-    q("DROP TABLE IF EXISTS idr_work.lp_labels_old")
+    # Swap tables - use DROP/CREATE for Unity Catalog compatibility
+    q("DROP TABLE IF EXISTS idr_work.lp_labels")
+    q("ALTER TABLE idr_work.lp_labels_next RENAME TO idr_work.lp_labels")
 else:
     raise RuntimeError(f"Label propagation did not converge in {MAX_ITERS} iterations")
+end_stage(stage_lp)
 
 # COMMAND ----------
 # Membership + clusters
+stage_membership = track_stage('Membership Update')
 run_sql_file(f"{sql_common_root}/40_update_membership_current.sql")
 
 q('''
@@ -636,6 +662,17 @@ elif run_warnings:
     print()
     print("ACTIONS NEEDED:")
     print(f"  → Review: SELECT * FROM idr_out.skipped_identifier_groups WHERE run_id = '{RUN_ID}'")
+
+print("=" * 60)
+
+# Save stage metrics to database
+save_stage_metrics()
+
+# Print stage timing summary
+print()
+print("STAGE TIMING:")
+for s in _stage_metrics:
+    print(f"  ⏱️ {s['stage_name']}: {s['duration_seconds']}s")
 
 print("=" * 60)
 if DRY_RUN:

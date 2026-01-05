@@ -47,7 +47,7 @@ CREATE TABLE IF NOT EXISTS idr_meta.rule (
   canonicalize STRING, 
   allow_hashed BOOLEAN, 
   require_non_null BOOLEAN,
-  max_group_size INT DEFAULT 10000
+  max_group_size INT
 );
 
 CREATE TABLE IF NOT EXISTS idr_meta.identifier_mapping (
@@ -73,9 +73,9 @@ CREATE TABLE IF NOT EXISTS idr_meta.survivorship_rule (
 CREATE TABLE IF NOT EXISTS idr_meta.identifier_exclusion (
   identifier_type STRING, 
   identifier_value_pattern STRING, 
-  match_type STRING DEFAULT 'EXACT',
+  match_type STRING,
   reason STRING, 
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, 
+  created_at TIMESTAMP, 
   created_by STRING
 );
 
@@ -83,7 +83,7 @@ CREATE TABLE IF NOT EXISTS idr_meta.config (
   config_key STRING NOT NULL,
   config_value STRING NOT NULL,
   description STRING,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP,
   updated_by STRING
 );
 
@@ -137,8 +137,8 @@ CREATE TABLE IF NOT EXISTS idr_out.skipped_identifier_groups (
   group_size BIGINT, 
   max_allowed INT, 
   sample_entity_keys STRING,
-  reason STRING DEFAULT 'EXCEEDED_MAX_GROUP_SIZE', 
-  skipped_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  reason STRING, 
+  skipped_at TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS idr_out.run_history (
@@ -184,7 +184,7 @@ CREATE TABLE IF NOT EXISTS idr_out.dry_run_results (
   change_type STRING,
   current_cluster_size INT,
   proposed_cluster_size INT,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  created_at TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS idr_out.dry_run_summary (
@@ -200,17 +200,17 @@ CREATE TABLE IF NOT EXISTS idr_out.dry_run_summary (
   groups_would_skip INT,
   values_would_exclude INT,
   execution_time_seconds INT,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  created_at TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS idr_out.metrics_export (
-  metric_id STRING DEFAULT uuid(),
+  metric_id STRING,
   run_id STRING,
   metric_name STRING NOT NULL,
   metric_value DOUBLE NOT NULL,
-  metric_type STRING DEFAULT 'gauge',
+  metric_type STRING,
   dimensions STRING,
-  recorded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  recorded_at TIMESTAMP,
   exported_at TIMESTAMP
 );
 

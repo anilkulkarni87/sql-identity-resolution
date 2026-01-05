@@ -209,8 +209,19 @@ def load_to_bigquery(input_dir: str, project: str, dataset: str = 'crm'):
 # LOAD TO DATABRICKS
 # ============================================
 def load_to_databricks(input_dir: str, server_hostname: str, http_path: str, 
-                        access_token: str, catalog: str = 'main', schema: str = 'crm'):
-    """Load Parquet files to Databricks Unity Catalog."""
+                        access_token: str, catalog: str = 'main', schema: str = 'crm',
+                        volume_path: str = None):
+    """
+    Load Parquet files to Databricks Unity Catalog.
+    
+    For large files (10M+ rows), use the volume_path option to specify a Unity Catalog
+    Volumes path where Parquet files have been uploaded, then use COPY INTO.
+    
+    Example workflow for large datasets:
+        1. Export Parquet files locally
+        2. Upload to DBFS or cloud storage (S3/GCS/ADLS)
+        3. Run this with --volume-path pointing to the uploaded files
+    """
     try:
         from databricks import sql
         import pandas as pd
@@ -233,46 +244,94 @@ def load_to_databricks(input_dir: str, server_hostname: str, http_path: str,
     cursor.execute(f"USE CATALOG {catalog}")
     cursor.execute(f"USE SCHEMA {schema}")
     
-    # Load each parquet file
     parquet_files = list(Path(input_dir).glob("*.parquet"))
     source_files = [f for f in parquet_files if not f.name.startswith("meta_")]
     
-    print(f"📤 Loading {len(source_files)} tables...")
-    print("  ⚠️ For large files, upload to DBFS/S3 first and use COPY INTO")
-    
-    for pq_file in source_files:
-        table_name = pq_file.stem
-        df = pd.read_parquet(pq_file)
+    if volume_path:
+        # Use COPY INTO for cloud-stored files (fast for large datasets)
+        print(f"📤 Loading {len(source_files)} tables using COPY INTO from {volume_path}...")
         
-        print(f"  Loading {table_name}: {len(df):,} rows...")
-        
-        # For small tables, we can use batch inserts
-        # For large tables, you should upload to cloud storage first
-        if len(df) > 100000:
-            print(f"    ⚠️ Large table - consider using DBFS upload + COPY INTO for better performance")
-        
-        # Create table from first batch to infer schema
-        cursor.execute(f"DROP TABLE IF EXISTS {table_name}")
-        
-        # Convert DataFrame to INSERT statements (chunked for large tables)
-        chunk_size = 10000
-        for i in range(0, len(df), chunk_size):
-            chunk = df.iloc[i:i+chunk_size]
+        for pq_file in source_files:
+            table_name = pq_file.stem
+            cloud_path = f"{volume_path}/{pq_file.name}"
             
-            if i == 0:
-                # First chunk - create table
-                cols = ", ".join([f"`{c}` STRING" for c in df.columns])
-                cursor.execute(f"CREATE TABLE {table_name} ({cols})")
+            print(f"  Loading {table_name} from {cloud_path}...")
             
-            # Insert data
-            for _, row in chunk.iterrows():
-                values = ", ".join([f"'{str(v)}'" if pd.notna(v) else "NULL" for v in row])
-                cursor.execute(f"INSERT INTO {table_name} VALUES ({values})")
+            # Drop and recreate using COPY INTO with schema inference
+            cursor.execute(f"DROP TABLE IF EXISTS {table_name}")
+            
+            # Create table from Parquet schema
+            cursor.execute(f"""
+                CREATE TABLE {table_name}
+                USING PARQUET
+                LOCATION '{cloud_path}'
+            """)
+            
+            # Get row count
+            cursor.execute(f"SELECT COUNT(*) FROM {table_name}")
+            count = cursor.fetchone()[0]
+            print(f"  ✅ {table_name}: {count:,} rows loaded")
+    else:
+        # Small file mode - read locally and create managed table
+        print(f"📤 Loading {len(source_files)} tables from local Parquet files...")
+        print("  💡 For faster loading of large files, upload to cloud storage first")
+        print("     and use --volume-path option")
         
-        # Get row count
-        cursor.execute(f"SELECT COUNT(*) FROM {table_name}")
-        count = cursor.fetchone()[0]
-        print(f"  ✅ {table_name}: {count:,} rows loaded")
+        for pq_file in source_files:
+            table_name = pq_file.stem
+            df = pd.read_parquet(pq_file)
+            
+            print(f"  Loading {table_name}: {len(df):,} rows...")
+            
+            if len(df) > 100000:
+                print(f"    ⚠️ Large table ({len(df):,} rows) - this may take a while")
+                print(f"    💡 Consider uploading {pq_file.name} to cloud storage for faster loading")
+            
+            # Drop existing table
+            cursor.execute(f"DROP TABLE IF EXISTS {table_name}")
+            
+            # Build CREATE TABLE with proper types
+            type_map = {
+                'int64': 'BIGINT',
+                'float64': 'DOUBLE',
+                'object': 'STRING',
+                'bool': 'BOOLEAN',
+                'datetime64[ns]': 'TIMESTAMP',
+            }
+            cols = []
+            for col, dtype in df.dtypes.items():
+                sql_type = type_map.get(str(dtype), 'STRING')
+                cols.append(f"`{col}` {sql_type}")
+            
+            cursor.execute(f"CREATE TABLE {table_name} ({', '.join(cols)})")
+            
+            # Batch insert for better performance
+            batch_size = 500
+            total_inserted = 0
+            
+            for i in range(0, len(df), batch_size):
+                batch = df.iloc[i:i+batch_size]
+                
+                # Build multi-row INSERT
+                rows = []
+                for _, row in batch.iterrows():
+                    values = []
+                    for v in row:
+                        if pd.isna(v):
+                            values.append("NULL")
+                        elif isinstance(v, str):
+                            values.append(f"'{v.replace(chr(39), chr(39)+chr(39))}'")
+                        else:
+                            values.append(str(v))
+                    rows.append(f"({', '.join(values)})")
+                
+                cursor.execute(f"INSERT INTO {table_name} VALUES {', '.join(rows)}")
+                total_inserted += len(batch)
+                
+                if total_inserted % 10000 == 0:
+                    print(f"    Progress: {total_inserted:,} / {len(df):,} rows")
+            
+            print(f"  ✅ {table_name}: {total_inserted:,} rows loaded")
     
     cursor.close()
     conn.close()
@@ -321,6 +380,7 @@ def main():
     db_parser.add_argument('--access-token', default=os.environ.get('DATABRICKS_TOKEN'), help='Access token')
     db_parser.add_argument('--catalog', default='main', help='Unity Catalog name')
     db_parser.add_argument('--schema', default='crm', help='Target schema')
+    db_parser.add_argument('--volume-path', help='Cloud storage path (S3/ADLS/DBFS) for COPY INTO (faster for large files)')
     
     args = parser.parse_args()
     
@@ -336,7 +396,8 @@ def main():
     elif args.command == 'load-databricks':
         load_to_databricks(
             args.input, args.server_hostname, args.http_path,
-            args.access_token, args.catalog, args.schema
+            args.access_token, args.catalog, args.schema,
+            getattr(args, 'volume_path', None)
         )
     else:
         parser.print_help()
