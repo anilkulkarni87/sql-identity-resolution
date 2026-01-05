@@ -103,12 +103,12 @@
 ### Total Duration by Platform & Scale
 
 ```
-Platform     | 10M      | 50M      | 100M
--------------|----------|----------|----------
-DuckDB       | ████ 175s|          |         
-Snowflake    |          |          |         
-BigQuery     | ██████ 289s|        |         
-Databricks   |          |          |         
+Platform     | 10M       | 50M      | 100M
+-------------|-----------|----------|----------
+DuckDB       | ███ 143s  |          |         
+Snowflake    |           |          |         
+BigQuery     | ██████ 295s|         |         
+Databricks   |           |          |         
 ```
 _(To be replaced with actual Chart.js visualization)_
 
@@ -126,9 +126,11 @@ _(To be replaced with actual Chart.js visualization)_
 ## Observations & Insights
 
 ### DuckDB
-- **10M rows in 175 seconds** (~3 min) - excellent for local/dev workloads
-- Label propagation converged in just **6 iterations** indicating healthy graph connectivity
-- Throughput: ~57,000 entities/second
+- **10M rows in 143 seconds** (~2.4 min) - excellent for local/dev workloads
+- **Label Propagation dominates**: 81s (57% of total) - bottleneck on both platforms
+- Edge Building: 33s (23%), fast single-node execution
+- Output Gen: 12s (8%), efficient local writes
+- Throughput: ~70,000 entities/second
 - Created 16.1M edges from 10M entities
 - Resolved into 1.84M clusters (~5.4 entities/cluster average)
 - RAM usage: ~8-12GB peak for 10M entities
@@ -137,12 +139,14 @@ _(To be replaced with actual Chart.js visualization)_
 - _To be filled_
 
 ### BigQuery
-- **10M rows in 289 seconds** (~4.8 min) - 1.65x slower than DuckDB
+- **10M rows in 295 seconds** (~4.9 min) - 2.1x slower than DuckDB
+- **Label Propagation**: 101s (34%) - serverless overhead on iterative queries
+- **Output Gen**: 91s (31%) - MERGE operations have high network overhead
+- Edge Building: 50s (17%), good parallel execution
 - Identical metrics: 16.1M edges, 1.84M clusters, 6 LP iterations
-- Overhead from network latency + query scheduling per SQL statement
-- Serverless scales horizontally for larger datasets
-- Throughput: ~34,600 entities/second
+- Throughput: ~34,000 entities/second
 - Estimated cost: ~$0.50 for 10M rows (on-demand pricing)
+- BigQuery wins at larger scales due to horizontal scaling
 
 ### Databricks
 - _To be filled_
