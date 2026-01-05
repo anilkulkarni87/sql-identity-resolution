@@ -24,7 +24,7 @@
 | Platform | Data Load | Entity Extract | Edge Build | Label Prop | Output Gen | **Total** |
 |----------|-----------|----------------|------------|------------|------------|-----------|
 | DuckDB | 1s | 7s | 33s | 81s | 12s | **143s** |
-| Snowflake | _TBD_ | _TBD_ | _TBD_ | _TBD_ | _TBD_ | **_TBD_** |
+| Snowflake | 5s | 17s | 58s | 53s | 26s | **168s** |
 | BigQuery | 5s | 10s | 50s | 101s | 91s | **295s** |
 | Databricks | 14s | 36s | 77s | 115s | ~75s | **317s** |
 
@@ -33,7 +33,7 @@
 | Platform | Entities | Edges | Clusters | Largest | Singletons | LP Iters |
 |----------|----------|-------|----------|---------|------------|----------|
 | DuckDB | 10,000,000 | 16,124,751 | 1,839,324 | _TBD_ | _TBD_ | 6 |
-| Snowflake | _TBD_ | _TBD_ | _TBD_ | _TBD_ | _TBD_ | _TBD_ |
+| Snowflake | 10,000,000 | 16,124,751 | 1,839,324 | _TBD_ | _TBD_ | 6 |
 | BigQuery | 10,000,000 | 16,124,751 | 1,839,324 | _TBD_ | _TBD_ | 6 |
 | Databricks | 10,000,000 | 16,124,751 | 1,839,324 | _TBD_ | _TBD_ | 6 |
 
@@ -106,7 +106,7 @@
 Platform     | 10M       | 50M      | 100M
 -------------|-----------|----------|----------
 DuckDB       | ███ 143s  |          |         
-Snowflake    |           |          |         
+Snowflake    | ████ 168s |          |         
 BigQuery     | ██████ 295s|         |         
 Databricks   | ██████ 317s|         |         
 ```
@@ -117,9 +117,9 @@ _(To be replaced with actual Chart.js visualization)_
 | Platform | 10M Cost | 50M Cost | 100M Cost | Notes |
 |----------|----------|----------|-----------|-------|
 | DuckDB | Free | Free | Free | Local/Docker |
-| Snowflake | $_TBD_ | $_TBD_ | $_TBD_ | Warehouse: _TBD_ |
+| Snowflake | ~$0.25 | _TBD_ | _TBD_ | XS Warehouse: 0.1 credits |
 | BigQuery | ~$0.50 | _TBD_ | _TBD_ | On-demand: $6.25/TB scanned |
-| Databricks | $_TBD_ | $_TBD_ | $_TBD_ | DBU cost |
+| Databricks | $_TBD_ | $_TBD_ | $_TBD_ | Serverless SQL Warehouse |
 
 ---
 
@@ -136,7 +136,15 @@ _(To be replaced with actual Chart.js visualization)_
 - RAM usage: ~8-12GB peak for 10M entities
 
 ### Snowflake
-- _To be filled_
+- **10M rows in 168 seconds** (~2.8 min) - **fastest cloud platform!**
+- Only 1.17x slower than local DuckDB
+- **Label Propagation**: 53s (32%) - fastest LP of all cloud platforms
+- Edge Building: 58s (35%), excellent parallel execution
+- Entity + Identifier Extraction: 22s combined (13%)
+- Output Gen: 26s (15%), efficient MERGE operations
+- Identical metrics: 16.1M edges, 1.84M clusters, 6 LP iterations
+- Throughput: ~59,500 entities/second
+- Warehouse: IDR_WH (standard size)
 
 ### BigQuery
 - **10M rows in 295 seconds** (~4.9 min) - 2.1x slower than DuckDB

@@ -8,7 +8,7 @@
 
 CREATE OR REPLACE PROCEDURE idr_run(
     RUN_MODE VARCHAR,      -- 'INCR' or 'FULL'
-    MAX_ITERS INTEGER,     -- Max label propagation iterations
+    MAX_ITERS FLOAT,     -- Max label propagation iterations (FLOAT for JS compatibility)
     DRY_RUN BOOLEAN DEFAULT FALSE  -- Preview mode - no production writes
 )
 RETURNS VARCHAR
