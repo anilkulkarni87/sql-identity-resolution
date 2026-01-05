@@ -2659,12 +2659,12 @@
 <hr />
 <h2 id="performance-charts">Performance Charts</h2>
 <h3 id="total-duration-by-platform-scale">Total Duration by Platform &amp; Scale</h3>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>Platform     | 10M      | 50M      | 100M
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>-------------|----------|----------|----------
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>DuckDB       | ████ 175s|          |         
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>Snowflake    |          |          |         
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>BigQuery     | ██████ 289s|        |         
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>Databricks   |          |          |         
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>Platform     | 10M       | 50M      | 100M
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>-------------|-----------|----------|----------
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>DuckDB       | ███ 143s  |          |         
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>Snowflake    |           |          |         
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>BigQuery     | ██████ 295s|         |         
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>Databricks   |           |          |         
 </code></pre></div>
 <em>(To be replaced with actual Chart.js visualization)</em></p>
 <h3 id="cost-analysis-cloud-only">Cost Analysis (Cloud Only)</h3>
@@ -2713,9 +2713,11 @@
 <h2 id="observations-insights">Observations &amp; Insights</h2>
 <h3 id="duckdb">DuckDB</h3>
 <ul>
-<li><strong>10M rows in 175 seconds</strong> (~3 min) - excellent for local/dev workloads</li>
-<li>Label propagation converged in just <strong>6 iterations</strong> indicating healthy graph connectivity</li>
-<li>Throughput: ~57,000 entities/second</li>
+<li><strong>10M rows in 143 seconds</strong> (~2.4 min) - excellent for local/dev workloads</li>
+<li><strong>Label Propagation dominates</strong>: 81s (57% of total) - bottleneck on both platforms</li>
+<li>Edge Building: 33s (23%), fast single-node execution</li>
+<li>Output Gen: 12s (8%), efficient local writes</li>
+<li>Throughput: ~70,000 entities/second</li>
 <li>Created 16.1M edges from 10M entities</li>
 <li>Resolved into 1.84M clusters (~5.4 entities/cluster average)</li>
 <li>RAM usage: ~8-12GB peak for 10M entities</li>
@@ -2726,12 +2728,14 @@
 </ul>
 <h3 id="bigquery">BigQuery</h3>
 <ul>
-<li><strong>10M rows in 289 seconds</strong> (~4.8 min) - 1.65x slower than DuckDB</li>
+<li><strong>10M rows in 295 seconds</strong> (~4.9 min) - 2.1x slower than DuckDB</li>
+<li><strong>Label Propagation</strong>: 101s (34%) - serverless overhead on iterative queries</li>
+<li><strong>Output Gen</strong>: 91s (31%) - MERGE operations have high network overhead</li>
+<li>Edge Building: 50s (17%), good parallel execution</li>
 <li>Identical metrics: 16.1M edges, 1.84M clusters, 6 LP iterations</li>
-<li>Overhead from network latency + query scheduling per SQL statement</li>
-<li>Serverless scales horizontally for larger datasets</li>
-<li>Throughput: ~34,600 entities/second</li>
+<li>Throughput: ~34,000 entities/second</li>
 <li>Estimated cost: ~$0.50 for 10M rows (on-demand pricing)</li>
+<li>BigQuery wins at larger scales due to horizontal scaling</li>
 </ul>
 <h3 id="databricks">Databricks</h3>
 <ul>
