@@ -13,6 +13,8 @@
         <link rel="canonical" href="https://anilkulkarni87.github.io/sql-identity-resolution/performance/benchmark-results/">
       
       
+        <link rel="prev" href="../../reference/metrics-reference/">
+      
       
       
         
@@ -23,7 +25,7 @@
     
     
       
-        <title>IDR Performance Benchmark Results - SQL Identity Resolution</title>
+        <title>Benchmark Results - SQL Identity Resolution</title>
       
     
     
@@ -108,7 +110,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              IDR Performance Benchmark Results
+              Benchmark Results
             
           </span>
         </div>
@@ -327,6 +329,28 @@
   
   
   Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="./" class="md-tabs__link">
+          
+  
+  
+  Performance
 
         </a>
       </li>
@@ -959,34 +983,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../guides/configuration/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Configuration
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../guides/dry-run-mode/" class="md-nav__link">
         
   
@@ -1473,18 +1469,115 @@
   
 
     
-  </ul>
-</nav>
-                  </div>
-                </div>
-              </div>
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="">
             
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Performance
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Performance
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
             
               
-              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
-                <div class="md-sidebar__scrollwrap">
-                  <div class="md-sidebar__inner">
-                    
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Benchmark Results
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Benchmark Results
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
 
 <nav class="md-nav md-nav--secondary" aria-label="Table of contents">
   
@@ -1511,15 +1604,15 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#20-million-rows" class="md-nav__link">
+  <a href="#10-million-rows-duckdb-baseline" class="md-nav__link">
     <span class="md-ellipsis">
       
-        20 Million Rows
+        10 Million Rows (DuckDB Baseline)
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="20 Million Rows">
+    <nav class="md-nav" aria-label="10 Million Rows (DuckDB Baseline)">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1561,15 +1654,15 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#50-million-rows" class="md-nav__link">
+  <a href="#50-million-rows-planned" class="md-nav__link">
     <span class="md-ellipsis">
       
-        50 Million Rows
+        50 Million Rows (Planned)
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="50 Million Rows">
+    <nav class="md-nav" aria-label="50 Million Rows (Planned)">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1611,15 +1704,368 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#100-million-rows" class="md-nav__link">
+  <a href="#100-million-rows-planned" class="md-nav__link">
     <span class="md-ellipsis">
       
-        100 Million Rows
+        100 Million Rows (Planned)
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="100 Million Rows">
+    <nav class="md-nav" aria-label="100 Million Rows (Planned)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#timing-results_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Timing Results
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#metrics-results_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Metrics Results
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#consistency-check_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Consistency Check
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#performance-charts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Performance Charts
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Performance Charts">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#total-duration-by-platform-scale" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Total Duration by Platform &amp; Scale
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cost-analysis-cloud-only" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cost Analysis (Cloud Only)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#observations-insights" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Observations &amp; Insights
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Observations &amp; Insights">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#duckdb" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DuckDB
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#snowflake" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Snowflake
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bigquery" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        BigQuery
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#databricks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Databricks
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#recommendations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Recommendations
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Recommendations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#when-to-use-each-platform" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        When to Use Each Platform
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#test-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Test Commands
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#appendix-test-data-distribution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Appendix: Test Data Distribution
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#test-environment-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Test Environment Summary
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-million-rows-duckdb-baseline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10 Million Rows (DuckDB Baseline)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="10 Million Rows (DuckDB Baseline)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#timing-results" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Timing Results
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#metrics-results" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Metrics Results
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#consistency-check" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Consistency Check
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#50-million-rows-planned" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        50 Million Rows (Planned)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="50 Million Rows (Planned)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#timing-results_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Timing Results
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#metrics-results_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Metrics Results
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#consistency-check_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Consistency Check
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#100-million-rows-planned" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        100 Million Rows (Planned)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="100 Million Rows (Planned)">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1862,9 +2308,9 @@
 </tr>
 <tr>
 <td>BigQuery</td>
-<td><em>TBD</em></td>
-<td><em>On-demand/Slots</em></td>
-<td></td>
+<td>On-demand</td>
+<td>Serverless</td>
+<td>Auto-scaling, pay-per-query</td>
 </tr>
 <tr>
 <td>Databricks</td>
@@ -1875,7 +2321,7 @@
 </tbody>
 </table>
 <hr />
-<h2 id="20-million-rows">20 Million Rows</h2>
+<h2 id="10-million-rows-duckdb-baseline">10 Million Rows (DuckDB Baseline)</h2>
 <h3 id="timing-results">Timing Results</h3>
 <table>
 <thead>
@@ -1892,12 +2338,12 @@
 <tbody>
 <tr>
 <td>DuckDB</td>
-<td><em>TBD</em></td>
-<td><em>TBD</em></td>
-<td><em>TBD</em></td>
-<td><em>TBD</em></td>
-<td><em>TBD</em></td>
-<td><strong><em>TBD</em></strong></td>
+<td>N/A (in-memory)</td>
+<td>~20s</td>
+<td>~60s</td>
+<td>~70s</td>
+<td>~25s</td>
+<td><strong>175s</strong></td>
 </tr>
 <tr>
 <td>Snowflake</td>
@@ -1910,12 +2356,12 @@
 </tr>
 <tr>
 <td>BigQuery</td>
-<td><em>TBD</em></td>
-<td><em>TBD</em></td>
-<td><em>TBD</em></td>
-<td><em>TBD</em></td>
-<td><em>TBD</em></td>
-<td><strong><em>TBD</em></strong></td>
+<td>N/A (serverless)</td>
+<td>~40s</td>
+<td>~100s</td>
+<td>~120s</td>
+<td>~30s</td>
+<td><strong>289s</strong></td>
 </tr>
 <tr>
 <td>Databricks</td>
@@ -1944,12 +2390,12 @@
 <tbody>
 <tr>
 <td>DuckDB</td>
+<td>10,000,000</td>
+<td>16,124,751</td>
+<td>1,839,324</td>
 <td><em>TBD</em></td>
 <td><em>TBD</em></td>
-<td><em>TBD</em></td>
-<td><em>TBD</em></td>
-<td><em>TBD</em></td>
-<td><em>TBD</em></td>
+<td>6</td>
 </tr>
 <tr>
 <td>Snowflake</td>
@@ -1962,12 +2408,12 @@
 </tr>
 <tr>
 <td>BigQuery</td>
+<td>10,000,000</td>
+<td>16,124,751</td>
+<td>1,839,324</td>
 <td><em>TBD</em></td>
 <td><em>TBD</em></td>
-<td><em>TBD</em></td>
-<td><em>TBD</em></td>
-<td><em>TBD</em></td>
-<td><em>TBD</em></td>
+<td>6</td>
 </tr>
 <tr>
 <td>Databricks</td>
@@ -1987,7 +2433,7 @@
 <li>[ ] Singleton count matches across platforms</li>
 </ul>
 <hr />
-<h2 id="50-million-rows">50 Million Rows</h2>
+<h2 id="50-million-rows-planned">50 Million Rows (Planned)</h2>
 <h3 id="timing-results_1">Timing Results</h3>
 <table>
 <thead>
@@ -2099,7 +2545,7 @@
 <li>[ ] Singleton count matches across platforms</li>
 </ul>
 <hr />
-<h2 id="100-million-rows">100 Million Rows</h2>
+<h2 id="100-million-rows-planned">100 Million Rows (Planned)</h2>
 <h3 id="timing-results_2">Timing Results</h3>
 <table>
 <thead>
@@ -2213,12 +2659,12 @@
 <hr />
 <h2 id="performance-charts">Performance Charts</h2>
 <h3 id="total-duration-by-platform-scale">Total Duration by Platform &amp; Scale</h3>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>Platform     | 20M      | 50M      | 100M
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>Platform     | 10M      | 50M      | 100M
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>-------------|----------|----------|----------
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>DuckDB       | ████     | ████████ | ████████████
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>Snowflake    | ████     | ████████ | ████████████
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>BigQuery     | ████     | ████████ | ████████████
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>Databricks   | ████     | ████████ | ████████████
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>DuckDB       | ████ 175s|          |         
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>Snowflake    |          |          |         
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>BigQuery     | ██████ 289s|        |         
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>Databricks   |          |          |         
 </code></pre></div>
 <em>(To be replaced with actual Chart.js visualization)</em></p>
 <h3 id="cost-analysis-cloud-only">Cost Analysis (Cloud Only)</h3>
@@ -2226,13 +2672,20 @@
 <thead>
 <tr>
 <th>Platform</th>
-<th>20M Cost</th>
+<th>10M Cost</th>
 <th>50M Cost</th>
 <th>100M Cost</th>
 <th>Notes</th>
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>DuckDB</td>
+<td>Free</td>
+<td>Free</td>
+<td>Free</td>
+<td>Local/Docker</td>
+</tr>
 <tr>
 <td>Snowflake</td>
 <td>$<em>TBD</em></td>
@@ -2242,10 +2695,10 @@
 </tr>
 <tr>
 <td>BigQuery</td>
-<td>$<em>TBD</em></td>
-<td>$<em>TBD</em></td>
-<td>$<em>TBD</em></td>
-<td>On-demand pricing</td>
+<td>~$0.50</td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+<td>On-demand: $6.25/TB scanned</td>
 </tr>
 <tr>
 <td>Databricks</td>
@@ -2273,7 +2726,12 @@
 </ul>
 <h3 id="bigquery">BigQuery</h3>
 <ul>
-<li><em>To be filled</em></li>
+<li><strong>10M rows in 289 seconds</strong> (~4.8 min) - 1.65x slower than DuckDB</li>
+<li>Identical metrics: 16.1M edges, 1.84M clusters, 6 LP iterations</li>
+<li>Overhead from network latency + query scheduling per SQL statement</li>
+<li>Serverless scales horizontally for larger datasets</li>
+<li>Throughput: ~34,600 entities/second</li>
+<li>Estimated cost: ~$0.50 for 10M rows (on-demand pricing)</li>
 </ul>
 <h3 id="databricks">Databricks</h3>
 <ul>
