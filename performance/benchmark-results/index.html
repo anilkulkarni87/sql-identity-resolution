@@ -2347,12 +2347,12 @@
 </tr>
 <tr>
 <td>Snowflake</td>
-<td><em>TBD</em></td>
-<td><em>TBD</em></td>
-<td><em>TBD</em></td>
-<td><em>TBD</em></td>
-<td><em>TBD</em></td>
-<td><strong><em>TBD</em></strong></td>
+<td>5s</td>
+<td>17s</td>
+<td>58s</td>
+<td>53s</td>
+<td>26s</td>
+<td><strong>168s</strong></td>
 </tr>
 <tr>
 <td>BigQuery</td>
@@ -2399,12 +2399,12 @@
 </tr>
 <tr>
 <td>Snowflake</td>
+<td>10,000,000</td>
+<td>16,124,751</td>
+<td>1,839,324</td>
 <td><em>TBD</em></td>
 <td><em>TBD</em></td>
-<td><em>TBD</em></td>
-<td><em>TBD</em></td>
-<td><em>TBD</em></td>
-<td><em>TBD</em></td>
+<td>6</td>
 </tr>
 <tr>
 <td>BigQuery</td>
@@ -2662,7 +2662,7 @@
 <p><div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>Platform     | 10M       | 50M      | 100M
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>-------------|-----------|----------|----------
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>DuckDB       | ███ 143s  |          |         
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>Snowflake    |           |          |         
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>Snowflake    | ████ 168s |          |         
 <a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>BigQuery     | ██████ 295s|         |         
 <a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>Databricks   | ██████ 317s|         |         
 </code></pre></div>
@@ -2688,10 +2688,10 @@
 </tr>
 <tr>
 <td>Snowflake</td>
-<td>$<em>TBD</em></td>
-<td>$<em>TBD</em></td>
-<td>$<em>TBD</em></td>
-<td>Warehouse: <em>TBD</em></td>
+<td>~$0.25</td>
+<td><em>TBD</em></td>
+<td><em>TBD</em></td>
+<td>XS Warehouse: 0.1 credits</td>
 </tr>
 <tr>
 <td>BigQuery</td>
@@ -2705,7 +2705,7 @@
 <td>$<em>TBD</em></td>
 <td>$<em>TBD</em></td>
 <td>$<em>TBD</em></td>
-<td>DBU cost</td>
+<td>Serverless SQL Warehouse</td>
 </tr>
 </tbody>
 </table>
@@ -2724,7 +2724,15 @@
 </ul>
 <h3 id="snowflake">Snowflake</h3>
 <ul>
-<li><em>To be filled</em></li>
+<li><strong>10M rows in 168 seconds</strong> (~2.8 min) - <strong>fastest cloud platform!</strong></li>
+<li>Only 1.17x slower than local DuckDB</li>
+<li><strong>Label Propagation</strong>: 53s (32%) - fastest LP of all cloud platforms</li>
+<li>Edge Building: 58s (35%), excellent parallel execution</li>
+<li>Entity + Identifier Extraction: 22s combined (13%)</li>
+<li>Output Gen: 26s (15%), efficient MERGE operations</li>
+<li>Identical metrics: 16.1M edges, 1.84M clusters, 6 LP iterations</li>
+<li>Throughput: ~59,500 entities/second</li>
+<li>Warehouse: IDR_WH (standard size)</li>
 </ul>
 <h3 id="bigquery">BigQuery</h3>
 <ul>
