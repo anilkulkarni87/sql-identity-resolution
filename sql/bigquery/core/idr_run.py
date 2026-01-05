@@ -439,7 +439,7 @@ print("🏆 Building golden profiles...")
 # Dynamically build entities_all from ALL registered sources
 # Key fix: entity_key format is 'table_id:raw_key', must construct same prefix
 
-# First create empty table
+# First create empty table (BigQuery requires FROM for WHERE, so use LIMIT 0)
 q(f"""
 CREATE OR REPLACE TABLE `{PROJECT}.idr_work.entities_all` AS
 SELECT 
@@ -450,7 +450,7 @@ SELECT
     CAST(NULL AS STRING) AS first_name,
     CAST(NULL AS STRING) AS last_name,
     CAST(NULL AS TIMESTAMP) AS record_updated_at
-WHERE FALSE
+LIMIT 0
 """)
 
 # Reload source_rows (we overwrote it above)
@@ -467,10 +467,22 @@ for r in source_rows_for_golden:
     entity_key_expr = r['entity_key_expr']
     
     # Discover columns in source table
+    # Parse table_fqn to get dataset and table name
+    fqn_parts = table_fqn.split(".")
+    if len(fqn_parts) == 3:
+        tbl_project, tbl_dataset, tbl_name = fqn_parts
+    elif len(fqn_parts) == 2:
+        tbl_project = PROJECT
+        tbl_dataset, tbl_name = fqn_parts
+    else:
+        tbl_project = PROJECT
+        tbl_dataset = "crm"
+        tbl_name = table_fqn
+    
     schema_result = client.query(f"""
         SELECT column_name 
-        FROM `{PROJECT}.INFORMATION_SCHEMA.COLUMNS`
-        WHERE table_name = '{table_fqn.split(".")[-1]}'
+        FROM `{tbl_project}.{tbl_dataset}.INFORMATION_SCHEMA.COLUMNS`
+        WHERE table_name = '{tbl_name}'
     """).result()
     cols = [row.column_name.lower() for row in schema_result]
     

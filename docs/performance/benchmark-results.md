@@ -12,12 +12,39 @@
 |----------|--------------|---------------|-------|
 | DuckDB | Local / Docker | MacBook Pro M1/M2 | Single-node, 16GB RAM |
 | Snowflake | _TBD_ | _Warehouse size_ | |
-| BigQuery | _TBD_ | _On-demand/Slots_ | |
+| BigQuery | On-demand | Serverless | Auto-scaling, pay-per-query |
 | Databricks | _TBD_ | _Cluster config_ | |
 
 ---
 
-## 20 Million Rows
+## 10 Million Rows (DuckDB Baseline)
+
+### Timing Results
+
+| Platform | Data Load | Entity Extract | Edge Build | Label Prop | Output Gen | **Total** |
+|----------|-----------|----------------|------------|------------|------------|-----------|
+| DuckDB | N/A (in-memory) | ~20s | ~60s | ~70s | ~25s | **175s** |
+| Snowflake | _TBD_ | _TBD_ | _TBD_ | _TBD_ | _TBD_ | **_TBD_** |
+| BigQuery | N/A (serverless) | ~40s | ~100s | ~120s | ~30s | **289s** |
+| Databricks | _TBD_ | _TBD_ | _TBD_ | _TBD_ | _TBD_ | **_TBD_** |
+
+### Metrics Results
+
+| Platform | Entities | Edges | Clusters | Largest | Singletons | LP Iters |
+|----------|----------|-------|----------|---------|------------|----------|
+| DuckDB | 10,000,000 | 16,124,751 | 1,839,324 | _TBD_ | _TBD_ | 6 |
+| Snowflake | _TBD_ | _TBD_ | _TBD_ | _TBD_ | _TBD_ | _TBD_ |
+| BigQuery | 10,000,000 | 16,124,751 | 1,839,324 | _TBD_ | _TBD_ | 6 |
+| Databricks | _TBD_ | _TBD_ | _TBD_ | _TBD_ | _TBD_ | _TBD_ |
+
+### Consistency Check  
+- [ ] All platforms produced same cluster count
+- [ ] Largest cluster size matches across platforms
+- [ ] Singleton count matches across platforms
+
+---
+
+## 50 Million Rows (Planned)
 
 ### Timing Results
 
@@ -44,34 +71,7 @@
 
 ---
 
-## 50 Million Rows
-
-### Timing Results
-
-| Platform | Data Load | Entity Extract | Edge Build | Label Prop | Output Gen | **Total** |
-|----------|-----------|----------------|------------|------------|------------|-----------|
-| DuckDB | _TBD_ | _TBD_ | _TBD_ | _TBD_ | _TBD_ | **_TBD_** |
-| Snowflake | _TBD_ | _TBD_ | _TBD_ | _TBD_ | _TBD_ | **_TBD_** |
-| BigQuery | _TBD_ | _TBD_ | _TBD_ | _TBD_ | _TBD_ | **_TBD_** |
-| Databricks | _TBD_ | _TBD_ | _TBD_ | _TBD_ | _TBD_ | **_TBD_** |
-
-### Metrics Results
-
-| Platform | Entities | Edges | Clusters | Largest | Singletons | LP Iters |
-|----------|----------|-------|----------|---------|------------|----------|
-| DuckDB | _TBD_ | _TBD_ | _TBD_ | _TBD_ | _TBD_ | _TBD_ |
-| Snowflake | _TBD_ | _TBD_ | _TBD_ | _TBD_ | _TBD_ | _TBD_ |
-| BigQuery | _TBD_ | _TBD_ | _TBD_ | _TBD_ | _TBD_ | _TBD_ |
-| Databricks | _TBD_ | _TBD_ | _TBD_ | _TBD_ | _TBD_ | _TBD_ |
-
-### Consistency Check  
-- [ ] All platforms produced same cluster count
-- [ ] Largest cluster size matches across platforms
-- [ ] Singleton count matches across platforms
-
----
-
-## 100 Million Rows
+## 100 Million Rows (Planned)
 
 ### Timing Results
 
@@ -103,21 +103,22 @@
 ### Total Duration by Platform & Scale
 
 ```
-Platform     | 20M      | 50M      | 100M
+Platform     | 10M      | 50M      | 100M
 -------------|----------|----------|----------
-DuckDB       | ████     | ████████ | ████████████
-Snowflake    | ████     | ████████ | ████████████
-BigQuery     | ████     | ████████ | ████████████
-Databricks   | ████     | ████████ | ████████████
+DuckDB       | ████ 175s|          |         
+Snowflake    |          |          |         
+BigQuery     | ██████ 289s|        |         
+Databricks   |          |          |         
 ```
 _(To be replaced with actual Chart.js visualization)_
 
 ### Cost Analysis (Cloud Only)
 
-| Platform | 20M Cost | 50M Cost | 100M Cost | Notes |
+| Platform | 10M Cost | 50M Cost | 100M Cost | Notes |
 |----------|----------|----------|-----------|-------|
+| DuckDB | Free | Free | Free | Local/Docker |
 | Snowflake | $_TBD_ | $_TBD_ | $_TBD_ | Warehouse: _TBD_ |
-| BigQuery | $_TBD_ | $_TBD_ | $_TBD_ | On-demand pricing |
+| BigQuery | ~$0.50 | _TBD_ | _TBD_ | On-demand: $6.25/TB scanned |
 | Databricks | $_TBD_ | $_TBD_ | $_TBD_ | DBU cost |
 
 ---
@@ -136,7 +137,12 @@ _(To be replaced with actual Chart.js visualization)_
 - _To be filled_
 
 ### BigQuery
-- _To be filled_
+- **10M rows in 289 seconds** (~4.8 min) - 1.65x slower than DuckDB
+- Identical metrics: 16.1M edges, 1.84M clusters, 6 LP iterations
+- Overhead from network latency + query scheduling per SQL statement
+- Serverless scales horizontally for larger datasets
+- Throughput: ~34,600 entities/second
+- Estimated cost: ~$0.50 for 10M rows (on-demand pricing)
 
 ### Databricks
 - _To be filled_

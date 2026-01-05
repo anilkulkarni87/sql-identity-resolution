@@ -74,7 +74,6 @@ nav:
     - Data Model: concepts/data-model.md
   - Guides:
     - Configuration: guides/configuration.md
-    - Metadata Management: guides/configuration.md  # We can reuse or create a specific page for the loader
     - Dry Run Mode: guides/dry-run-mode.md
     - Metrics & Monitoring: guides/metrics-monitoring.md
     - Production Hardening: guides/production-hardening.md
@@ -90,6 +89,8 @@ nav:
     - CLI Reference: reference/cli-reference.md
     - Schema Reference: reference/schema-reference.md
     - Metrics Reference: reference/metrics-reference.md
+  - Performance:
+    - Benchmark Results: performance/benchmark-results.md
 
 extra:
   social:
