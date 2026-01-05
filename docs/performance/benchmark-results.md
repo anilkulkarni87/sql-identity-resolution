@@ -23,9 +23,9 @@
 
 | Platform | Data Load | Entity Extract | Edge Build | Label Prop | Output Gen | **Total** |
 |----------|-----------|----------------|------------|------------|------------|-----------|
-| DuckDB | N/A (in-memory) | ~20s | ~60s | ~70s | ~25s | **175s** |
+| DuckDB | 1s | 7s | 33s | 81s | 12s | **143s** |
 | Snowflake | _TBD_ | _TBD_ | _TBD_ | _TBD_ | _TBD_ | **_TBD_** |
-| BigQuery | N/A (serverless) | ~40s | ~100s | ~120s | ~30s | **289s** |
+| BigQuery | 5s | 10s | 50s | 101s | 91s | **295s** |
 | Databricks | _TBD_ | _TBD_ | _TBD_ | _TBD_ | _TBD_ | **_TBD_** |
 
 ### Metrics Results

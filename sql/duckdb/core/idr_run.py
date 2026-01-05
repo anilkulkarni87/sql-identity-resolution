@@ -76,6 +76,44 @@ def get_config(key: str, default: str = None) -> str:
     val = collect_one(f"SELECT config_value FROM idr_meta.config WHERE config_key = '{key}'")
     return val if val else default
 
+# Stage timing for performance metrics
+_stage_metrics = []
+_stage_order = 0
+
+def track_stage(stage_name: str, rows_in: int = None, notes: str = None) -> dict:
+    """Start tracking a processing stage."""
+    global _stage_order
+    _stage_order += 1
+    return {
+        "run_id": RUN_ID,
+        "stage_name": stage_name,
+        "stage_order": _stage_order,
+        "started_at": time.time(),
+        "rows_in": rows_in,
+        "notes": notes
+    }
+
+def end_stage(stage: dict, rows_out: int = None):
+    """Complete a stage and record metrics."""
+    stage["ended_at"] = time.time()
+    stage["duration_seconds"] = int(stage["ended_at"] - stage["started_at"])
+    stage["rows_out"] = rows_out
+    _stage_metrics.append(stage)
+    print(f"  ⏱️ {stage['stage_name']}: {stage['duration_seconds']}s" + 
+          (f", rows={rows_out:,}" if rows_out else ""))
+
+def save_stage_metrics():
+    """Save stage metrics to database."""
+    for s in _stage_metrics:
+        q(f"""
+        INSERT INTO idr_out.stage_metrics (run_id, stage_name, stage_order, started_at, ended_at, duration_seconds, rows_in, rows_out, notes)
+        VALUES ('{s['run_id']}', '{s['stage_name']}', {s['stage_order']}, 
+                TIMESTAMP '{datetime.fromtimestamp(s["started_at"]).strftime("%Y-%m-%d %H:%M:%S")}',
+                TIMESTAMP '{datetime.fromtimestamp(s["ended_at"]).strftime("%Y-%m-%d %H:%M:%S")}',
+                {s['duration_seconds']}, {s['rows_in'] or 'NULL'}, {s['rows_out'] or 'NULL'}, 
+                {f"'{s['notes']}'" if s.get('notes') else 'NULL'})
+        """)
+
 print(f"🦆 Starting DuckDB IDR run: {RUN_ID}")
 print(f"   Database: {DB_PATH}")
 print(f"   Mode: {RUN_MODE}, Max iterations: {MAX_ITERS}")
@@ -127,6 +165,7 @@ VALUES ('{RUN_ID}', '{RUN_MODE}', 'RUNNING', TIMESTAMP '{RUN_TS}', {len(source_r
 # BUILD ENTITIES DELTA
 # ============================================
 print("📊 Building entities delta...")
+stage_entities = track_stage("Entity Extraction")
 
 def build_where(wm_col, last_wm, lookback_min):
     if RUN_MODE == "FULL":
@@ -149,11 +188,14 @@ for r in source_rows:
     """)
 
 q(f"CREATE OR REPLACE TABLE idr_work.entities_delta AS {' UNION ALL '.join(entities_parts)}")
+entities_cnt = collect_one("SELECT COUNT(*) FROM idr_work.entities_delta")
+end_stage(stage_entities, entities_cnt)
 
 # ============================================
 # BUILD IDENTIFIERS
 # ============================================
 print("🔍 Extracting identifiers...")
+stage_identifiers = track_stage("Identifier Extraction")
 
 by_table = {}
 for m in mapping_rows:
@@ -183,11 +225,14 @@ FROM idr_work.identifiers_all_raw i
 JOIN idr_meta.rule r ON r.is_active=TRUE AND r.identifier_type=i.identifier_type
 WHERE i.identifier_value IS NOT NULL
 """)
+identifiers_cnt = collect_one("SELECT COUNT(*) FROM idr_work.identifiers_all")
+end_stage(stage_identifiers, identifiers_cnt)
 
 # ============================================
 # BUILD EDGES (Anchor-based with size limits)
 # ============================================
 print("🔗 Building edges...")
+stage_edges = track_stage("Edge Building")
 
 # Track skipped groups for observability
 groups_skipped = 0
@@ -331,11 +376,14 @@ WHERE EXISTS (
       AND tgt.identifier_value_norm = src.identifier_value_norm
 )
 """)
+edges_cnt = collect_one("SELECT COUNT(*) FROM idr_work.edges_new")
+end_stage(stage_edges, edges_cnt)
 
 # ============================================
 # BUILD IMPACTED SUBGRAPH
 # ============================================
 print("📈 Building impacted subgraph...")
+stage_subgraph = track_stage("Subgraph Building")
 
 q("""
 CREATE OR REPLACE TABLE idr_work.impacted_nodes AS
@@ -364,11 +412,14 @@ FROM idr_out.identity_edges_current e
 WHERE EXISTS (SELECT 1 FROM idr_work.subgraph_nodes a WHERE a.entity_key = e.left_entity_key)
   AND EXISTS (SELECT 1 FROM idr_work.subgraph_nodes b WHERE b.entity_key = e.right_entity_key)
 """)
+subgraph_nodes_cnt = collect_one("SELECT COUNT(*) FROM idr_work.subgraph_nodes")
+end_stage(stage_subgraph, subgraph_nodes_cnt)
 
 # ============================================
 # LABEL PROPAGATION
 # ============================================
 print("🔄 Running label propagation...")
+stage_lp = track_stage("Label Propagation")
 
 q("""
 CREATE OR REPLACE TABLE idr_work.lp_labels AS
@@ -412,11 +463,13 @@ for i in range(MAX_ITERS):
     # Swap tables
     q("DROP TABLE IF EXISTS idr_work.lp_labels")
     q("ALTER TABLE idr_work.lp_labels_next RENAME TO lp_labels")
+end_stage(stage_lp)
 
 # ============================================
 # UPDATE MEMBERSHIP & CLUSTERS
 # ============================================
 print("👥 Updating membership...")
+stage_membership = track_stage("Membership Update")
 
 # Include singletons (entities with no edges) - they get resolved_id = entity_key
 q("""
@@ -481,11 +534,14 @@ if not DRY_RUN:
     INSERT INTO idr_out.identity_clusters_current
     SELECT * FROM idr_work.cluster_sizes_updates
     """)
+clusters_cnt = collect_one("SELECT COUNT(*) FROM idr_work.cluster_sizes_updates")
+end_stage(stage_membership, clusters_cnt)
 
 # ============================================
 # BUILD GOLDEN PROFILE
 # ============================================
 print("🏆 Building golden profiles...")
+stage_golden = track_stage("Golden Profile Generation")
 
 # Build entities_all for golden profile - dynamically from registered sources
 # Key fix: entity_key format is 'table_id:raw_key', but source tables use raw_key
@@ -599,6 +655,8 @@ if not DRY_RUN:
     INSERT INTO idr_out.golden_profile_current
     SELECT * FROM idr_work.golden_updates
     """)
+golden_cnt = collect_one("SELECT COUNT(*) FROM idr_work.golden_updates")
+end_stage(stage_golden, golden_cnt)
 
 # ============================================
 # UPDATE RUN STATE
@@ -732,6 +790,10 @@ SET status = '{status}',
 WHERE run_id = '{RUN_ID}'
 """)
 
+# Save stage metrics before closing connection
+if not DRY_RUN:
+    save_stage_metrics()
+
 con.close()
 
 # Enhanced run summary
@@ -786,3 +848,8 @@ if DRY_RUN:
 else:
     print(f"✅ DuckDB IDR run completed!")
 
+# Print stage timing summary
+if _stage_metrics:
+    print("\n⏱️ STAGE TIMING:")
+    for s in _stage_metrics:
+        print(f"   {s['stage_name']}: {s['duration_seconds']}s")

@@ -63,6 +63,44 @@ $$
         }
     }
     
+    // Stage timing for performance metrics
+    var stageMetrics = [];
+    var stageOrder = 0;
+    
+    function trackStage(stageName, rowsIn, notes) {
+        stageOrder++;
+        return {
+            runId: run_id,
+            stageName: stageName,
+            stageOrder: stageOrder,
+            startedAt: Date.now(),
+            rowsIn: rowsIn || null,
+            notes: notes || null
+        };
+    }
+    
+    function endStage(stage, rowsOut) {
+        stage.endedAt = Date.now();
+        stage.durationSeconds = Math.floor((stage.endedAt - stage.startedAt) / 1000);
+        stage.rowsOut = rowsOut || null;
+        stageMetrics.push(stage);
+    }
+    
+    function saveStageMetrics() {
+        for (var i = 0; i < stageMetrics.length; i++) {
+            var s = stageMetrics[i];
+            var startTs = new Date(s.startedAt).toISOString().replace('T', ' ').substring(0, 19);
+            var endTs = new Date(s.endedAt).toISOString().replace('T', ' ').substring(0, 19);
+            q(`
+                INSERT INTO idr_out.stage_metrics (run_id, stage_name, stage_order, started_at, ended_at, duration_seconds, rows_in, rows_out, notes)
+                VALUES ('${s.runId}', '${s.stageName}', ${s.stageOrder}, 
+                        '${startTs}'::TIMESTAMP_NTZ, '${endTs}'::TIMESTAMP_NTZ,
+                        ${s.durationSeconds}, ${s.rowsIn || 'NULL'}, ${s.rowsOut || 'NULL'}, 
+                        ${s.notes ? "'" + s.notes + "'" : 'NULL'})
+            `);
+        }
+    }
+    
     // =============================================
     // PREFLIGHT VALIDATION
     // =============================================
@@ -106,6 +144,7 @@ $$
     // =============================================
     // BUILD ENTITIES DELTA
     // =============================================
+    var stageEntities = trackStage('Entity Extraction');
     var entities_sql_parts = [];
     for (var i = 0; i < source_rows.length; i++) {
         var r = source_rows[i];
@@ -131,10 +170,13 @@ $$
     }
     
     q(`CREATE OR REPLACE TRANSIENT TABLE idr_work.entities_delta AS ${entities_sql_parts.join(' UNION ALL ')}`);
+    var entitiesCnt = collectOne('SELECT COUNT(*) FROM idr_work.entities_delta');
+    endStage(stageEntities, entitiesCnt);
     
     // =============================================
     // BUILD IDENTIFIERS
     // =============================================
+    var stageIdentifiers = trackStage('Identifier Extraction');
     var by_table = {};
     for (var i = 0; i < mapping_rows.length; i++) {
         var m = mapping_rows[i];
@@ -170,10 +212,13 @@ $$
        FROM idr_work.identifiers_all_raw i
        JOIN idr_meta.rule r ON r.is_active=true AND r.identifier_type=i.identifier_type
        WHERE i.identifier_value IS NOT NULL`);
+    var identifiersCnt = collectOne('SELECT COUNT(*) FROM idr_work.identifiers_all');
+    endStage(stageIdentifiers, identifiersCnt);
     
     // =============================================
     // BUILD EDGES (Anchor-based with size limits)
     // =============================================
+    var stageEdges = trackStage('Edge Building');
     var groups_skipped = 0;
     var values_excluded = 0;
     
@@ -286,10 +331,13 @@ $$
        FROM idr_out.identity_edges_current e
        JOIN idr_work.subgraph_nodes a ON a.entity_key = e.left_entity_key
        JOIN idr_work.subgraph_nodes b ON b.entity_key = e.right_entity_key`);
+    var edgesCnt = collectOne('SELECT COUNT(*) FROM idr_work.edges_new');
+    endStage(stageEdges, edgesCnt);
     
     // =============================================
     // LABEL PROPAGATION
     // =============================================
+    var stageLP = trackStage('Label Propagation');
     q(`CREATE OR REPLACE TRANSIENT TABLE idr_work.lp_labels AS
        SELECT entity_key, entity_key AS label FROM idr_work.subgraph_nodes`);
     
@@ -325,10 +373,12 @@ $$
         // Swap tables
         q(`ALTER TABLE idr_work.lp_labels SWAP WITH idr_work.lp_labels_next`);
     }
+    endStage(stageLP);
     
     // =============================================
     // UPDATE MEMBERSHIP & CLUSTERS
     // =============================================
+    var stageMembership = trackStage('Membership Update');
     // Include singletons (entities with no edges) - they get resolved_id = entity_key
     q(`CREATE OR REPLACE TRANSIENT TABLE idr_work.membership_updates AS
        SELECT entity_key, label AS resolved_id, CURRENT_TIMESTAMP() AS updated_ts
@@ -370,10 +420,13 @@ $$
            WHEN MATCHED THEN UPDATE SET tgt.cluster_size=src.cluster_size, tgt.updated_ts=src.updated_ts
            WHEN NOT MATCHED THEN INSERT (resolved_id,cluster_size,updated_ts) VALUES (src.resolved_id,src.cluster_size,src.updated_ts)`);
     }
+    var clustersCnt = collectOne('SELECT COUNT(*) FROM idr_work.cluster_sizes_updates');
+    endStage(stageMembership, clustersCnt);
     
     // =============================================
     // BUILD GOLDEN PROFILE
     // =============================================
+    var stageGolden = trackStage('Golden Profile Generation');
     
     // Dynamically build entities_all from ALL registered sources
     // Key fix: entity_key format is 'table_id:raw_key', must construct same prefix
@@ -480,6 +533,13 @@ $$
              tgt.first_name=src.first_name, tgt.last_name=src.last_name, tgt.updated_ts=src.updated_ts
            WHEN NOT MATCHED THEN INSERT (resolved_id,email_primary,phone_primary,first_name,last_name,updated_ts) 
              VALUES (src.resolved_id,src.email_primary,src.phone_primary,src.first_name,src.last_name,src.updated_ts)`);
+    }
+    var goldenCnt = collectOne('SELECT COUNT(*) FROM idr_work.golden_updates');
+    endStage(stageGolden, goldenCnt);
+    
+    // Save stage metrics before updating run state
+    if (!dry_run) {
+        saveStageMetrics();
     }
     
     // =============================================
