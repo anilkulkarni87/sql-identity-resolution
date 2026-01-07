@@ -291,14 +291,18 @@ This completes the 8-part series on warehouse-native identity resolution:
 4. The Hidden Cost of CDPs
 5. How Label Propagation Works
 6. Dry Run Mode Explained
-7. Comparing Open Source Tools
+7. Open Source Identity Resolution Landscape
 8. From Zero to Customer 360 in 60 Minutes ← You are here
-
-If you found this series helpful, please:
-- ⭐ Star the [GitHub repo](https://github.com/anilkulkarni87/sql-identity-resolution)
-- Share with colleagues facing identity resolution challenges
-- Open issues for questions or feature requests
+9. dbt Integration for Identity Resolution
 
 ---
 
-*Thanks for following along! If you like, please share with your friends.*
+*This is post 8 of 9 in the warehouse-native identity resolution series.*
+
+**Next:** [dbt Integration for Identity Resolution](09_dbt_integration.md)
+
+If you found this helpful:
+- ⭐ Star the [GitHub repo](https://github.com/anilkulkarni87/sql-identity-resolution)
+- 📖 Check out [CDP Atlas](https://cdpatlas.vercel.app/) for CDP evaluation tools
+- 💬 Questions? [Open an issue](https://github.com/anilkulkarni87/sql-identity-resolution/issues)
+

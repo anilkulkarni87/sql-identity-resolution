@@ -176,7 +176,7 @@ In the next post, I'll compare open-source identity resolution tools—Zingg, De
 
 *This is post 6 of 8 in the warehouse-native identity resolution series.*
 
-**Next:** [Comparing Open Source Identity Resolution Tools](07_comparing_open_source_tools.md)
+**Next:** [Open Source Identity Resolution Landscape](07_comparing_open_source_tools.md)
 
 If you found this helpful:
 - ⭐ Star the [GitHub repo](https://github.com/anilkulkarni87/sql-identity-resolution)

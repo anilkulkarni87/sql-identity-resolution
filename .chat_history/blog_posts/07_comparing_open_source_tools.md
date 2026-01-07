@@ -1,176 +1,140 @@
-# Comparing Open Source Identity Resolution Tools
+# Open Source Identity Resolution Landscape
 
-*Zingg vs Dedupe vs sql-identity-resolution*
+*Exploring the available tools*
 
-**Tags:** `identity-resolution` `open-source` `zingg` `dedupe` `comparison`
+**Tags:** `identity-resolution` `open-source` `zingg` `dedupe` `data-engineering`
 
-**Reading time:** 6 minutes
+**Reading time:** 5 minutes
 
 ---
 
-> **TL;DR:** Zingg (Spark/ML) for 100M+ records with fuzzy matching. Dedupe (Python/ML) for experimentation. sql-identity-resolution (SQL) for warehouse-native deterministic matching with audit trail.
+> **TL;DR:** The open source ecosystem offers several approaches to identity resolution. Zingg uses Spark for ML-based matching at scale. Dedupe provides Python-native probabilistic matching. sql-identity-resolution focuses on warehouse-native deterministic matching.
 
-In this post, I'll compare the three main options and share my perspective on when each makes sense.
+After building [CDP Atlas](https://cdpatlas.vercel.app/) to help teams evaluate CDP solutions, one question comes up frequently: "What open-source identity resolution tools are available?"
 
-## The Landscape
+In this post, I'll share an overview of the landscape and the different approaches each tool takes.
 
-| Tool | Technology | Approach | Origin |
-|------|------------|----------|--------|
-| **Zingg** | Apache Spark (Java) | ML/Active Learning | Open source, enterprise option |
-| **Dedupe** | Python | ML/Active Learning | Open source |
-| **sql-identity-resolution** | SQL | Deterministic | Open source (my project) |
+## The Open Source Landscape
+
+Identity resolution is a hard problem, and different tools have emerged with different philosophies:
+
+| Tool | Technology | Approach | Best For |
+|------|------------|----------|----------|
+| **Zingg** | Apache Spark | ML + Active Learning | Large-scale fuzzy matching |
+| **Dedupe** | Python | ML + Active Learning | Python workflows |
+| **sql-identity-resolution** | SQL | Deterministic | Warehouse-native workflows |
+| **Splink** | Spark/DuckDB | Probabilistic | Record linkage at scale |
+| **RecordLinkage (R)** | R | Statistical | Research, small datasets |
 
 ## Zingg
 
-[Zingg](https://github.com/zingg/zingg) is an ML-based entity resolution tool built on Apache Spark.
+[Zingg](https://github.com/zingg/zingg) is built on Apache Spark and uses machine learning with active learning for entity resolution.
 
-### Key Features
-
-- **Spark-native** - Designed for distributed processing at scale
+### Capabilities
 - **Active learning** - Interactive model training with minimal labeled data
-- **Multiple match types** - Probabilistic and deterministic matching
-- **Cloud integrations** - Snowflake, Databricks, AWS Glue compatible
+- **Distributed processing** - Built on Spark for horizontal scalability
+- **Multiple match types** - Supports both fuzzy and exact matching
+- **Cloud integrations** - Works with Snowflake, Databricks, AWS Glue
+- **Enterprise option** - Commercial support available
 
-### Best For
+### Technical Approach
+Zingg uses blocking to reduce comparisons and trains models interactively by asking users to label pairs as matches or non-matches.
 
-- Very large datasets (100M+ records)
-- Teams with Spark infrastructure
-- Use cases requiring fuzzy matching
-- Organizations with ML expertise
+### Resources
+- [GitHub](https://github.com/zingg/zingg)
+- [Documentation](https://docs.zingg.ai/)
 
-### Considerations
-
-- Requires Spark cluster
-- Learning curve for active learning workflow
-- More complex deployment
+---
 
 ## Dedupe
 
 [Dedupe](https://github.com/dedupeio/dedupe) is a Python library for fuzzy matching and deduplication.
 
-### Key Features
-
-- **Python-native** - Easy integration with Python workflows
-- **Active learning** - Train models interactively
-- **Probabilistic matching** - Confidence scores for matches
+### Capabilities
+- **Python-native** - Integrates with pandas, SQL databases
+- **Active learning** - Train models by labeling examples
+- **Probabilistic** - Provides confidence scores
 - **Flexible** - Works with any Python data source
+- **Blocking** - Efficient candidate pair generation
 
-### Best For
+### Technical Approach
+Dedupe learns from user feedback to build a classifier that predicts whether records match.
 
-- Python-centric data teams
-- Medium-scale datasets
-- Projects needing fuzzy matching
-- Research and experimentation
+### Resources
+- [GitHub](https://github.com/dedupeio/dedupe)
+- [Documentation](https://docs.dedupe.io/)
 
-### Considerations
+---
 
-- Single-node processing (scaling requires orchestration)
-- Requires Python environment
-- Model explainability can be challenging
+## Splink
+
+[Splink](https://github.com/moj-analytical-services/splink) is a probabilistic record linkage library developed by the UK Ministry of Justice.
+
+### Capabilities
+- **Multi-backend** - DuckDB, Spark, Athena, PostgreSQL
+- **Probabilistic** - Fellegi-Sunter model
+- **Explainable** - Waterfall charts showing match contributions
+- **Scalable** - Handles billions of comparisons
+- **Interactive** - Jupyter-friendly visualizations
+
+### Technical Approach
+Uses the Fellegi-Sunter model with expectation-maximization to estimate match weights.
+
+### Resources
+- [GitHub](https://github.com/moj-analytical-services/splink)
+- [Documentation](https://moj-analytical-services.github.io/splink/)
+
+---
 
 ## sql-identity-resolution
 
 [sql-identity-resolution](https://github.com/anilkulkarni87/sql-identity-resolution) is the tool I built for warehouse-native deterministic matching.
 
-### Key Features
-
+### Capabilities
 - **SQL-native** - Runs inside your data warehouse
-- **Deterministic** - Exact match on identifiers, fully auditable
+- **Deterministic** - Exact match on identifiers
 - **Multi-platform** - Snowflake, BigQuery, Databricks, DuckDB
-- **Production features** - Dry run, incremental, metrics, audit trail
+- **dbt integration** - Native dbt package available
+- **Production features** - Dry run, incremental, audit trail
 
-### Best For
+### Technical Approach
+Uses label propagation on a graph of shared identifiers to cluster entities.
 
-- Teams with existing data warehouses
-- Deterministic matching use cases
-- Cost-conscious organizations
-- Compliance/audit requirements
+### Resources
+- [GitHub](https://github.com/anilkulkarni87/sql-identity-resolution)
+- [Documentation](https://anilkulkarni87.github.io/sql-identity-resolution/)
 
-### Considerations
+---
 
-- No fuzzy matching (planned)
-- Requires SQL expertise
-- No GUI
+## Choosing the Right Approach
 
-## Comparison Table
+Different scenarios call for different tools:
 
-| Factor | Zingg | Dedupe | sql-identity-resolution |
-|--------|-------|--------|-------------------------|
-| **Infrastructure** | Spark cluster | Python environment | Data warehouse |
-| **Matching** | ML + Deterministic | ML (probabilistic) | Deterministic only |
-| **Scale** | 100M+ | Millions | 10M+ tested |
-| **Training Required** | Yes (active learning) | Yes (active learning) | No |
-| **Auditability** | Moderate | Low | High |
-| **Cost** | Spark compute | Python compute | Warehouse compute |
-| **Setup Time** | Days | Hours | Hours |
-| **Learning Curve** | Steep | Moderate | Low (if you know SQL) |
+### When ML-Based Matching Helps
+- Data with typos, abbreviations, variations
+- Name and address as primary identifiers
+- Training data available or can be generated
 
-## Decision Guide
+### When Deterministic Matching Suffices
+- Strong identifiers available (email, phone, IDs)
+- Internal data sources with consistent formatting
+- Audit trail and explainability required
 
-Based on my experience, here's how I'd recommend choosing:
-
-### Choose Zingg If:
-- You have 100M+ records
-- Spark infrastructure exists
-- Fuzzy matching is critical
-- You have ML resources
-
-### Choose Dedupe If:
-- You work primarily in Python
-- Datasets are moderate size
-- You need fuzzy matching
-- Experimentation is the goal
-
-### Choose sql-identity-resolution If:
-- You have a data warehouse
-- Deterministic matching is sufficient
-- Cost is a concern
-- Audit trail matters
-
-## Hybrid Approaches
-
-These tools aren't mutually exclusive:
-
-1. **Start with sql-identity-resolution** - Handle email/phone/ID matching
-2. **Add Zingg/Dedupe** - For name/address fuzzy enhancement
-3. **Merge results** - Union deterministic + high-confidence fuzzy matches
+### Hybrid Approaches
+Some organizations use multiple tools:
+1. Start with deterministic matching on strong identifiers
+2. Enhance with probabilistic matching on remaining records
+3. Human review for low-confidence matches
 
 ## Connection to CDP Patterns
 
-On [CDP Atlas](https://cdpatlas.vercel.app/patterns), I've documented different identity resolution architectural patterns:
+On [CDP Atlas Patterns](https://cdpatlas.vercel.app/patterns), I've documented different architectural approaches for identity resolution within a CDP context. The choice of tool often depends on your broader data architecture.
 
-- **Centralized** - Single tool handles all matching
-- **Federated** - Different tools for different sources
-- **Hybrid** - Deterministic core + probabilistic enhancement
+## Further Reading
 
-Understanding your pattern helps choose the right tool(s).
-
-## My Approach
-
-I built sql-identity-resolution because I saw a gap:
-
-- Zingg/Dedupe require separate infrastructure
-- CDPs are expensive
-- dbt packages are limited
-- Many use cases don't need ML
-
-For teams that fit the profile—warehouse-first, deterministic matching, cost-conscious—it's the right choice.
-
-## Performance Comparison
-
-| Tool | 10M Records | Notes |
-|------|-------------|-------|
-| Zingg (Databricks cluster) | ~10 min | Includes training |
-| Dedupe (single node) | ~30 min | Depends on blocking |
-| sql-identity-resolution (Snowflake X-Small) | ~3 min | No training needed |
-
-Note: These are approximate and depend heavily on data characteristics and configuration.
-
-## Next Steps
-
-In the final post, I'll provide a complete zero-to-customer-360 tutorial in 60 minutes.
-
-If you're evaluating identity resolution as part of a CDP initiative, check out the evaluation tools on [CDP Atlas](https://cdpatlas.vercel.app/evaluation).
+- [Zingg Blog](https://www.zingg.ai/blog)
+- [Splink Demos](https://moj-analytical-services.github.io/splink/demos.html)
+- [Entity Resolution Survey Paper](https://arxiv.org/abs/2009.06420)
 
 ---
 
