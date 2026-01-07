@@ -165,7 +165,7 @@ if bad_types:
 for r in source_rows:
     try:
         q(f"SELECT 1 FROM {r['table_fqn']} LIMIT 1")
-    except Exception as e:
+    except Exception:
         raise RuntimeError(f"PREFLIGHT FAILED: Source table not found: {r['table_fqn']} (table_id: {r['table_id']})")
 
 print(f"✅ Preflight OK: {len(source_rows)} sources, {len(mapping_rows)} mappings, {len(active_rule_types)} rules")
