@@ -1,0 +1,13 @@
+
+    
+    
+    
+    create table "test_idr"."main"."sample_pos_transactions" ("transaction_id" varchar,"loyalty_card_id" varchar,"contact_phone" varchar,"transaction_date" varchar)
+  ;
+    -- dbt seed --
+    
+          COPY "test_idr"."main"."sample_pos_transactions" FROM '/Users/harihiom/Anil/Development/sql-identity-resolution/dbt_idr/integration_tests/seeds/sample_pos_transactions.csv' (FORMAT CSV, HEADER TRUE, DELIMITER ',')
+        
+
+;
+  

@@ -164,7 +164,7 @@ sequenceDiagram
 | Table | Purpose |
 |-------|---------|
 | `identity_resolved_membership_current` | Entity → Cluster mapping |
-| `identity_clusters_current` | Cluster metadata (size, updated_ts) |
+| `identity_clusters_current` | Cluster metadata (size, confidence_score, edge_diversity, match_density, primary_reason) |
 | `golden_profile_current` | Best-record profiles per cluster |
 | `run_history` | Audit log of all runs |
 | `stage_metrics` | Per-stage timing metrics |

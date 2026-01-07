@@ -1,0 +1,13 @@
+
+    
+    
+    
+    create table "test_idr"."main"."sample_crm_customers" ("customer_id" varchar,"email" varchar,"phone" varchar,"first_name" varchar,"last_name" varchar,"loyalty_id" varchar,"updated_at" varchar)
+  ;
+    -- dbt seed --
+    
+          COPY "test_idr"."main"."sample_crm_customers" FROM '/Users/harihiom/Anil/Development/sql-identity-resolution/dbt_idr/integration_tests/seeds/sample_crm_customers.csv' (FORMAT CSV, HEADER TRUE, DELIMITER ',')
+        
+
+;
+  

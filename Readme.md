@@ -70,6 +70,7 @@ docker run -it --rm -v $(pwd)/output:/output ghcr.io/anilkulkarni87/sql-identity
 
 ## ✨ Key Features
 
+- **🎯 Cluster Confidence Scoring** - Quality score (0-1) for each cluster based on edge diversity and match density
 - **🔒 Dry Run Mode** - Preview changes before committing
 - **📊 Metrics Export** - Prometheus, DataDog, webhook support
 - **🛡️ Data Quality Controls** - max_group_size, exclusion lists
@@ -139,6 +140,26 @@ python sql/bigquery/idr_run.py --project=your-project --run-mode=FULL
 1. Import `sql/databricks/notebooks/IDR_QuickStart.py`
 2. Run all cells
 3. Check `idr_out.identity_resolved_membership_current`
+
+</details>
+
+<details>
+<summary><b>dbt Package</b></summary>
+
+```yaml
+# packages.yml
+packages:
+  - git: "https://github.com/anilkulkarni87/sql-identity-resolution"
+    subdirectory: "dbt_idr"
+```
+
+```bash
+dbt deps
+dbt seed --select dbt_idr
+dbt run --select dbt_idr
+```
+
+[📖 dbt Package Docs](dbt_idr/README.md)
 
 </details>
 

@@ -1,0 +1,13 @@
+
+    
+    
+    
+    create table "test_idr"."main_idr_meta"."idr_rules" ("rule_id" text,"identifier_type" text,"priority" integer,"is_active" boolean,"canonicalize" text,"max_group_size" integer,"description" text)
+  ;
+    -- dbt seed --
+    
+          COPY "test_idr"."main_idr_meta"."idr_rules" FROM '/Users/harihiom/Anil/Development/sql-identity-resolution/dbt_idr/integration_tests/dbt_packages/dbt_idr/seeds/idr_rules.csv' (FORMAT CSV, HEADER TRUE, DELIMITER ',')
+        
+
+;
+  

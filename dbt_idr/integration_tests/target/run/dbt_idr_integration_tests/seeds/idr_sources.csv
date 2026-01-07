@@ -1,0 +1,13 @@
+
+    
+    
+    
+    create table "test_idr"."main"."idr_sources" ("source_id" text,"source_name" text,"database" integer,"schema" text,"table_name" text,"entity_key_column" text,"watermark_column" text,"is_active" boolean,"description" text)
+  ;
+    -- dbt seed --
+    
+          COPY "test_idr"."main"."idr_sources" FROM '/Users/harihiom/Anil/Development/sql-identity-resolution/dbt_idr/integration_tests/seeds/idr_sources.csv' (FORMAT CSV, HEADER TRUE, DELIMITER ',')
+        
+
+;
+  

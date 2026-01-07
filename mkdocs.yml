@@ -76,6 +76,7 @@ nav:
   - Guides:
     - Configuration: guides/configuration.md
     - Metadata Configuration: metadata_configuration.md
+    - dbt Package: guides/dbt-package.md
     - Dry Run Mode: guides/dry-run-mode.md
     - Metrics & Monitoring: guides/metrics-monitoring.md
     - Scale Considerations: scale_considerations.md

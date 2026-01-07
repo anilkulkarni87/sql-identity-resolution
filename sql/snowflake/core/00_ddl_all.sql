@@ -104,6 +104,11 @@ CREATE TABLE IF NOT EXISTS idr_out.identity_resolved_membership_current (
 CREATE TABLE IF NOT EXISTS idr_out.identity_clusters_current (
   resolved_id VARCHAR,
   cluster_size INTEGER,
+  -- Confidence scoring columns
+  confidence_score FLOAT,
+  edge_diversity INTEGER,
+  match_density FLOAT,
+  primary_reason VARCHAR,
   updated_ts TIMESTAMP_NTZ
 );
 

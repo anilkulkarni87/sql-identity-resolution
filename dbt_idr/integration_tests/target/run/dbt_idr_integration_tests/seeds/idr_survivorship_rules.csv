@@ -1,0 +1,13 @@
+
+    
+    
+    
+    create table "test_idr"."main"."idr_survivorship_rules" ("attribute_name" text,"strategy" text,"source_priority_list" integer,"recency_field" text,"description" text)
+  ;
+    -- dbt seed --
+    
+          COPY "test_idr"."main"."idr_survivorship_rules" FROM '/Users/harihiom/Anil/Development/sql-identity-resolution/dbt_idr/integration_tests/seeds/idr_survivorship_rules.csv' (FORMAT CSV, HEADER TRUE, DELIMITER ',')
+        
+
+;
+  

@@ -1,0 +1,13 @@
+
+    
+    
+    
+    create table "test_idr"."main"."idr_exclusions" ("identifier_type" text,"identifier_value_pattern" text,"match_type" text,"reason" text)
+  ;
+    -- dbt seed --
+    
+          COPY "test_idr"."main"."idr_exclusions" FROM '/Users/harihiom/Anil/Development/sql-identity-resolution/dbt_idr/integration_tests/seeds/idr_exclusions.csv' (FORMAT CSV, HEADER TRUE, DELIMITER ',')
+        
+
+;
+  

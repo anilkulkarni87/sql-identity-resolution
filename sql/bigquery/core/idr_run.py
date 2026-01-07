@@ -491,13 +491,47 @@ else:
     GROUP BY resolved_id
     """)
 
-# Upsert clusters (skip in dry run)
+# Upsert clusters with confidence scoring (skip in dry run)
 if not DRY_RUN:
+    # Compute edge stats for confidence scoring
+    q(f"""
+    CREATE OR REPLACE TABLE `{PROJECT}.idr_work.cluster_edge_stats` AS
+    SELECT m.resolved_id, COUNT(DISTINCT e.identifier_type) AS edge_diversity, COUNT(*) AS edge_count
+    FROM `{PROJECT}.idr_out.identity_resolved_membership_current` m
+    JOIN `{PROJECT}.idr_out.identity_edges_current` e ON e.left_entity_key = m.entity_key OR e.right_entity_key = m.entity_key
+    WHERE m.resolved_id IN (SELECT resolved_id FROM `{PROJECT}.idr_work.impacted_resolved_ids`)
+    GROUP BY m.resolved_id
+    """)
+    
+    # Compute confidence scores
+    q(f"""
+    CREATE OR REPLACE TABLE `{PROJECT}.idr_work.cluster_confidence` AS
+    SELECT
+        c.resolved_id, c.cluster_size,
+        CASE WHEN c.cluster_size = 1 THEN 1.0
+             ELSE ROUND(0.50 * (IFNULL(es.edge_diversity, 0) / GREATEST(1, (SELECT MAX(edge_diversity) FROM `{PROJECT}.idr_work.cluster_edge_stats`))) +
+                        0.35 * LEAST(1.0, IFNULL(es.edge_count, 0) / GREATEST(1, c.cluster_size - 1)) +
+                        0.15, 3)
+        END AS confidence_score,
+        IFNULL(es.edge_diversity, 0) AS edge_diversity,
+        CASE WHEN c.cluster_size <= 1 THEN 1.0 ELSE LEAST(1.0, IFNULL(es.edge_count, 0) / GREATEST(1, c.cluster_size - 1)) END AS match_density,
+        CASE WHEN c.cluster_size = 1 THEN 'SINGLETON_NO_MATCH_REQUIRED'
+             WHEN IFNULL(es.edge_diversity, 0) >= 2 THEN CONCAT(CAST(IFNULL(es.edge_diversity, 0) AS STRING), ' identifier types')
+             ELSE 'Single identifier type'
+        END AS primary_reason,
+        CURRENT_TIMESTAMP() AS updated_ts
+    FROM `{PROJECT}.idr_work.cluster_sizes_updates` c
+    LEFT JOIN `{PROJECT}.idr_work.cluster_edge_stats` es ON es.resolved_id = c.resolved_id
+    """)
+    
     q(f"""
     MERGE INTO `{PROJECT}.idr_out.identity_clusters_current` tgt
-    USING `{PROJECT}.idr_work.cluster_sizes_updates` src ON tgt.resolved_id=src.resolved_id
-    WHEN MATCHED THEN UPDATE SET cluster_size=src.cluster_size, updated_ts=src.updated_ts
-    WHEN NOT MATCHED THEN INSERT ROW
+    USING `{PROJECT}.idr_work.cluster_confidence` src ON tgt.resolved_id=src.resolved_id
+    WHEN MATCHED THEN UPDATE SET cluster_size=src.cluster_size, confidence_score=src.confidence_score,
+         edge_diversity=src.edge_diversity, match_density=src.match_density, 
+         primary_reason=src.primary_reason, updated_ts=src.updated_ts
+    WHEN NOT MATCHED THEN INSERT (resolved_id, cluster_size, confidence_score, edge_diversity, match_density, primary_reason, updated_ts)
+    VALUES (src.resolved_id, src.cluster_size, src.confidence_score, src.edge_diversity, src.match_density, src.primary_reason, src.updated_ts)
     """)
 clusters_cnt = collect_one(f"SELECT COUNT(*) FROM `{PROJECT}.idr_work.cluster_sizes_updates`")
 end_stage(stage_membership, clusters_cnt)

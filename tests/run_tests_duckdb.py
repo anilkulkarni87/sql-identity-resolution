@@ -174,6 +174,10 @@ class TestRunner:
         CREATE TABLE IF NOT EXISTS idr_out.identity_clusters_current (
             resolved_id VARCHAR PRIMARY KEY,
             cluster_size INT,
+            confidence_score DOUBLE,
+            edge_diversity INT,
+            match_density DOUBLE,
+            primary_reason VARCHAR,
             updated_ts TIMESTAMP
         )""")
         
@@ -526,13 +530,43 @@ class TestRunner:
         GROUP BY resolved_id
         """)
         
+        # Compute cluster confidence
+        self.q("""
+        CREATE OR REPLACE TABLE idr_work.cluster_edge_stats AS
+        SELECT m.resolved_id, COUNT(DISTINCT e.identifier_type) AS edge_diversity, COUNT(*) AS edge_count
+        FROM idr_out.identity_resolved_membership_current m
+        JOIN idr_out.identity_edges_current e ON e.left_entity_key = m.entity_key OR e.right_entity_key = m.entity_key
+        WHERE m.resolved_id IN (SELECT resolved_id FROM idr_work.impacted_resolved_ids)
+        GROUP BY m.resolved_id
+        """)
+        
+        self.q("""
+        CREATE OR REPLACE TABLE idr_work.cluster_confidence AS
+        SELECT
+            c.resolved_id, c.cluster_size,
+            CASE WHEN c.cluster_size = 1 THEN 1.0
+                 ELSE ROUND(0.50 * (CAST(COALESCE(es.edge_diversity, 0) AS DOUBLE) / GREATEST(1, (SELECT MAX(edge_diversity) FROM idr_work.cluster_edge_stats))) +
+                            0.35 * LEAST(1.0, CAST(COALESCE(es.edge_count, 0) AS DOUBLE) / GREATEST(1, c.cluster_size - 1)) +
+                            0.15, 3)
+            END AS confidence_score,
+            COALESCE(es.edge_diversity, 0) AS edge_diversity,
+            CASE WHEN c.cluster_size <= 1 THEN 1.0 ELSE LEAST(1.0, CAST(COALESCE(es.edge_count, 0) AS DOUBLE) / GREATEST(1, c.cluster_size - 1)) END AS match_density,
+            CASE WHEN c.cluster_size = 1 THEN 'SINGLETON_NO_MATCH_REQUIRED'
+                 WHEN COALESCE(es.edge_diversity, 0) >= 2 THEN CAST(COALESCE(es.edge_diversity, 0) AS VARCHAR) || ' identifier types'
+                 ELSE 'Single identifier type'
+            END AS primary_reason,
+            CURRENT_TIMESTAMP AS updated_ts
+        FROM idr_work.cluster_sizes_updates c
+        LEFT JOIN idr_work.cluster_edge_stats es ON es.resolved_id = c.resolved_id
+        """)
+        
         self.q("""
         DELETE FROM idr_out.identity_clusters_current
-        WHERE resolved_id IN (SELECT resolved_id FROM idr_work.cluster_sizes_updates)
+        WHERE resolved_id IN (SELECT resolved_id FROM idr_work.cluster_confidence)
         """)
         self.q("""
         INSERT INTO idr_out.identity_clusters_current
-        SELECT * FROM idr_work.cluster_sizes_updates
+        SELECT * FROM idr_work.cluster_confidence
         """)
     
     def add_test_result(self, name: str, passed: bool, detail: str):
@@ -1086,6 +1120,149 @@ def test_dry_run_mode(runner: TestRunner):
     )
 
 
+def test_confidence_singleton(runner: TestRunner):
+    """Test: Singleton entities should have confidence_score = 1.0."""
+    print("\n🧪 Test 10: Singleton Confidence Score = 1.0")
+    
+    runner.q("""
+    CREATE TABLE crm.test10_single AS
+    SELECT 'SOLO1' AS entity_id, 'unique_solo@example.com' AS email, NULL AS phone,
+           TIMESTAMP '2024-01-01' AS updated_at
+    """)
+    
+    runner.q("""
+    INSERT INTO idr_meta.source_table VALUES
+        ('test10_single', 'crm.test10_single', 'PERSON', 'entity_id', 'updated_at', 0, TRUE)
+    """)
+    
+    runner.q("""
+    INSERT INTO idr_meta.identifier_mapping VALUES
+        ('test10_single', 'EMAIL', 'email', FALSE)
+    """)
+    
+    runner.run_idr_pipeline(['test10_single'])
+    
+    # Check singleton confidence
+    confidence = runner.collect_one("""
+        SELECT confidence_score FROM idr_out.identity_clusters_current
+        WHERE resolved_id LIKE 'test10_%' AND cluster_size = 1
+    """)
+    
+    reason = runner.collect_one("""
+        SELECT primary_reason FROM idr_out.identity_clusters_current
+        WHERE resolved_id LIKE 'test10_%' AND cluster_size = 1
+    """)
+    
+    passed = confidence == 1.0 and reason == 'SINGLETON_NO_MATCH_REQUIRED'
+    runner.add_test_result(
+        "Singleton Confidence = 1.0",
+        passed,
+        f"confidence={confidence}, reason={reason}"
+    )
+
+
+def test_confidence_multi_identifier(runner: TestRunner):
+    """Test: Cluster connected by multiple identifier types should have higher confidence."""
+    print("\n🧪 Test 11: Multi-Identifier → Higher Confidence")
+    
+    # Two entities connected by BOTH email AND phone
+    runner.q("""
+    CREATE TABLE crm.test11_multi_a AS
+    SELECT 'MULTI_A' AS entity_id, 'multi@example.com' AS email, '5550001111' AS phone,
+           TIMESTAMP '2024-01-01' AS updated_at
+    """)
+    
+    runner.q("""
+    CREATE TABLE crm.test11_multi_b AS
+    SELECT 'MULTI_B' AS entity_id, 'multi@example.com' AS email, '5550001111' AS phone,
+           TIMESTAMP '2024-01-02' AS updated_at
+    """)
+    
+    runner.q("""
+    INSERT INTO idr_meta.source_table VALUES
+        ('test11_multi_a', 'crm.test11_multi_a', 'PERSON', 'entity_id', 'updated_at', 0, TRUE),
+        ('test11_multi_b', 'crm.test11_multi_b', 'PERSON', 'entity_id', 'updated_at', 0, TRUE)
+    """)
+    
+    runner.q("""
+    INSERT INTO idr_meta.identifier_mapping VALUES
+        ('test11_multi_a', 'EMAIL', 'email', FALSE),
+        ('test11_multi_a', 'PHONE', 'phone', FALSE),
+        ('test11_multi_b', 'EMAIL', 'email', FALSE),
+        ('test11_multi_b', 'PHONE', 'phone', FALSE)
+    """)
+    
+    runner.run_idr_pipeline(['test11_multi_a', 'test11_multi_b'])
+    
+    # Check multi-identifier confidence (should be higher)
+    confidence = runner.collect_one("""
+        SELECT confidence_score FROM idr_out.identity_clusters_current
+        WHERE resolved_id LIKE 'test11_%' AND cluster_size > 1
+    """)
+    
+    edge_diversity = runner.collect_one("""
+        SELECT edge_diversity FROM idr_out.identity_clusters_current
+        WHERE resolved_id LIKE 'test11_%' AND cluster_size > 1
+    """)
+    
+    passed = confidence is not None and confidence > 0.7 and edge_diversity == 2
+    runner.add_test_result(
+        "Multi-Identifier → Higher Confidence",
+        passed,
+        f"confidence={confidence} (expected > 0.7), edge_diversity={edge_diversity} (expected=2)"
+    )
+
+
+def test_confidence_single_identifier(runner: TestRunner):
+    """Test: Cluster connected by only one identifier type should have lower confidence."""
+    print("\n🧪 Test 12: Single Identifier → Lower Confidence")
+    
+    # Two entities connected by email only
+    runner.q("""
+    CREATE TABLE crm.test12_single_a AS
+    SELECT 'SINGLE_A' AS entity_id, 'single_only@example.com' AS email, '1111111111' AS phone,
+           TIMESTAMP '2024-01-01' AS updated_at
+    """)
+    
+    runner.q("""
+    CREATE TABLE crm.test12_single_b AS
+    SELECT 'SINGLE_B' AS entity_id, 'single_only@example.com' AS email, '2222222222' AS phone,
+           TIMESTAMP '2024-01-02' AS updated_at
+    """)
+    
+    runner.q("""
+    INSERT INTO idr_meta.source_table VALUES
+        ('test12_single_a', 'crm.test12_single_a', 'PERSON', 'entity_id', 'updated_at', 0, TRUE),
+        ('test12_single_b', 'crm.test12_single_b', 'PERSON', 'entity_id', 'updated_at', 0, TRUE)
+    """)
+    
+    runner.q("""
+    INSERT INTO idr_meta.identifier_mapping VALUES
+        ('test12_single_a', 'EMAIL', 'email', FALSE),
+        ('test12_single_b', 'EMAIL', 'email', FALSE)
+    """)
+    
+    runner.run_idr_pipeline(['test12_single_a', 'test12_single_b'])
+    
+    # Check single-identifier confidence (should be lower than multi)
+    confidence = runner.collect_one("""
+        SELECT confidence_score FROM idr_out.identity_clusters_current
+        WHERE resolved_id LIKE 'test12_%' AND cluster_size > 1
+    """)
+    
+    edge_diversity = runner.collect_one("""
+        SELECT edge_diversity FROM idr_out.identity_clusters_current
+        WHERE resolved_id LIKE 'test12_%' AND cluster_size > 1
+    """)
+    
+    passed = confidence is not None and edge_diversity == 1
+    runner.add_test_result(
+        "Single Identifier → edge_diversity = 1",
+        passed,
+        f"confidence={confidence}, edge_diversity={edge_diversity} (expected=1)"
+    )
+
+
 # ============================================
 # MAIN
 # ============================================
@@ -1115,6 +1292,11 @@ def main():
         
         # Dry run tests
         test_dry_run_mode(runner)
+        
+        # Confidence scoring tests
+        test_confidence_singleton(runner)
+        test_confidence_multi_identifier(runner)
+        test_confidence_single_identifier(runner)
         
         # Print results
         all_passed = runner.print_results()

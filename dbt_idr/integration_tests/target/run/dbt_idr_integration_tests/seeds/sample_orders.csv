@@ -1,0 +1,13 @@
+
+    
+    
+    
+    create table "test_idr"."main"."sample_orders" ("order_id" varchar,"customer_email" varchar,"contact_phone" varchar,"order_date" varchar)
+  ;
+    -- dbt seed --
+    
+          COPY "test_idr"."main"."sample_orders" FROM '/Users/harihiom/Anil/Development/sql-identity-resolution/dbt_idr/integration_tests/seeds/sample_orders.csv' (FORMAT CSV, HEADER TRUE, DELIMITER ',')
+        
+
+;
+  

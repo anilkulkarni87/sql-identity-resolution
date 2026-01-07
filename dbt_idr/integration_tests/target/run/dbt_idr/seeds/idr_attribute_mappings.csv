@@ -1,0 +1,13 @@
+
+    
+    
+    
+    create table "test_idr"."main_idr_meta"."idr_attribute_mappings" ("source_id" text,"attribute_name" text,"column_expr" text,"description" text)
+  ;
+    -- dbt seed --
+    
+          COPY "test_idr"."main_idr_meta"."idr_attribute_mappings" FROM '/Users/harihiom/Anil/Development/sql-identity-resolution/dbt_idr/integration_tests/dbt_packages/dbt_idr/seeds/idr_attribute_mappings.csv' (FORMAT CSV, HEADER TRUE, DELIMITER ',')
+        
+
+;
+  
