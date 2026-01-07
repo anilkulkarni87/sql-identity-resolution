@@ -1,3 +1,11 @@
+---
+tags:
+  - schema
+  - ddl
+  - tables
+  - reference
+---
+
 # Schema Reference
 
 Complete DDL reference for all SQL Identity Resolution tables.
@@ -173,13 +181,49 @@ CREATE TABLE idr_out.identity_resolved_membership_current (
 );
 ```
 
+### identity_edges_current
+
+```sql
+CREATE TABLE idr_out.identity_edges_current (
+    rule_id VARCHAR NOT NULL,
+    left_entity_key VARCHAR NOT NULL,
+    right_entity_key VARCHAR NOT NULL,
+    identifier_type VARCHAR NOT NULL,
+    identifier_value_norm VARCHAR NOT NULL,
+    first_seen_ts TIMESTAMP NOT NULL,
+    last_seen_ts TIMESTAMP NOT NULL,
+    PRIMARY KEY (rule_id, left_entity_key, right_entity_key, identifier_type, identifier_value_norm)
+);
+```
+
+### rule_match_audit
+
+```sql
+CREATE TABLE idr_out.rule_match_audit (
+    run_id VARCHAR NOT NULL,
+    rule_id VARCHAR NOT NULL,
+    identifier_type VARCHAR NOT NULL,
+    edges_created INT NOT NULL,
+    entities_matched INT NOT NULL,
+    groups_processed INT NOT NULL,
+    groups_skipped INT DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (run_id, rule_id)
+);
+```
+
 ### identity_clusters_current
 
 ```sql
 CREATE TABLE idr_out.identity_clusters_current (
     resolved_id VARCHAR PRIMARY KEY,
     cluster_size INT NOT NULL,
-    updated_ts TIMESTAMP NOT NULL
+    updated_ts TIMESTAMP NOT NULL,
+    -- Confidence scoring columns
+    edge_diversity INT,              -- Number of distinct identifier types
+    match_density DECIMAL(5,4),      -- Ratio of actual to possible edges
+    confidence_score DECIMAL(5,4),   -- Weighted score (0.0-1.0)
+    primary_reason VARCHAR           -- Human-readable explanation
 );
 ```
 

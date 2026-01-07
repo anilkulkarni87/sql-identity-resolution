@@ -1,3 +1,12 @@
+---
+tags:
+  - dbt
+  - dbt-package
+  - cross-platform
+  - seeds
+  - models
+---
+
 # dbt Package Guide
 
 The `dbt_idr` package brings SQL Identity Resolution to your dbt workflow. It provides the same functionality as the platform-specific implementations but integrates natively with dbt's model-based approach.

@@ -2,9 +2,13 @@
 
 *And the $0 alternative for identity resolution*
 
+**Tags:** `identity-resolution` `cdp-alternative` `build-vs-buy` `tco` `data-warehouse`
+
+**Reading time:** 5 minutes
+
 ---
 
-A Customer Data Platform (CDP) is a powerful tool that can help businesses unify their customer data and gain insights into customer behavior. After looking at the articles in [cdpinstitute.org](https://www.cdpinstitute.org/) and working with platforms like Treasure Data, I've gained appreciation for both the value and the cost of these solutions.
+> **TL;DR:** CDP licenses cost $60K-$480K/year + implementation. Warehouse-native identity resolution costs ~$15/month in compute. 99% cheaper for the identity resolution capability alone. After looking at the articles in [cdpinstitute.org](https://www.cdpinstitute.org/) and working with platforms like Treasure Data, I've gained appreciation for both the value and the cost of these solutions.
 
 In this post, I want to break down the true cost of CDP implementation and present an alternative for teams focused primarily on identity resolution.
 
@@ -124,10 +128,22 @@ Key advantages:
 - **Audit-friendly** - Every decision traceable
 - **Extensible** - Modify matching rules as needed
 
+## Related Resources
+
+- [CDP Atlas Cost Calculator](https://cdpatlas.vercel.app/calculator) - Build vs Buy analysis tool
+- [CDP Atlas Maturity Assessment](https://cdpatlas.vercel.app/assessment) - Score your current CDP state
+
 ## Next Steps
 
 In the next post, I'll dive into the technical details of how label propagation creates identity clusters—the algorithm at the heart of the matching process.
 
 ---
 
-*This is post 4 of 8 in the series. If you like, please share with your friends. Questions? Reach out on [GitHub](https://github.com/anilkulkarni87/sql-identity-resolution).*
+*This is post 4 of 8 in the warehouse-native identity resolution series.*
+
+**Next:** [How Label Propagation Creates Identity Clusters](05_how_label_propagation_works.md)
+
+If you found this helpful:
+- ⭐ Star the [GitHub repo](https://github.com/anilkulkarni87/sql-identity-resolution)
+- 📖 Check out [CDP Atlas](https://cdpatlas.vercel.app/) for CDP evaluation tools
+- 💬 Questions? [Open an issue](https://github.com/anilkulkarni87/sql-identity-resolution/issues)

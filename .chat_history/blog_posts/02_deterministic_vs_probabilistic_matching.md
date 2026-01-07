@@ -2,9 +2,13 @@
 
 *When to use what for identity resolution*
 
+**Tags:** `identity-resolution` `deterministic-matching` `probabilistic-matching` `data-quality`
+
+**Reading time:** 4 minutes
+
 ---
 
-When implementing identity resolution, one of the first decisions you'll face is choosing between deterministic and probabilistic matching. After working on identity resolution projects, I've found that understanding when to use each approach is critical for success.
+> **TL;DR:** Deterministic matching uses exact identifier matches (email, phone) and is auditable. Probabilistic uses ML for fuzzy matching. Start with deterministic—it handles 60-80% of cases. After working on identity resolution projects, I've found that understanding when to use each approach is critical for success.
 
 In this post, I'll break down both approaches and share my perspective on when each makes sense.
 
@@ -40,6 +44,22 @@ The output includes confidence scores: "85% likely to be the same person."
 | **Setup Effort** | Low - define identifiers | High - requires training data |
 | **Coverage** | Lower - only exact matches | Higher - handles variations |
 | **Maintenance** | Minimal | Ongoing model tuning |
+
+## Decision Guide
+
+```mermaid
+flowchart TD
+    A[Start: Choose Matching Approach] --> B{Have quality email/phone?}
+    B -->|Yes| C{Need audit trail?}
+    B -->|No| D[Probabilistic]
+    C -->|Yes| E[Deterministic]
+    C -->|No| F{Have ML resources?}
+    F -->|Yes| D
+    F -->|No| E
+    
+    style E fill:#c8e6c9
+    style D fill:#fff3e0
+```
 
 ## When Deterministic Is Enough
 
@@ -104,4 +124,11 @@ In the next post, I'll walk through a complete Snowflake implementation of deter
 
 ---
 
-*This is post 2 of 8 in the warehouse-native identity resolution series. If you like, please share with your friends.*
+*This is post 2 of 8 in the warehouse-native identity resolution series.*
+
+**Next:** [Building Customer 360 in Snowflake with SQL](03_building_customer_360_in_snowflake.md)
+
+If you found this helpful:
+- ⭐ Star the [GitHub repo](https://github.com/anilkulkarni87/sql-identity-resolution)
+- 📖 Check out [CDP Atlas](https://cdpatlas.vercel.app/) for CDP evaluation tools
+- 💬 Questions? [Open an issue](https://github.com/anilkulkarni87/sql-identity-resolution/issues)

@@ -1,3 +1,15 @@
+---
+tags:
+  - identity-resolution
+  - customer-360
+  - cdp
+  - data-warehouse
+  - snowflake
+  - bigquery
+  - databricks
+  - duckdb
+---
+
 # SQL Identity Resolution
 
 **Production-grade deterministic identity resolution for modern data warehouses.**
@@ -20,13 +32,13 @@
 
     [:octicons-arrow-right-24: Production Guide](guides/production-hardening.md)
 
--   :material-code-tags:{ .lg .middle } **SQL-First**
+-   :material-code-tags:{ .lg .middle } **SQL-First & dbt Native**
 
     ---
 
-    Pure SQL execution—no Python runtime needed in production.
+    Pure SQL execution or use the dbt package for seamless integration.
 
-    [:octicons-arrow-right-24: Architecture](concepts/architecture.md)
+    [:octicons-arrow-right-24: dbt Package](guides/dbt-package.md)
 
 -   :material-lock-open:{ .lg .middle } **Open Source**
 
@@ -37,6 +49,13 @@
     [:octicons-arrow-right-24: GitHub](https://github.com/anilkulkarni87/sql-identity-resolution)
 
 </div>
+
+---
+
+## Why SQL Identity Resolution?
+
+!!! tip "Your data never leaves your warehouse"
+    Unlike SaaS solutions, SQL IDR runs entirely within your data platform. No data egress, no third-party processing, full compliance control.
 
 ---
 

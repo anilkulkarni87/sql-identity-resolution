@@ -2,9 +2,13 @@
 
 *Preview changes safely in production*
 
+**Tags:** `identity-resolution` `dry-run` `data-quality` `testing` `production`
+
+**Reading time:** 6 minutes
+
 ---
 
-Data quality is a nightmare when supporting multiple pipelines. Any change to identity resolution logic can have cascading effects—merging clusters that shouldn't be merged, splitting existing relationships, or creating unexpected mega-clusters.
+> **TL;DR:** Dry run mode runs all processing but doesn't commit changes. Review proposed clusters, catch giant merges from shared identifiers, and add exclusions before going live. Any change to identity resolution logic can have cascading effects—merging clusters that shouldn't be merged, splitting existing relationships, or creating unexpected mega-clusters.
 
 I built dry-run mode into sql-identity-resolution specifically to address this. In this post, I'll explain how it works and how to use it effectively.
 
@@ -170,4 +174,11 @@ In the next post, I'll compare open-source identity resolution tools—Zingg, De
 
 ---
 
-*This is post 6 of 8 in the series. Detailed dry-run documentation at [GitHub](https://anilkulkarni87.github.io/sql-identity-resolution/).*
+*This is post 6 of 8 in the warehouse-native identity resolution series.*
+
+**Next:** [Comparing Open Source Identity Resolution Tools](07_comparing_open_source_tools.md)
+
+If you found this helpful:
+- ⭐ Star the [GitHub repo](https://github.com/anilkulkarni87/sql-identity-resolution)
+- 📖 Check out [CDP Atlas](https://cdpatlas.vercel.app/) for CDP evaluation tools
+- 💬 Questions? [Open an issue](https://github.com/anilkulkarni87/sql-identity-resolution/issues)

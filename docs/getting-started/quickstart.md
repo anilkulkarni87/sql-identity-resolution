@@ -1,3 +1,11 @@
+---
+tags:
+  - getting-started
+  - quickstart
+  - tutorial
+  - setup
+---
+
 # Quick Start
 
 Get SQL Identity Resolution running in under 5 minutes.

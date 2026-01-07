@@ -2,7 +2,13 @@
 
 *The graph algorithm powering identity resolution*
 
+**Tags:** `identity-resolution` `label-propagation` `graph-algorithm` `sql` `clustering`
+
+**Reading time:** 6 minutes
+
 ---
+
+> **TL;DR:** Label propagation assigns each entity its own ID, then iteratively propagates the minimum ID through connected edges until all connected entities share the same cluster ID. Typically converges in 5-15 iterations.
 
 In previous posts, I covered what warehouse-native identity resolution is and how to implement it in Snowflake. Now let's dive into the technical heart of the system: **label propagation**.
 
@@ -21,6 +27,26 @@ We need to assign all connected nodes to the same cluster. This seems simple, bu
 ## What is Label Propagation?
 
 Label propagation is a semi-supervised graph algorithm. Here's the concept:
+
+```mermaid
+flowchart LR
+    subgraph "Iteration 1"
+        A1[A=A] --> B1[B=A]
+        B1 --> C1[C=B]
+    end
+    subgraph "Iteration 2"
+        A2[A=A] --> B2[B=A]
+        B2 --> C2[C=A]
+    end
+    subgraph "Final"
+        A3[A=A] --> B3[B=A]
+        B3 --> C3[C=A]
+    end
+    
+    style A3 fill:#c8e6c9
+    style B3 fill:#c8e6c9
+    style C3 fill:#c8e6c9
+```
 
 1. **Initialize** - Each node gets a unique label (its own ID)
 2. **Iterate** - Each node adopts the minimum label of itself and neighbors
@@ -193,4 +219,11 @@ In the next post, I'll cover dry-run mode—how to preview identity resolution c
 
 ---
 
-*This is post 5 of 8 in the series. Technical questions? Check the [documentation](https://anilkulkarni87.github.io/sql-identity-resolution/) or open an issue on [GitHub](https://github.com/anilkulkarni87/sql-identity-resolution).*
+*This is post 5 of 8 in the warehouse-native identity resolution series.*
+
+**Next:** [Dry Run Your Identity Resolution Before Committing](06_dry_run_mode_explained.md)
+
+If you found this helpful:
+- ⭐ Star the [GitHub repo](https://github.com/anilkulkarni87/sql-identity-resolution)
+- 📖 Check out [CDP Atlas](https://cdpatlas.vercel.app/) for CDP evaluation tools
+- 💬 Questions? [Open an issue](https://github.com/anilkulkarni87/sql-identity-resolution/issues)

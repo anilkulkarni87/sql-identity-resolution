@@ -2,9 +2,13 @@
 
 *A practical walkthrough using sql-identity-resolution*
 
+**Tags:** `identity-resolution` `customer-360` `snowflake` `sql` `tutorial`
+
+**Reading time:** 7 minutes
+
 ---
 
-In the first two posts, I introduced warehouse-native identity resolution and compared deterministic vs probabilistic matching. Now let's get practical—building a Customer 360 view in Snowflake from scratch.
+> **TL;DR:** Register source tables, configure identifier mappings, run a dry run, then commit. Complete Snowflake setup in 30 minutes with DDL scripts provided. Now let's get practical—building a Customer 360 view in Snowflake from scratch.
 
 The documentation for sql-identity-resolution can be found [here](https://anilkulkarni87.github.io/sql-identity-resolution/). Below are the generalized steps.
 
@@ -174,4 +178,11 @@ In the next post, I'll cover the hidden costs of traditional CDPs and the cost c
 
 ---
 
-*This is post 3 of 8 in the warehouse-native identity resolution series. Code and documentation available at [GitHub](https://github.com/anilkulkarni87/sql-identity-resolution).*
+*This is post 3 of 8 in the warehouse-native identity resolution series.*
+
+**Next:** [The Hidden Cost of CDPs](04_hidden_cost_of_cdps.md)
+
+If you found this helpful:
+- ⭐ Star the [GitHub repo](https://github.com/anilkulkarni87/sql-identity-resolution)
+- 📖 Check out [CDP Atlas](https://cdpatlas.vercel.app/) for CDP evaluation tools
+- 💬 Questions? [Open an issue](https://github.com/anilkulkarni87/sql-identity-resolution/issues)

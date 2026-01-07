@@ -1,3 +1,11 @@
+---
+tags:
+  - dry-run
+  - preview
+  - testing
+  - validation
+---
+
 # Dry Run Mode
 
 Preview the impact of identity resolution changes before committing to production.

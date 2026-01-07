@@ -2,9 +2,13 @@
 
 *Building Customer 360 without the CDP price tag*
 
+**Tags:** `identity-resolution` `customer-360` `cdp-alternative` `data-warehouse` `sql`
+
+**Reading time:** 5 minutes
+
 ---
 
-Identity resolution is an important part of collecting and combining customer data. It helps businesses create a complete view of each customer by matching and merging information from different sources. After working with CDPs like Treasure Data and similar platforms, I've come to appreciate how critical this capability is—but also how inaccessible it can be for many teams.
+> **TL;DR:** Warehouse-native identity resolution runs matching logic inside your existing data warehouse (Snowflake, BigQuery, Databricks) instead of an external CDP. It's 99% cheaper, fully transparent, and you control the logic. It helps businesses create a complete view of each customer by matching and merging information from different sources. After working with CDPs like Treasure Data and similar platforms, I've come to appreciate how critical this capability is—but also how inaccessible it can be for many teams.
 
 In the coming weeks, I intend to write about an alternative approach: **warehouse-native identity resolution**. This post introduces the concept and sets the foundation for deeper technical dives.
 
@@ -36,6 +40,17 @@ Here's how I think about the key differences:
 ## How It Works
 
 The technical approach involves four main components:
+
+```mermaid
+flowchart LR
+    A[Source Tables] --> B[Entity Extraction]
+    B --> C[Edge Building]
+    C --> D[Label Propagation]
+    D --> E[Golden Profiles]
+    
+    style A fill:#e1f5fe
+    style E fill:#c8e6c9
+```
 
 1. **Entity Extraction** - Pull identifiers (email, phone, loyalty ID) from source tables
 2. **Edge Building** - Create links between entities sharing common identifiers  
@@ -112,6 +127,18 @@ This is the first post in a series on warehouse-native identity resolution:
 
 In conclusion, warehouse-native identity resolution is a powerful approach for businesses that want to gain a deeper understanding of their customers without the CDP price tag. It works best when you have deterministic identifiers and a team comfortable with SQL.
 
+## Related Resources
+
+- [CDP Atlas Interactive Map](https://cdpatlas.vercel.app/map) - Explore the 7 CDP primitives visually
+- [CDP Atlas Patterns](https://cdpatlas.vercel.app/patterns) - Architecture patterns for customer data
+
 ---
 
-*If you like, please share with your friends. Questions or feedback? Reach out on [GitHub](https://github.com/anilkulkarni87/sql-identity-resolution).*
+*This is post 1 of 8 in the warehouse-native identity resolution series.*
+
+**Next:** [Deterministic vs Probabilistic Matching](02_deterministic_vs_probabilistic_matching.md)
+
+If you found this helpful:
+- ⭐ Star the [GitHub repo](https://github.com/anilkulkarni87/sql-identity-resolution)
+- 📖 Check out [CDP Atlas](https://cdpatlas.vercel.app/) for CDP evaluation tools
+- 💬 Questions? [Open an issue](https://github.com/anilkulkarni87/sql-identity-resolution/issues)

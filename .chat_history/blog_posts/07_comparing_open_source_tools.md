@@ -2,9 +2,13 @@
 
 *Zingg vs Dedupe vs sql-identity-resolution*
 
+**Tags:** `identity-resolution` `open-source` `zingg` `dedupe` `comparison`
+
+**Reading time:** 6 minutes
+
 ---
 
-After working with customer data platforms and building [CDP Atlas](https://cdpatlas.vercel.app/) to help teams evaluate CDP solutions, one question comes up frequently: "Which open-source identity resolution tool should I use?"
+> **TL;DR:** Zingg (Spark/ML) for 100M+ records with fuzzy matching. Dedupe (Python/ML) for experimentation. sql-identity-resolution (SQL) for warehouse-native deterministic matching with audit trail.
 
 In this post, I'll compare the three main options and share my perspective on when each makes sense.
 
@@ -170,4 +174,11 @@ If you're evaluating identity resolution as part of a CDP initiative, check out 
 
 ---
 
-*This is post 7 of 8 in the series. Have questions? Open an issue on [GitHub](https://github.com/anilkulkarni87/sql-identity-resolution).*
+*This is post 7 of 8 in the warehouse-native identity resolution series.*
+
+**Next:** [From Zero to Customer 360 in 60 Minutes](08_zero_to_customer_360_tutorial.md)
+
+If you found this helpful:
+- ⭐ Star the [GitHub repo](https://github.com/anilkulkarni87/sql-identity-resolution)
+- 📖 Check out [CDP Atlas](https://cdpatlas.vercel.app/) for CDP evaluation tools
+- 💬 Questions? [Open an issue](https://github.com/anilkulkarni87/sql-identity-resolution/issues)

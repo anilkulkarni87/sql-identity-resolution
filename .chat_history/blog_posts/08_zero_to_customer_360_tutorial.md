@@ -2,9 +2,13 @@
 
 *Complete hands-on tutorial*
 
+**Tags:** `identity-resolution` `customer-360` `tutorial` `duckdb` `hands-on`
+
+**Reading time:** 10 minutes
+
 ---
 
-In this final post of the series, I'm providing a complete end-to-end tutorial. By the end, you'll have working identity resolution with unified customer profiles.
+> **TL;DR:** Clone repo → `pip install duckdb` → `make demo` → View results. Full setup with custom data in 60 minutes. By the end, you'll have working identity resolution with unified customer profiles.
 
 The documentation for sql-identity-resolution can be found [here](https://anilkulkarni87.github.io/sql-identity-resolution/). This tutorial follows the DuckDB path (no cloud account needed) but the concepts apply to all platforms.
 

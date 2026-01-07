@@ -35,6 +35,7 @@ theme:
 plugins:
   - search
   - mermaid2
+  - tags
 
 markdown_extensions:
   - pymdownx.highlight:
@@ -62,6 +63,7 @@ nav:
   - Getting Started:
     - Overview: getting-started/overview.md
     - Quick Start: getting-started/quickstart.md
+    - FAQ: getting-started/faq.md
     - Platform Setup:
       - DuckDB: getting-started/platforms/duckdb.md
       - Snowflake: getting-started/platforms/snowflake.md
@@ -74,13 +76,15 @@ nav:
     - Data Model: concepts/data-model.md
     - Cluster Sizing: cluster_sizing.md
   - Guides:
-    - Configuration: guides/configuration.md
-    - Metadata Configuration: metadata_configuration.md
+    - Configuration:
+      - Overview: guides/configuration.md
+      - Metadata Tables: metadata_configuration.md
     - dbt Package: guides/dbt-package.md
     - Dry Run Mode: guides/dry-run-mode.md
+    - "Example: Customer Unification": guides/example-customer-unification.md
     - Metrics & Monitoring: guides/metrics-monitoring.md
-    - Scale Considerations: scale_considerations.md
     - Production Hardening: guides/production-hardening.md
+    - Scale Considerations: scale_considerations.md
     - Troubleshooting: guides/troubleshooting.md
   - Deployment:
     - DuckDB: guides/production-duckdb.md
